@@ -12,6 +12,7 @@ COPY requirements.txt ./app/
 COPY entrypoint.sh ./app/
 COPY nginx/ ./app/nginx/
 COPY bildungsplattform/ ./app/bildungsplattform/
+COPY core/ ./app/core/
 
 COPY manage.py ./app/
 

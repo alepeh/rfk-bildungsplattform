@@ -42,7 +42,8 @@ CSRF_TRUSTED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    'core.apps.CoreConfig',
+    'bildungsplattform.apps.BildungsplattformAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
