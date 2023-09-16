@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -150,3 +151,9 @@ STATIC_ROOT = '/www/data/static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# django-extensions (generate diagrams for all applications)
+GRAPH_MODELS = {
+    'app_labels': ["core"],
+    'group_models': True,
+}
