@@ -16,8 +16,10 @@ class FunktionAdmin(admin.ModelAdmin):
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('nachname', 'vorname', 'funktion', 'erfuelltMindestanforderung')
 
-    def erfuelltMindestanforderung(self):
+    def erfuelltMindestanforderung(self, obj):
             return False
+
+    erfuelltMindestanforderung.boolean = True
 
 class SchulungsTerminAdmin(admin.ModelAdmin):
     list_display = ('schulung', 'datum')
