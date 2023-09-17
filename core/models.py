@@ -5,18 +5,50 @@ from django.contrib.auth.models import User
 class SchulungsArt(models.Model):
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return str(self.name)
+
+    class Meta:
+        verbose_name_plural = "Schulungsarten"
+
+class SchulungsOrt(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return str(self.name)
+
+    class Meta:
+        verbose_name_plural = "Schulungsorte"
 
 class Schulung(models.Model):
     name = models.CharField(max_length=100)
     art = models.OneToOneField(to=SchulungsArt, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return str(self.name)
+
+    class Meta:
+        verbose_name_plural = "Schulungen"
+
+
+class SchulungsTermin(models.Model):
+    datum = models.DateTimeField()
+    beschreibung = models.TextField(max_length=200)
+    ort = models.OneToOneField(to=SchulungsOrt, on_delete=models.DO_NOTHING)
+    schulung = models.OneToOneField(to=Schulung, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.datum)
+
+    class Meta:
+        verbose_name_plural = "Schulungstermine"
 
 class Funktion(models.Model):
     name = models.CharField(max_length=100)
     schulungsanforderung = models.ManyToManyField(
-        Schulung,
-        through='FunktionSchulung',
-        through_fields=('funktion', 'schulung'),
+        SchulungsArt,
+        through='SchulungsArtFunktion',
+        through_fields=('funktion', 'schulungsart'),
     )
     def __str__(self):
         return str(self.name)
@@ -52,8 +84,15 @@ class Betrieb(models.Model):
         verbose_name_plural = "betriebe"
 
 
-class FunktionSchulung(models.Model):
-    schulung = models.OneToOneField(to=Schulung, on_delete=models.CASCADE)
+class SchulungsArtFunktion(models.Model):
+    schulungsart = models.OneToOneField(to=SchulungsArt, on_delete=models.CASCADE)
     funktion = models.OneToOneField(to=Funktion, on_delete=models.CASCADE)
     intervall = models.IntegerField()
+
+    def __str__(self):
+        return str(self.name)
+
+    class Meta:
+        verbose_name = "Schulungsmindestanforderung"
+        verbose_name_plural = "Schulungsmindestanforderung"
 
