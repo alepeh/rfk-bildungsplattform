@@ -2,6 +2,10 @@ from django.contrib import admin
 from core.models import Funktion, Person, Schulung, SchulungsArt, Betrieb, SchulungsArtFunktion, SchulungsTermin, \
     SchulungsOrt
 
+class PersonInline(admin.TabularInline):
+    model = Person
+    extra = 0
+    show_change_link = True
 
 class SchulungsArtFunktionInline(admin.TabularInline):
     model = SchulungsArtFunktion
@@ -15,6 +19,7 @@ class FunktionAdmin(admin.ModelAdmin):
 
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('nachname', 'vorname', 'funktion', 'erfuelltMindestanforderung')
+    list_filter = ('betrieb',)
 
     def erfuelltMindestanforderung(self, obj):
             return False
@@ -24,11 +29,13 @@ class PersonAdmin(admin.ModelAdmin):
 class SchulungsTerminAdmin(admin.ModelAdmin):
     list_display = ('schulung', 'datum')
 
+class BetriebAdmin(admin.ModelAdmin):
+    inlines = [PersonInline,]
 
 admin.site.register(Funktion, FunktionAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Schulung)
 admin.site.register(SchulungsArt)
-admin.site.register(Betrieb)
+admin.site.register(Betrieb, BetriebAdmin)
 admin.site.register(SchulungsOrt)
 admin.site.register(SchulungsTermin, SchulungsTerminAdmin)
