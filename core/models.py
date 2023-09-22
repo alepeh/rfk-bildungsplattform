@@ -22,7 +22,8 @@ class SchulungsOrt(models.Model):
 
 class Schulung(models.Model):
     name = models.CharField(max_length=100)
-    art = models.OneToOneField(to=SchulungsArt, on_delete=models.CASCADE)
+    beschreibung = models.TextField(max_length=200)
+    art = models.ForeignKey(to=SchulungsArt, on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.name)
@@ -33,9 +34,9 @@ class Schulung(models.Model):
 
 class SchulungsTermin(models.Model):
     datum = models.DateTimeField()
-    beschreibung = models.TextField(max_length=200)
     ort = models.OneToOneField(to=SchulungsOrt, on_delete=models.DO_NOTHING)
     schulung = models.ForeignKey(to=Schulung, on_delete=models.CASCADE)
+    max_teilnehmer = models.IntegerField(default=0, verbose_name="Maximale Teilnehmeranzahl")
 
     def __str__(self):
         return str(self.datum)
