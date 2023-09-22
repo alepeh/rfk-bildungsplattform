@@ -1,3 +1,11 @@
-from django.shortcuts import render
+from django.http import HttpResponse
+from django.template import loader
+from core.models import SchulungsTermin
 
-# Create your views here.
+def index(request):
+    schulungstermine = SchulungsTermin.objects.order_by("datum")
+    template = loader.get_template("home/index.html")
+    context = {
+        "schulungstermine": schulungstermine,
+    }
+    return HttpResponse(template.render(context, request))

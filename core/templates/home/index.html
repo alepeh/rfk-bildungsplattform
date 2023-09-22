@@ -1,0 +1,9 @@
+{% if schulungstermine %}
+<ul>
+    {% for schulungstermin in schulungstermine %}
+    <li><a href="/admin/core/schulungstermin/{{ schulungstermin.id }}/">{{ schulungstermin }}</a></li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Keine Schulungen verfügbar!</p>
+{% endif %}
