@@ -9,3 +9,7 @@ def index(request):
         "schulungstermine": schulungstermine,
     }
     return HttpResponse(template.render(context, request))
+
+def login(request):
+    template = loader.get_template("home/login.html")
+    return HttpResponse(template.render())

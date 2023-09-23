@@ -1,35 +1,18 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{% block title %}{% endblock %}</title>
-    {% load bootstrap5 %}
-    {% load static %}
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
-</head>
-<body>
-<nav class="navbar navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-            <img src="{% static 'logo_rfk.png' %}" width="200" height="62" class="d-inline-block align-text-center">
-            Bildungsplattform der burgenländischen Rauchfangkehrer
-        </a>
-    </div>
-</nav>
+{% extends "../components/base.html" %}
+{% block content %}
 {% if schulungstermine %}
 
-    {% for schulungstermin in schulungstermine %}
-    <div class="card">
-        <h5 class="card-header">{{ schulungstermin.schulung }}</h5>
-        <div class="card-body">
-            <h5 class="card-title">{{ schulungstermin.datum|date:"b d, Y" }}</h5>
-            <p class="card-text">{{ schulungstermin.beschreibung }}</p>
-            <a href="/admin/core/schulungstermin/{{ schulungstermin.id }}/" class="btn btn-primary">Anmelden</a>
-        </div>
+{% for schulungstermin in schulungstermine %}
+<div class="card">
+    <h5 class="card-header">{{ schulungstermin.schulung }}</h5>
+    <div class="card-body">
+        <h5 class="card-title">{{ schulungstermin.datum|date:"b d, Y" }}</h5>
+        <p class="card-text">{{ schulungstermin.beschreibung }}</p>
+        <a href="/admin/core/schulungstermin/{{ schulungstermin.id }}/" class="btn btn-primary">Anmelden</a>
     </div>
-    {% endfor %}
+</div>
+{% endfor %}
 {% else %}
 <p>Keine Schulungen verfügbar!</p>
 {% endif %}
-</body>
-</html>
+{% endblock content %}

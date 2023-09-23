@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    {% load bootstrap5 %}
+    {% load static %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+</head>
+<body>
+<nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'logo_rfk.png' %}" width="200" height="62" class="d-inline-block align-text-center">
+            Bildungsplattform der burgenländischen Rauchfangkehrer
+        </a>
+        <span class="nav-item">
+            <a class="nav-link" href="/login" >Login</a>
+        </span>
+    </div>
+</nav>
+{% block content %}
+{% endblock content %}
+</body>
+</html>
