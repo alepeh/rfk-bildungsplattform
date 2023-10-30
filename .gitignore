@@ -232,3 +232,6 @@ fabric.properties
 
 #temporary files
 tmp
+
+# macosx
+.DS_Store
