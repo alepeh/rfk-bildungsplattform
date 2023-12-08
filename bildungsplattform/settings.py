@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'storages',
     'bootstrap5',
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
@@ -126,7 +127,9 @@ if 'test' in sys.argv or 'test_coverage' in sys.argv:
 
 # To upload your media files to S3 set
 STORAGES = {
-    "default": "storages.backends.s3boto3.S3Boto3Storage",
+    "default": {
+        "BACKEND" : "storages.backends.s3boto3.S3Boto3Storage"
+    },
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
