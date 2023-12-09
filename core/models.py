@@ -1,6 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from wagtail.models import Page
+from wagtail.fields import RichTextField
+from wagtail.admin.panels import FieldPanel
+
+
+class SchulungIndexPage(Page):
+    intro = RichTextField(blank=True)
+
+    content_panels = Page.content_panels + [
+        FieldPanel('intro')
+    ]
+
 
 class SchulungsArt(models.Model):
     name = models.CharField(max_length=100)
