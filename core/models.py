@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from wagtail.models import Page
 from wagtail.fields import RichTextField
 from wagtail.admin.panels import FieldPanel
+from wagtail.search import index
+
 
 
 class SchulungIndexPage(Page):
@@ -11,6 +13,22 @@ class SchulungIndexPage(Page):
 
     content_panels = Page.content_panels + [
         FieldPanel('intro')
+    ]
+
+class SchulungPage(Page):
+    date = models.DateField("Schulungsdatum")
+    intro = models.CharField(max_length=250)
+    body = RichTextField(blank=True)
+
+    search_fields = Page.search_fields + [
+        index.SearchField('intro'),
+        index.SearchField('body'),
+    ]
+
+    content_panels = Page.content_panels + [
+        FieldPanel('date'),
+        FieldPanel('intro'),
+        FieldPanel('body'),
     ]
 
 

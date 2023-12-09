@@ -20,7 +20,7 @@ load_dotenv()
 #BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
-
+WAGTAILADMIN_BASE_URL= os.getenv('WAGTAILADMIN_BASE_URL')
 
 
 # Quick-start development settings - unsuitable for production
