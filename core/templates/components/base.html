@@ -22,7 +22,11 @@
                 <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="services.html">Services</a></li>
             </ul>
-            <a class="btn btn-primary shadow" role="button" href="login">Login</a>
+            {% if user.is_authenticated %}
+            Hi {{ user.username }}! <a href="{% url 'logout' %}">Log Out</a>
+            {% else %}
+            <a href="{% url 'login' %}">Log In</a>
+            {% endif %}
         </div>
     </div>
 </nav>

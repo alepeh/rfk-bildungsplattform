@@ -153,6 +153,10 @@ STATIC_ROOT = '/www/data/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+
+
 # django-extensions (generate diagrams for all applications)
 GRAPH_MODELS = {
     'app_labels': ["core"],
