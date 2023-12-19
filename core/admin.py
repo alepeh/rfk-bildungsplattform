@@ -1,5 +1,5 @@
 from django.contrib import admin
-from core.models import Funktion, Person, SchulungsArt, Betrieb, SchulungPage, SchulungPerson
+from core.models import Funktion, Person, SchulungsArt, Betrieb, Schulung, SchulungPerson
 
 
 class PersonInline(admin.TabularInline):
@@ -9,7 +9,7 @@ class PersonInline(admin.TabularInline):
 
 
 class SchulungAdmin(admin.ModelAdmin):
-    model = SchulungPage
+    model = Schulung
 
 class SchulungsTerminPersonInline(admin.TabularInline):
     model = SchulungPerson
@@ -39,6 +39,7 @@ class BetriebAdmin(admin.ModelAdmin):
 
 admin.site.register(Funktion, FunktionAdmin)
 admin.site.register(Person, PersonAdmin)
-admin.site.register(SchulungPage, SchulungAdmin)
+admin.site.register(Schulung, SchulungAdmin)
 admin.site.register(SchulungsArt)
 admin.site.register(Betrieb, BetriebAdmin)
+admin.site.register(SchulungPerson)

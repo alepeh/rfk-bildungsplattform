@@ -39,3 +39,11 @@ Set the media url to the custom s3 domain in settings.py
 ```
 MEDIA_URL = AWS_S3_CUSTOM_DOMAIN
 ```
+
+## Adding content
+
+### Pages and Page templates
+Each page is represented as a Django model and therefore also as a table in the database.
+You can use any django field class, also from 3rd party apps.
+
+

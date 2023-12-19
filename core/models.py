@@ -1,9 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from wagtail.models import Page
+from modelcluster.fields import ParentalKey
+from wagtail.models import Page, Orderable
 from wagtail.fields import RichTextField
-from wagtail.admin.panels import FieldPanel
+from wagtail.admin.panels import FieldPanel, InlinePanel
 from wagtail.search import index
 from wagtail.snippets.models import register_snippet
 
@@ -22,14 +23,16 @@ class SchulungsArt(models.Model):
     class Meta:
         verbose_name_plural = "Schulungsarten"
 
-class SchulungIndexPage(Page):
+class SchulungIndex(Page):
     intro = RichTextField(blank=True)
 
     content_panels = Page.content_panels + [
         FieldPanel('intro')
     ]
 
-class SchulungPage(Page):
+    subpage_types = ['Schulung',]
+
+class Schulung(Page):
     date = models.DateField("Schulungsdatum")
     intro = models.CharField(max_length=250)
     body = RichTextField(blank=True)
@@ -47,9 +50,12 @@ class SchulungPage(Page):
         FieldPanel('body'),
         FieldPanel('art'),
         FieldPanel('max_teilnehmer'),
+        InlinePanel('teilnehmer', label="Teilnehmer"),
     ]
 
+    subpage_types = []
 
+@register_snippet
 class Funktion(models.Model):
     name = models.CharField(max_length=100)
 
@@ -60,7 +66,7 @@ class Funktion(models.Model):
         ordering = ['name']
         verbose_name_plural = "funktionen"
 
-
+@register_snippet
 class Betrieb(models.Model):
     name = models.CharField(max_length=100)
 
@@ -71,7 +77,7 @@ class Betrieb(models.Model):
         ordering = ['name']
         verbose_name_plural = "betriebe"
 
-
+@register_snippet
 class Person(models.Model):
     benutzer = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     vorname = models.CharField(max_length=150)
@@ -86,8 +92,8 @@ class Person(models.Model):
         verbose_name_plural = "personen"
 
 
-class SchulungPerson(models.Model):
-    schulungstermin = models.ForeignKey(to=SchulungPage, on_delete=models.CASCADE)
+class SchulungPerson(Orderable):
+    schulung = ParentalKey(Schulung, on_delete=models.CASCADE, related_name='teilnehmer')
     person = models.ForeignKey(to=Person, on_delete=models.CASCADE)
     STATUS_CHOICES = [
         ('Angemeldet', 'Angemeldet'),
@@ -100,6 +106,11 @@ class SchulungPerson(models.Model):
         choices=STATUS_CHOICES,
         default='Angemeldet',
     )
+
+    panels = [
+        FieldPanel('schulung'),
+        FieldPanel('person'),
+    ]
 
     class Meta:
         verbose_name = "Teilnehmer"
