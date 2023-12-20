@@ -1,0 +1,17 @@
+{% extends "../components/base.html" %}
+{% block content %}
+{% if person %}
+{{ person.vorname }}
+<table>
+{% for ma in mitarbeiter %}
+<tr>
+    <td>{{ ma.vorname }}</td>
+    <td>{{ ma.nachname }}</td>
+    <td><input type="checkbox"></td>
+</tr>
+{% endfor %}
+</table>
+{% else %}
+<p>No user found</p>
+{% endif %}
+{% endblock content %}

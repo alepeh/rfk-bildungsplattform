@@ -9,7 +9,7 @@
         <h5 class="card-title">{{ schulungstermin.datum|date:"b d, Y" }}</h5>
         <p class="card-text">{{ schulungstermin.beschreibung }}</p>
         {% if user.is_authenticated %}
-        <a href="/admin/core/schulungstermin/{{ schulungstermin.id }}/">Teilnehmen</a>
+        <a href="/register/{{ schulungstermin.id }}/">Teilnehmen</a>
         {% else %}
         <a href="{% url 'login' %}">Anmelden</a>
         {% endif %}

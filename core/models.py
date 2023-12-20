@@ -117,3 +117,6 @@ class SchulungsArtFunktion(models.Model):
         verbose_name = "Schulungsmindestanforderung"
         verbose_name_plural = "Schulungsmindestanforderung"
 
+class PersonBetrieb(models.Model):
+    inhaber = models.ForeignKey(to=Person, on_delete=models.DO_NOTHING)
+    betrieb = models.ForeignKey(to=Betrieb, on_delete=models.DO_NOTHING)
