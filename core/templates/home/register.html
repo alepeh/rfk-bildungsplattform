@@ -1,16 +1,25 @@
 {% extends "../components/base.html" %}
 {% block content %}
 {% if person %}
-{{ person.vorname }}
-<table>
-{% for ma in mitarbeiter %}
-<tr>
-    <td>{{ ma.vorname }}</td>
-    <td>{{ ma.nachname }}</td>
-    <td><input type="checkbox"></td>
-</tr>
-{% endfor %}
-</table>
+<form method="post">
+    {% csrf_token %}
+    <table>
+        {% for ma in mitarbeiter %}
+        <input name=ma_{{ma.id}} type="hidden" value={{ma.id}}>
+        <tr>
+            <td>{{ ma.vorname }}</td>
+            <td>{{ ma.nachname }}</td>
+            {% if ma.id  in teilnehmer %}
+            <td><input name=cb_{{ma.id}} type="checkbox" checked></td>
+            {% else %}
+            <td><input name=cb_{{ma.id}} type="checkbox"></td>
+            {% endif %}
+
+        </tr>
+        {% endfor %}
+    </table>
+    <input type="submit">
+</form>
 {% else %}
 <p>No user found</p>
 {% endif %}
