@@ -3,22 +3,26 @@
 {% if person %}
 <form method="post">
     {% csrf_token %}
-    <table>
-        {% for ma in mitarbeiter %}
-        <input name=ma_{{ma.id}} type="hidden" value={{ma.id}}>
-        <tr>
-            <td>{{ ma.vorname }}</td>
-            <td>{{ ma.nachname }}</td>
-            {% if ma.id  in teilnehmer %}
-            <td><input name=cb_{{ma.id}} type="checkbox" checked></td>
-            {% else %}
-            <td><input name=cb_{{ma.id}} type="checkbox"></td>
-            {% endif %}
-
-        </tr>
-        {% endfor %}
-    </table>
-    <input type="submit">
+    <div class="card" style="width: 18rem;">
+        <div class="card-header">
+            Melde dich und deine Mitarbeiter für diese Schulung an
+        </div>
+        <ul class="list-group list-group-flush">
+            {% for ma in mitarbeiter %}
+            <li class="list-group-item">
+                {% if ma.id  in teilnehmer %}
+                    <input name=cb_{{ma.id}} class="form-check-input me-1" type="checkbox" checked>
+                {% else %}
+                    <input name=cb_{{ma.id}} class="form-check-input me-1" type="checkbox">
+                {% endif %}
+                {{ ma.vorname }} {{ ma.nachname }}
+            </li>
+            <input name=ma_{{ma.id}} type="hidden" value={{ma.id}}>
+            {% endfor %}
+        </ul>
+    </div>
+    <input class="btn btn-primary" type="submit" value="Speichern">
+    <a href="/">Zurück zu den Schulungen</a>
 </form>
 {% else %}
 <p>No user found</p>

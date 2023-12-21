@@ -38,6 +38,10 @@ class SchulungsTermin(models.Model):
     schulung = models.ForeignKey(to=Schulung, on_delete=models.CASCADE)
     max_teilnehmer = models.IntegerField(default=0, verbose_name="Maximale Teilnehmeranzahl")
 
+    @property
+    def freie_plaetze(self):
+        return self.max_teilnehmer - self.schulungsterminperson_set.count()
+
     def __str__(self):
         return str(self.datum)
 

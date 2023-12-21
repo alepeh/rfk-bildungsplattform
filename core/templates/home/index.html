@@ -1,22 +1,31 @@
 {% extends "../components/base.html" %}
 {% block content %}
+<div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h4>Herzlich Willkommen auf der Bildungsplattform der burgenländischen Rauchfangkehrer!
+    </h4>
+    <p class="lead">Hier könnt ihr euch direkt für einige bereits geplante Schulungen anmelden.</p>
+</div>
+<div class='container'>
 {% if schulungstermine %}
-
 {% for schulungstermin in schulungstermine %}
 <div class="card">
-    <h5 class="card-header">{{ schulungstermin.schulung }}</h5>
+    <div class="card-header">{{ schulungstermin.schulung }}</div>
     <div class="card-body">
         <h5 class="card-title">{{ schulungstermin.datum|date:"b d, Y" }}</h5>
         <p class="card-text">{{ schulungstermin.beschreibung }}</p>
         {% if user.is_authenticated %}
-        <a href="/register/{{ schulungstermin.id }}/">Teilnehmen</a>
+        <a href="/register/{{ schulungstermin.id }}/" class="btn btn-primary">Teilnehmen</a>
         {% else %}
-        <a href="{% url 'login' %}">Anmelden</a>
+        <a href="{% url 'login' %}">Einloggen</a>
         {% endif %}
+    </div>
+    <div class="card-footer text-muted">
+        <p class="card-text">{{ schulungstermin.freie_plaetze }} Freie Plätze</p>
     </div>
 </div>
 {% endfor %}
 {% else %}
 <p>Keine Schulungen verfügbar!</p>
 {% endif %}
+</div>
 {% endblock content %}
