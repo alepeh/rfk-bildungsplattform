@@ -102,8 +102,8 @@ class Person(models.Model):
 
 
 class SchulungsTerminPerson(models.Model):
-    schulungstermin = models.ForeignKey(to=SchulungsTermin, on_delete=models.CASCADE)
-    person = models.ForeignKey(to=Person, on_delete=models.CASCADE)
+    schulungstermin = models.ForeignKey(to=SchulungsTermin, on_delete=models.DO_NOTHING)
+    person = models.ForeignKey(to=Person, on_delete=models.DO_NOTHING)
     STATUS_CHOICES = [
         ('Angemeldet', 'Angemeldet'),
         ('Teilgenommen', 'Teilgenommen'),
@@ -122,17 +122,21 @@ class SchulungsTerminPerson(models.Model):
 
 
 class SchulungsArtFunktion(models.Model):
-    schulungsart = models.ForeignKey(to=SchulungsArt, on_delete=models.CASCADE)
-    funktion = models.ForeignKey(to=Funktion, on_delete=models.CASCADE)
+    schulungsart = models.ForeignKey(to=SchulungsArt, on_delete=models.DO_NOTHING)
+    funktion = models.ForeignKey(to=Funktion, on_delete=models.DO_NOTHING)
     intervall = models.IntegerField()
 
     def __str__(self):
-        return str(self.name)
+        return self.schulungsart.name
 
     class Meta:
         verbose_name = "Schulungsmindestanforderung"
         verbose_name_plural = "Schulungsmindestanforderung"
 
 class PersonBetrieb(models.Model):
-    inhaber = models.ForeignKey(to=Person, on_delete=models.DO_NOTHING)
+    inhaber = models.ForeignKey(to=Person, on_delete=models.DO_NOTHING, related_name="Betriebsinhaber")
     betrieb = models.ForeignKey(to=Betrieb, on_delete=models.DO_NOTHING)
+
+    class Meta:
+        verbose_name = "Betriebsinhaber"
+        verbose_name_plural = "Betriebsinhaber"

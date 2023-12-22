@@ -31,6 +31,7 @@ class FunktionAdmin(admin.ModelAdmin):
 
 class PersonBetriebInline(admin.TabularInline):
     model = PersonBetrieb
+    extra = 1
 
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('nachname', 'vorname', 'funktion', 'erfuelltMindestanforderung')
