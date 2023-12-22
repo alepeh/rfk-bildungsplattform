@@ -34,7 +34,7 @@ class Schulung(models.Model):
 
 class SchulungsTermin(models.Model):
     datum = models.DateTimeField()
-    ort = models.OneToOneField(to=SchulungsOrt, on_delete=models.DO_NOTHING)
+    ort = models.ForeignKey(to=SchulungsOrt, on_delete=models.DO_NOTHING, null=True, blank=True)
     schulung = models.ForeignKey(to=Schulung, on_delete=models.CASCADE)
     max_teilnehmer = models.IntegerField(default=0, verbose_name="Maximale Teilnehmeranzahl")
 
