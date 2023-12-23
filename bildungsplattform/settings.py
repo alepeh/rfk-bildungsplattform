@@ -37,7 +37,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'https://rfkbgldbeqyiq7k-bildungsplattform.functions.fnc.fr-par.scw.cloud',
     'https://rfkbgldbeqyiq7k-rfk-bildungsplattform-test.functions.fnc.fr-par.scw.cloud',
-    'http://bildungsplattform-test.rauchfangkehrer.or.at'
+    'https://bildungsplattform-test.rauchfangkehrer.or.at'
+    'https://bildungsplattform.rauchfangkehrer.or.at'
 ]
 
 
