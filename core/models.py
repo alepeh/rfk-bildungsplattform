@@ -53,7 +53,7 @@ class SchulungsTermin(models.Model):
         return self.max_teilnehmer - self.schulungsterminperson_set.count()
 
     def __str__(self):
-        return str(self.datum)
+        return str(self.datum_von)
 
     class Meta:
         verbose_name_plural = "Schulungstermine"
