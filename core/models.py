@@ -42,7 +42,10 @@ class SchulungsTermin(models.Model):
     datum = models.DateTimeField()
     ort = models.ForeignKey(to=SchulungsOrt, on_delete=models.DO_NOTHING, null=True, blank=True)
     schulung = models.ForeignKey(to=Schulung, on_delete=models.CASCADE)
+    dauer = models.CharField(max_length=20, null=True, blank=True, help_text="Zeiteinheit auch angeben z.B. 8h, 2 Tage")
     max_teilnehmer = models.IntegerField(default=0, verbose_name="Maximale Teilnehmeranzahl")
+    min_teilnehmer = models.IntegerField(default=0, verbose_name="Mininum Teilnehmeranzahl")
+    buchbar = models.BooleanField(default=1)
 
     @property
     def freie_plaetze(self):
