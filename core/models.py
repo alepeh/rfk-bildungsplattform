@@ -27,8 +27,8 @@ class SchulungsOrt(models.Model):
         verbose_name_plural = "Schulungsorte"
 
 class Schulung(models.Model):
-    name = models.CharField(max_length=100)
-    beschreibung = models.TextField(max_length=200)
+    name = models.CharField(max_length=200)
+    beschreibung = models.TextField(max_length=1000)
     art = models.ForeignKey(to=SchulungsArt, on_delete=models.CASCADE)
 
     def __str__(self):
