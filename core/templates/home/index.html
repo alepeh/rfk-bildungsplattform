@@ -8,6 +8,7 @@
 <div class='container d-flex flex-column align-items-center'>
     {% if schulungstermine %}
     {% for schulungstermin in schulungstermine %}
+    {% if schulungstermin.buchbar %}
     <div class="card w-75 mb-3" style="max-width: 900px;">
         <div class="card-header">
             <div class="row g-0">
@@ -22,7 +23,10 @@
         <div class="row g-0">
             <div class="col-md-4">
                 <div class="card-body">
-                    <h5 class="card-title">{{ schulungstermin.datum|date:"d. b Y" }}</h5>
+                    <h5 class="card-title">{{ schulungstermin.datum_von|date:"d. b Y" }}</h5>
+                    {% if schulungstermin.dauer %}
+                    <p class="card-text">Dauer: {{ schulungstermin.dauer }}</p>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-md-8">
@@ -38,15 +42,16 @@
                     <span class="badge rounded-pill text-bg-success">{{ schulungstermin.freie_plaetze }} Freie Plätze</span>
                 </div>
                 <div class="col-md-8 text-end">
-                        {% if user.is_authenticated %}
-                        <a href="/register/{{ schulungstermin.id }}/" class="btn btn-primary">Teilnehmen</a>
-                        {% else %}
-                        <a href="{% url 'login' %}">Einloggen</a>
-                        {% endif %}
+                    {% if user.is_authenticated %}
+                    <a href="/register/{{ schulungstermin.id }}/" class="btn btn-primary">Teilnehmen</a>
+                    {% else %}
+                    <a href="{% url 'login' %}">Einloggen</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
+    {% endif %}
     {% endfor %}
     {% else %}
     <p>Keine Schulungen verfügbar!</p>

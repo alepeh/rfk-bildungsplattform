@@ -1,9 +1,19 @@
 {% extends "../components/base.html" %}
 {% block content %}
 {% if person %}
+<div class='container d-flex'>
+    <div class="card w-50 mx-3">
+        <div class="card-header">
+            {{ schulungstermin.schulung }}
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">{{ schulungstermin.datum_von|date:"d. b Y h:m" }} - {{ schulungstermin.datum_bis|date:"d. b Y h:m" }}</h5>
+            <p class="card-text">{{ schulungstermin.schulung.beschreibung }}</p>
+        </div>
+    </div>
 <form method="post">
     {% csrf_token %}
-    <div class="card" style="width: 18rem;">
+    <div class="card">
         <div class="card-header">
             Melde dich und deine Mitarbeiter für diese Schulung an
         </div>
@@ -24,6 +34,7 @@
     <input class="btn btn-primary" type="submit" value="Speichern">
     <a href="/">Zurück zu den Schulungen</a>
 </form>
+</div>
 {% else %}
 <p>No user found</p>
 {% endif %}

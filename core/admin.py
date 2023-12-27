@@ -44,7 +44,7 @@ class PersonAdmin(admin.ModelAdmin):
     erfuelltMindestanforderung.boolean = True
 
 class SchulungsTerminAdmin(admin.ModelAdmin):
-    list_display = ('schulung', 'datum')
+    list_display = ('schulung', 'datum_von')
     inlines = (SchulungsTerminPersonInline,)
 
 

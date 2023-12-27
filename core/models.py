@@ -39,7 +39,8 @@ class Schulung(models.Model):
 
 
 class SchulungsTermin(models.Model):
-    datum = models.DateTimeField()
+    datum_von = models.DateTimeField()
+    datum_bis = models.DateTimeField()
     ort = models.ForeignKey(to=SchulungsOrt, on_delete=models.DO_NOTHING, null=True, blank=True)
     schulung = models.ForeignKey(to=Schulung, on_delete=models.CASCADE)
     dauer = models.CharField(max_length=20, null=True, blank=True, help_text="Zeiteinheit auch angeben z.B. 8h, 2 Tage")

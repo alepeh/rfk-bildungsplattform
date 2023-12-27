@@ -5,7 +5,7 @@ from django.db.models import Q
 
 
 def index(request):
-    schulungstermine = SchulungsTermin.objects.order_by("datum")
+    schulungstermine = SchulungsTermin.objects.order_by("datum_von")
     template = loader.get_template("home/index.html")
     context = {
         "schulungstermine": schulungstermine,
@@ -38,6 +38,7 @@ def register(request : HttpRequest, id :int):
         "person" : person,
         "mitarbeiter" : mitarbeiter,
         "teilnehmer" : teilnehmer,
+        "schulungstermin" : schulungstermin
     }
     return HttpResponse(template.render(context, request))
 
