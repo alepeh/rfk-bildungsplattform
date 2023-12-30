@@ -1,6 +1,13 @@
 {% extends "../components/base.html" %}
 {% block content %}
 {% if person %}
+<ul class="messages">
+    {% for message in messages %}
+    <div class="alert alert-primary" role="alert">
+        <div  {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </div>
+    </div>
+    {% endfor %}
+</ul>
 <div class='container d-flex'>
     <div class="card w-50 mx-3">
         <div class="card-header">

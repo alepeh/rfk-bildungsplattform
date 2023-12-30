@@ -82,6 +82,7 @@ class Betrieb(models.Model):
     ort = models.CharField(max_length=50, null=True, blank=True)
     telefon = models.CharField(max_length=30, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
+    geschaeftsfuehrer = models.OneToOneField("Person", on_delete=models.PROTECT, related_name="geschaeftsfuehrer", null=True, blank=True)
 
     def __str__(self):
         return str(self.name)
@@ -136,11 +137,3 @@ class SchulungsArtFunktion(models.Model):
     class Meta:
         verbose_name = "Schulungsmindestanforderung"
         verbose_name_plural = "Schulungsmindestanforderung"
-
-class PersonBetrieb(models.Model):
-    inhaber = models.ForeignKey(to=Person, on_delete=models.DO_NOTHING, related_name="Betriebsinhaber")
-    betrieb = models.ForeignKey(to=Betrieb, on_delete=models.DO_NOTHING)
-
-    class Meta:
-        verbose_name = "Betriebsinhaber"
-        verbose_name_plural = "Betriebsinhaber"

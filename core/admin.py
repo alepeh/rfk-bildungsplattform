@@ -1,6 +1,6 @@
 from django.contrib import admin
 from core.models import Funktion, Person, Schulung, SchulungsArt, Betrieb, SchulungsArtFunktion, SchulungsTermin, \
-    SchulungsOrt, SchulungsTerminPerson, PersonBetrieb
+    SchulungsOrt, SchulungsTerminPerson
 
 
 class PersonInline(admin.TabularInline):
@@ -29,14 +29,10 @@ class FunktionAdmin(admin.ModelAdmin):
     list_display = ('name',)
     inlines = (SchulungsArtFunktionInline,)
 
-class PersonBetriebInline(admin.TabularInline):
-    model = PersonBetrieb
-    extra = 1
 
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('nachname', 'vorname', 'funktion', 'erfuelltMindestanforderung')
     list_filter = ('betrieb',)
-    inlines = (PersonBetriebInline,)
 
     def erfuelltMindestanforderung(self, obj):
             return False

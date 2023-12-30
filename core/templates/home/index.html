@@ -42,10 +42,14 @@
                     <span class="badge rounded-pill text-bg-success">{{ schulungstermin.freie_plaetze }} Freie Plätze</span>
                 </div>
                 <div class="col-md-8 text-end">
-                    {% if user.is_authenticated %}
-                    <a href="/register/{{ schulungstermin.id }}/" class="btn btn-primary">Teilnehmen</a>
+                    {% if schulungstermin.freie_plaetze > 0 %}
+                        {% if user.is_authenticated %}
+                        <a href="/register/{{ schulungstermin.id }}/" class="btn btn-primary">Teilnehmen</a>
+                        {% else %}
+                        <a href="{% url 'login' %}">Einloggen</a>
+                        {% endif %}
                     {% else %}
-                    <a href="{% url 'login' %}">Einloggen</a>
+                        Keine freien Plätze
                     {% endif %}
                 </div>
             </div>

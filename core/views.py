@@ -1,7 +1,13 @@
 from django.http import HttpResponse, HttpRequest
 from django.template import loader
-from core.models import SchulungsTermin, Person, PersonBetrieb, SchulungsTerminPerson
+from core.models import SchulungsTermin, Person, SchulungsTerminPerson, Betrieb
 from django.db.models import Q
+from django.forms import modelformset_factory, inlineformset_factory
+from django.shortcuts import render
+from django.contrib import messages
+
+
+
 
 
 def index(request):
@@ -26,11 +32,12 @@ def register(request : HttpRequest, id :int):
                     addPersonToSchulungstermin(id, mitarbeiterId)
                 else:
                     removePersonFromSchulungstermin(id, mitarbeiterId)
+        messages.success(request, 'Anmeldung gespeichtert!')
 
     user = request.user
     person = Person.objects.get(Q(benutzer=user))
-    betriebe = PersonBetrieb.objects.filter(inhaber=person).values_list('betrieb_id')
-    mitarbeiter = Person.objects.filter(betrieb__in=betriebe)
+    betrieb = Betrieb.objects.get(geschaeftsfuehrer=person)
+    mitarbeiter = Person.objects.filter(betrieb=betrieb)
     schulungstermin = SchulungsTermin.objects.get(id=id)
     teilnehmer = SchulungsTerminPerson.objects.filter(schulungstermin=schulungstermin).values_list('person',flat=True)
     template = loader.get_template("home/register.html")
@@ -54,6 +61,21 @@ def removePersonFromSchulungstermin(schulungsTerminId, personId):
     if(SchulungsTerminPerson.objects.filter(schulungstermin=schulungstermin, person=person).count() > 0):
         SchulungsTerminPerson.objects.get(schulungstermin=schulungstermin, person=person).delete()
 
-# def login(request):
-#     template = loader.get_template("home/login.html")
-#     return HttpResponse(template.render())
+def manage_authors(request):
+    PersonFormSet = inlineformset_factory(Betrieb, Person, fields=["vorname", "nachname", "funktion"], )
+    user = request.user
+    person = Person.objects.get(Q(benutzer=user))
+    betrieb = Betrieb.objects.get(geschaeftsfuehrer=person)
+    queryset = Person.objects.filter(betrieb=betrieb)
+    if request.method == "POST":
+        formset = PersonFormSet(
+            request.POST,
+            request.FILES,
+            instance=betrieb,
+        )
+        if formset.is_valid():
+            formset.save()
+            messages.success(request, 'Mitarbeiter erfolgreich gespeichert!')
+    else:
+        formset = PersonFormSet(instance=betrieb)
+    return render(request, "home/mitarbeiter.html", {"formset": formset})
