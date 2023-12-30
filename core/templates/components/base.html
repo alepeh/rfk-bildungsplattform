@@ -10,19 +10,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no"/>
 </head>
 <body>
-<nav id="mainNav" class="navbar navbar-expand-md sticky-top navbar-shrink py-3 navbar-light">
-    <div class="container"><a class="navbar-brand d-flex align-items-center" href="/">
-                    <img src="{% static 'logo_rfk.png' %}" width="200" height="62" class="d-inline-block align-text-center">
-
-        <span>Bildungsplattform</span></a>
-        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navcol-1"><span
-                class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
-        <div id="navcol-1" class="d-flex ms-auto order-5">
+<nav class="navbar navbar-expand-lg bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img src="{% static 'logo_rfk.png' %}" width="200" height="62" class="d-inline-block align-text-center">
+            <span>Bildungsplattform</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
             {% if user.is_authenticated %}
-            Servus {{ user.username }}!&nbsp;<a href="{% url 'logout' %}">Log Out</a>
-            {% else %}
-            <a href="{% url 'login' %}">Log In</a>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/mitarbeiter">Mitarbeiter verwalten</a>
+                </li>
+            </ul>
             {% endif %}
+            <div class="d-flex">
+                {% if user.is_authenticated %}
+                Servus {{ user.username }}!&nbsp;<a href="{% url 'logout' %}">Log Out</a>
+                {% else %}
+                <a href="{% url 'login' %}">Log In</a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </nav>

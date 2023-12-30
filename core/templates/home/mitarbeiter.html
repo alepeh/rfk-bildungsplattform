@@ -1,9 +1,18 @@
 {% extends "../components/base.html" %}
 {% block content %}
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <div class="alert alert-primary" role="alert">
+        <div  {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </div>
+    </div>
+    {% endfor %}
+</ul>
+{% endif %}
 <div class='container d-flex'>
-    <div class="card">
+    <div class="card w-50">
       <div class="card-header">
-        Hier kannst du neue Mitarbeiter anlegen
+        Hier kannst du deine Mitarbeiter verwalten
       </div>
       <form method="post">
           {% csrf_token %}
