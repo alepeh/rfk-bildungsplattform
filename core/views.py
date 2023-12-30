@@ -1,7 +1,11 @@
 from django.http import HttpResponse, HttpRequest
 from django.template import loader
-from core.models import SchulungsTermin, Person, PersonBetrieb, SchulungsTerminPerson
+from core.models import SchulungsTermin, Person, PersonBetrieb, SchulungsTerminPerson, Betrieb
 from django.db.models import Q
+from django.forms import modelformset_factory, inlineformset_factory
+from django.shortcuts import render
+
+
 
 
 def index(request):
@@ -54,6 +58,22 @@ def removePersonFromSchulungstermin(schulungsTerminId, personId):
     if(SchulungsTerminPerson.objects.filter(schulungstermin=schulungstermin, person=person).count() > 0):
         SchulungsTerminPerson.objects.get(schulungstermin=schulungstermin, person=person).delete()
 
-# def login(request):
-#     template = loader.get_template("home/login.html")
-#     return HttpResponse(template.render())
+def manage_authors(request):
+    PersonFormSet = inlineformset_factory(Betrieb, Person, fields=["vorname", "nachname"])
+
+    user = request.user
+    person = Person.objects.get(Q(benutzer=user))
+    betriebe = PersonBetrieb.objects.filter(inhaber=person).values_list('betrieb_id')
+    queryset = Person.objects.filter(betrieb__in=betriebe)
+    if request.method == "POST":
+        formset = PersonFormSet(
+            request.POST,
+            request.FILES,
+            queryset=queryset,
+        )
+        if formset.is_valid():
+            formset.save()
+            # Do something.
+    else:
+        formset = PersonFormSet(queryset=queryset)
+    return render(request, "home/mitarbeiter.html", {"formset": formset})
