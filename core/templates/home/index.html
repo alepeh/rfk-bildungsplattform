@@ -44,7 +44,11 @@
                 <div class="col-md-8 text-end">
                     {% if schulungstermin.freie_plaetze > 0 %}
                         {% if user.is_authenticated %}
-                        <a href="/register/{{ schulungstermin.id }}/" class="btn btn-primary">Teilnehmen</a>
+                            {% if person.betrieb in schulungstermin.registrierte_betriebe %}
+                            Dein Betrieb ist angemeldet <a href="/register/{{ schulungstermin.id }}/" class="btn btn-success">Ändern</a>
+                    {% else %}
+                            <a href="/register/{{ schulungstermin.id }}/" class="btn btn-primary">Teilnehmen</a>
+                            {% endif %}
                         {% else %}
                         <a href="{% url 'login' %}">Einloggen</a>
                         {% endif %}
