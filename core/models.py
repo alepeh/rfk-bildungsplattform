@@ -52,6 +52,13 @@ class SchulungsTermin(models.Model):
     def freie_plaetze(self):
         return self.max_teilnehmer - self.schulungsterminperson_set.count()
 
+    @property
+    def registrierte_betriebe(self):
+        betriebe = set()
+        for schulungsterminperson in self.schulungsterminperson_set.all():
+            betriebe.add(schulungsterminperson.person.betrieb)
+        return betriebe
+
     def __str__(self):
         return str(self.datum_von)
 

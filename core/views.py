@@ -13,8 +13,14 @@ from django.contrib import messages
 def index(request):
     schulungstermine = SchulungsTermin.objects.order_by("datum_von")
     template = loader.get_template("home/index.html")
+    user = request.user
+    person = None
+    if(user):
+        person = Person.objects.get(Q(benutzer=user))
+
     context = {
         "schulungstermine": schulungstermine,
+        "person" : person
     }
     return HttpResponse(template.render(context, request))
 
@@ -61,7 +67,7 @@ def removePersonFromSchulungstermin(schulungsTerminId, personId):
     if(SchulungsTerminPerson.objects.filter(schulungstermin=schulungstermin, person=person).count() > 0):
         SchulungsTerminPerson.objects.get(schulungstermin=schulungstermin, person=person).delete()
 
-def manage_authors(request):
+def manage_mitarbeiter(request):
     PersonFormSet = inlineformset_factory(Betrieb, Person, fields=["vorname", "nachname", "funktion"], )
     user = request.user
     person = Person.objects.get(Q(benutzer=user))
