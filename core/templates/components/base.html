@@ -20,16 +20,20 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            {% if user.is_authenticated %}
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {% if user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="/mitarbeiter">Mitarbeiter verwalten</a>
                 </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="https://docs.google.com/document/d/e/2PACX-1vS16yzjhok2aywLq5QUUHJAqA16KNnqbEPF48BJc-8CY6Nke7MRft3cpzN3lw6I_sK4xNhDm3bq9FW6/pub" target="_blank">Hilfe</a>
+
+                </li>
             </ul>
-            {% endif %}
             <div class="d-flex">
                 {% if user.is_authenticated %}
-                Servus {{ user.username }}!&nbsp;<a href="{% url 'logout' %}">Log Out</a>
+                Servus {{ user.username }}!
                 {% else %}
                 <a href="{% url 'login' %}">Log In</a>
                 {% endif %}

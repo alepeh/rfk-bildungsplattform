@@ -15,7 +15,7 @@ def index(request):
     template = loader.get_template("home/index.html")
     user = request.user
     person = None
-    if(user):
+    if not(user.is_anonymous):
         person = Person.objects.get(Q(benutzer=user))
 
     context = {
@@ -25,20 +25,43 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 
+def is_overbooked(request, schulungsterminId):
+    schulungstermin = SchulungsTermin.objects.get(id=schulungsterminId)
+    teilnehmer = list(SchulungsTerminPerson.objects.filter(schulungstermin=schulungstermin).values_list('person_id', flat=True))
+    free_spots = schulungstermin.max_teilnehmer - len(teilnehmer)
+    for param in list(request.POST.keys()):
+        if(param.startswith('ma_')):
+            mitarbeiterId = request.POST.get(param)
+            # user is already or wants to register
+            if(request.POST.get("cb_"+mitarbeiterId)):
+                    if not (int(mitarbeiterId) in teilnehmer):
+                        free_spots -= 1
+            else:
+                    if int(mitarbeiterId) in teilnehmer:
+                        free_spots += 1
+    if(free_spots >= 0):
+        print("Free Spots: " + str(free_spots))
+        return False
+    else:
+        return True
+
+
+
 def register(request : HttpRequest, id :int):
     #form has been submitted
     if request.method == 'POST':
         print(list(request.POST.keys()))
-        for param in list(request.POST.keys()):
-            if(param.startswith('ma_')):
-                mitarbeiterId = request.POST.get(param)
-                istTeilnehmer = False
-                if(request.POST.get("cb_"+mitarbeiterId)):
-                    istTeilnehmer = True
-                    addPersonToSchulungstermin(id, mitarbeiterId)
-                else:
-                    removePersonFromSchulungstermin(id, mitarbeiterId)
-        messages.success(request, 'Anmeldung gespeichtert!')
+        if(is_overbooked(request, id)):
+            messages.warning(request, 'Nicht genügend Plätze!')
+        else:
+            for param in list(request.POST.keys()):
+                if(param.startswith('ma_')):
+                    mitarbeiterId = request.POST.get(param)
+                    if(request.POST.get("cb_"+mitarbeiterId)):
+                        addPersonToSchulungstermin(id, mitarbeiterId)
+                    else:
+                        removePersonFromSchulungstermin(id, mitarbeiterId)
+            messages.success(request, 'Anmeldung gespeichtert!')
 
     user = request.user
     person = Person.objects.get(Q(benutzer=user))
@@ -67,7 +90,7 @@ def removePersonFromSchulungstermin(schulungsTerminId, personId):
     if(SchulungsTerminPerson.objects.filter(schulungstermin=schulungstermin, person=person).count() > 0):
         SchulungsTerminPerson.objects.get(schulungstermin=schulungstermin, person=person).delete()
 
-def manage_mitarbeiter(request):
+def mitarbeiter(request):
     PersonFormSet = inlineformset_factory(Betrieb, Person, fields=["vorname", "nachname", "funktion"], )
     user = request.user
     person = Person.objects.get(Q(benutzer=user))
