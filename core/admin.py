@@ -1,12 +1,23 @@
 from django.contrib import admin
-from core.models import Funktion, Person, Schulung, SchulungsArt, Betrieb, SchulungsArtFunktion, SchulungsTermin, \
-    SchulungsOrt, SchulungsTerminPerson
+
+from core.models import (
+    Betrieb,
+    Funktion,
+    Person,
+    Schulung,
+    SchulungsArt,
+    SchulungsArtFunktion,
+    SchulungsOrt,
+    SchulungsTermin,
+    SchulungsTerminPerson,
+)
 
 
 class PersonInline(admin.TabularInline):
     model = Person
     extra = 0
     show_change_link = True
+    ordering = ('funktion__sortierung',)
 
 class SchulungsArtFunktionInline(admin.TabularInline):
     model = SchulungsArtFunktion
