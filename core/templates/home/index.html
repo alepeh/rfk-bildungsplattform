@@ -42,19 +42,24 @@
                     <span class="badge rounded-pill text-bg-success">{{ schulungstermin.freie_plaetze }} Freie Plätze</span>
                 </div>
                 <div class="col-md-8 text-end">
-                    {% if schulungstermin.freie_plaetze > 0 %}
+                    
                         {% if user.is_authenticated %}
                             {% if person.betrieb in schulungstermin.registrierte_betriebe %}
-                            Dein Betrieb ist angemeldet <a href="/register/{{ schulungstermin.id }}/" class="btn btn-success">Ändern</a>
-                    {% else %}
-                            <a href="/register/{{ schulungstermin.id }}/" class="btn btn-primary">Teilnehmen</a>
+                            Dein Betrieb ist angemeldet <a href="/register/{{ schulungstermin.id }}/" 
+                                                          class="btn btn-success">Ändern</a>
+                            {% elif schulungstermin.freie_plaetze > 0 %}
+                              <a href="/register/{{ schulungstermin.id }}/" class="btn btn-primary">Teilnehmen</a>
+                            {% else %}
+                              Keine freien Plätze
                             {% endif %}
                         {% else %}
-                        <a href="{% url 'login' %}">Einloggen</a>
+                          {% if schulungstermin.freie_plaetze > 0 %}
+                            <a href="{% url 'login' %}">Einloggen</a>
+                          {% else %}
+                              Keine freien Plätze
+                          {% endif %}
                         {% endif %}
-                    {% else %}
-                        Keine freien Plätze
-                    {% endif %}
+                
                 </div>
             </div>
         </div>
