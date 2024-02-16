@@ -14,49 +14,67 @@ from core.models import (
 
 
 class PersonInline(admin.TabularInline):
-    model = Person
-    extra = 0
-    show_change_link = True
-    ordering = ('funktion__sortierung',)
+  model = Person
+  extra = 0
+  show_change_link = True
+  ordering = ('funktion__sortierung', )
+
 
 class SchulungsArtFunktionInline(admin.TabularInline):
-    model = SchulungsArtFunktion
-    extra = 1
+  model = SchulungsArtFunktion
+  extra = 1
+
 
 class SchulungsTerminInline(admin.TabularInline):
-    model = SchulungsTermin
-    extra = 1
+  model = SchulungsTermin
+  extra = 1
+
 
 class SchulungAdmin(admin.ModelAdmin):
-    model = Schulung
-    inlines = (SchulungsTerminInline,)
+  model = Schulung
+  inlines = (SchulungsTerminInline, )
+
 
 class SchulungsTerminPersonInline(admin.TabularInline):
-    model = SchulungsTerminPerson
-    extra = 1
+  model = SchulungsTerminPerson
+  extra = 1
+  fields = ('person', 'betrieb')
+  readonly_fields = ('betrieb', )
+  ordering = ('person__betrieb', )
+
+  def betrieb(self, obj):
+    return obj.person.betrieb
+
+  betrieb.short_description = 'Betrieb'
 
 
 class FunktionAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    inlines = (SchulungsArtFunktionInline,)
+  list_display = ('name', )
+  inlines = (SchulungsArtFunktionInline, )
 
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('nachname', 'vorname', 'funktion', 'erfuelltMindestanforderung')
-    list_filter = ('betrieb',)
+  list_display = ('nachname', 'vorname', 'funktion',
+                  'erfuelltMindestanforderung')
+  list_filter = ('funktion', 'betrieb',)
+  
+  def erfuelltMindestanforderung(self, obj):
+    return False
 
-    def erfuelltMindestanforderung(self, obj):
-            return False
+  erfuelltMindestanforderung.boolean = True
 
-    erfuelltMindestanforderung.boolean = True
 
 class SchulungsTerminAdmin(admin.ModelAdmin):
-    list_display = ('schulung', 'datum_von')
-    inlines = (SchulungsTerminPersonInline,)
+  list_display = ('schulung', 'datum_von', 'buchbar', 'freie_plaetze')
+  inlines = (SchulungsTerminPersonInline, )
+  ordering = ('datum_von', )
 
 
 class BetriebAdmin(admin.ModelAdmin):
-    inlines = [PersonInline,]
+  inlines = [
+      PersonInline,
+  ]
+
 
 admin.site.register(Funktion, FunktionAdmin)
 admin.site.register(Person, PersonAdmin)

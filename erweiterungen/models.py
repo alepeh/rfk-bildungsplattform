@@ -1,4 +1,6 @@
 from django.db import models
+from django.conf import settings
+
 
 class Todo(models.Model):
 
@@ -21,3 +23,13 @@ class Todo(models.Model):
     
     def __str__(self):
         return self.name
+
+
+class Comment(models.Model):
+  todo = models.ForeignKey(Todo, on_delete=models.CASCADE, related_name='comments')
+  user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+  text = models.TextField()
+  created_at = models.DateTimeField(auto_now_add=True)
+  def __str__(self):
+      # Optionally display the user's username in the string representation
+      return f'Kommentar von {self.user.username} am {self.created_at}'
