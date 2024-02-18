@@ -11,18 +11,18 @@ from django.contrib import messages
 
 
 def index(request):
-    schulungstermine = SchulungsTermin.objects.order_by("datum_von")
-    template = loader.get_template("home/index.html")
-    user = request.user
-    person = None
-    if not(user.is_anonymous):
-        person = Person.objects.get(Q(benutzer=user))
-
-    context = {
-        "schulungstermine": schulungstermine,
-        "person" : person
-    }
-    return HttpResponse(template.render(context, request))
+  # Using select_related to prefetch related SchulungsOrt and Schulung objects
+  schulungstermine = SchulungsTermin.objects.select_related('ort', 'schulung').order_by("datum_von")
+  template = loader.get_template("home/index.html")
+  user = request.user
+  person = None
+  if not(user.is_anonymous):
+      person = Person.objects.get(Q(benutzer=user))
+  context = {
+      "schulungstermine": schulungstermine,
+      "person" : person
+  }
+  return HttpResponse(template.render(context, request))
 
 
 def is_overbooked(request, schulungsterminId):
