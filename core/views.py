@@ -95,7 +95,7 @@ def mitarbeiter(request):
     user = request.user
     person = Person.objects.get(Q(benutzer=user))
     betrieb = Betrieb.objects.get(geschaeftsfuehrer=person)
-    queryset = Person.objects.filter(betrieb=betrieb)
+    queryset = Person.objects.filter(betrieb=betrieb).order_by('funktion')
     if request.method == "POST":
         formset = PersonFormSet(
             request.POST,
@@ -106,5 +106,5 @@ def mitarbeiter(request):
             formset.save()
             messages.success(request, 'Mitarbeiter erfolgreich gespeichert!')
     else:
-        formset = PersonFormSet(instance=betrieb)
+        formset = PersonFormSet(instance=betrieb, queryset=queryset)
     return render(request, "home/mitarbeiter.html", {"formset": formset})

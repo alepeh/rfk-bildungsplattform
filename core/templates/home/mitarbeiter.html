@@ -2,24 +2,40 @@
 {% block content %}
 {% if messages %}
 <ul class="messages">
-    {% for message in messages %}
-    <div class="alert alert-primary" role="alert">
-        <div  {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </div>
-    </div>
-    {% endfor %}
+  {% for message in messages %}
+  <div class="alert alert-primary" role="alert">
+    <div {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </div>
+  </div>
+  {% endfor %}
 </ul>
 {% endif %}
-<div class='container d-flex'>
-    <div class="card w-50">
-      <div class="card-header">
-        Hier kannst du deine Mitarbeiter verwalten
-      </div>
-      <form method="post">
-          {% csrf_token %}
-
-          {{ formset }}
-          <input class="btn btn-primary" type="submit" value="Speichern">
+<div class='container my-4'>
+  <div class="card">
+    <div class="card-header">
+      Mitarbeiter hinzufügen/bearbeiten
+    </div>
+    <div class="card-body">
+      <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+        {% for form in formset %}
+          <div class="row mb-3">
+            {{ form.id }}
+            {% for field in form.visible_fields %}
+              <div class="col-md-4 mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                  <div class="invalid-feedback">
+                    {{ field.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+        <input type="submit" class="btn btn-primary" value="Speichern">
       </form>
     </div>
+  </div>
 </div>
 {% endblock content %}
