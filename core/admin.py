@@ -1,4 +1,7 @@
+import csv
+
 from django.contrib import admin
+from django.http import HttpResponse
 
 from core.models import (
     Betrieb,
@@ -11,6 +14,28 @@ from core.models import (
     SchulungsTermin,
     SchulungsTerminPerson,
 )
+
+
+def export_schulungsterminperson_to_csv(modeladmin, request, queryset):
+    meta = modeladmin.model._meta
+
+    # Define the HTTP response with the appropriate CSV header
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="schulungsteilnehmer.csv"'
+
+    writer = csv.writer(response)
+
+    # Write your CSV headers (adapt these fields as needed)
+    writer.writerow(['Person', 'Betrieb', 'SchulungsTermin'])
+
+    # Gather related SchulungsTerminPerson instances and write them to the CSV
+    for schulungstermin in queryset:
+        for stp in schulungstermin.schulungsterminperson_set.all():
+            writer.writerow([stp.person, stp.person.betrieb, schulungstermin])
+
+    return response
+export_schulungsterminperson_to_csv.short_description = "Schulungsteilnehmer CSV Export"
+
 
 
 class PersonInline(admin.TabularInline):
@@ -54,7 +79,7 @@ class FunktionAdmin(admin.ModelAdmin):
 
 
 class PersonAdmin(admin.ModelAdmin):
-  list_display = ('nachname', 'vorname', 'funktion',
+  list_display = ('nachname', 'vorname', 'betrieb', 'funktion',
                   'erfuelltMindestanforderung')
   list_filter = ('funktion', 'betrieb',)
   
@@ -68,6 +93,8 @@ class SchulungsTerminAdmin(admin.ModelAdmin):
   list_display = ('schulung', 'datum_von', 'buchbar', 'freie_plaetze')
   inlines = (SchulungsTerminPersonInline, )
   ordering = ('datum_von', )
+  actions = [export_schulungsterminperson_to_csv]
+
 
 
 class BetriebAdmin(admin.ModelAdmin):

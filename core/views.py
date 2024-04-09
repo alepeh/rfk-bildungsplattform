@@ -5,6 +5,8 @@ from django.db.models import Q
 from django.forms import modelformset_factory, inlineformset_factory
 from django.shortcuts import render
 from django.contrib import messages
+from django.utils import timezone
+
 
 
 
@@ -12,7 +14,7 @@ from django.contrib import messages
 
 def index(request):
   # Using select_related to prefetch related SchulungsOrt and Schulung objects
-  schulungstermine = SchulungsTermin.objects.select_related('ort', 'schulung').order_by("datum_von")
+  schulungstermine = SchulungsTermin.objects.filter(datum_von__gte=timezone.now()).select_related('ort', 'schulung').order_by("datum_von")
   template = loader.get_template("home/index.html")
   user = request.user
   person = None
