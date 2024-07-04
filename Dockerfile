@@ -1,5 +1,17 @@
 FROM python:3.11-slim
 
+ARG PGDATABASE
+ARG PGHOST
+ARG PGPORT
+ARG PGUSER
+ARG PGPASSWORD
+
+ENV PGDATABASE=$PGDATABASE
+ENV PGHOST=$PGHOST
+ENV PGPORT=$PGPORT
+ENV PGUSER=$PGUSER
+ENV PGPASSWORD=$PGPASSWORD
+
 # install nginx
 RUN apt-get update && apt-get install default-libmysqlclient-dev gcc nginx -y
 # copy our nginx configuration to overwrite nginx defaults
