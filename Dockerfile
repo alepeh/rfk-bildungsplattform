@@ -13,6 +13,7 @@ COPY entrypoint.sh ./app/
 COPY nginx/ ./app/nginx/
 COPY bildungsplattform/ ./app/bildungsplattform/
 COPY core/ ./app/core/
+COPY erweiterungen/ ./app/erweiterungen
 
 COPY manage.py ./app/
 

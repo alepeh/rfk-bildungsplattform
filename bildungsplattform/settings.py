@@ -32,7 +32,8 @@ ALLOWED_HOSTS = ['*']
 X_FRAME_OPTIONS = '*'
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://127.0.0.1:8000', 'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
     'https://rfkbgldbeqyiq7k-bildungsplattform.functions.fnc.fr-par.scw.cloud',
     'https://rfkbgldbeqyiq7k-rfk-bildungsplattform-test.functions.fnc.fr-par.scw.cloud',
     'https://3e13a2a1-5eb4-431b-a41d-ebc0c9e89c46-00-1pfa686cbln1x.janeway.replit.dev',
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'django_bootstrap5',
+    'django_bootstrap_icons'
 ]
 
 MIDDLEWARE = [
@@ -84,7 +86,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'bildungsplattform.wsgi.application'
-
 
 DATABASES = {
     "default": {
@@ -132,7 +133,7 @@ TIME_ZONE = 'Europe/Vienna'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -148,6 +149,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
+
+# Email configuration
+SCALEWAY_EMAIL_API_TOKEN = os.getenv('SCALEWAY_EMAIL_API_TOKEN')
+
 
 # django-extensions (generate diagrams for all applications)
 GRAPH_MODELS = {

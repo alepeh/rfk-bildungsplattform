@@ -17,25 +17,27 @@ from core.models import (
 
 
 def export_schulungsterminperson_to_csv(modeladmin, request, queryset):
-    meta = modeladmin.model._meta
+  meta = modeladmin.model._meta
 
-    # Define the HTTP response with the appropriate CSV header
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="schulungsteilnehmer.csv"'
+  # Define the HTTP response with the appropriate CSV header
+  response = HttpResponse(content_type='text/csv')
+  response[
+      'Content-Disposition'] = 'attachment; filename="schulungsteilnehmer.csv"'
 
-    writer = csv.writer(response)
+  writer = csv.writer(response)
 
-    # Write your CSV headers (adapt these fields as needed)
-    writer.writerow(['Person', 'Betrieb', 'SchulungsTermin'])
+  # Write your CSV headers (adapt these fields as needed)
+  writer.writerow(['Person', 'Betrieb', 'SchulungsTermin'])
 
-    # Gather related SchulungsTerminPerson instances and write them to the CSV
-    for schulungstermin in queryset:
-        for stp in schulungstermin.schulungsterminperson_set.all():
-            writer.writerow([stp.person, stp.person.betrieb, schulungstermin])
+  # Gather related SchulungsTerminPerson instances and write them to the CSV
+  for schulungstermin in queryset:
+    for stp in schulungstermin.schulungsterminperson_set.all():
+      writer.writerow([stp.person, stp.person.betrieb, schulungstermin])
 
-    return response
+  return response
+
+
 export_schulungsterminperson_to_csv.short_description = "Schulungsteilnehmer CSV Export"
-
 
 
 class PersonInline(admin.TabularInline):
@@ -63,7 +65,7 @@ class SchulungAdmin(admin.ModelAdmin):
 class SchulungsTerminPersonInline(admin.TabularInline):
   model = SchulungsTerminPerson
   extra = 1
-  fields = ('person', 'betrieb')
+  fields = ('person', 'betrieb', 'status')
   readonly_fields = ('betrieb', )
   ordering = ('person__betrieb', )
 
@@ -81,8 +83,11 @@ class FunktionAdmin(admin.ModelAdmin):
 class PersonAdmin(admin.ModelAdmin):
   list_display = ('nachname', 'vorname', 'betrieb', 'funktion',
                   'erfuelltMindestanforderung')
-  list_filter = ('funktion', 'betrieb',)
-  
+  list_filter = (
+      'funktion',
+      'betrieb',
+  )
+
   def erfuelltMindestanforderung(self, obj):
     return False
 
@@ -90,11 +95,11 @@ class PersonAdmin(admin.ModelAdmin):
 
 
 class SchulungsTerminAdmin(admin.ModelAdmin):
+  change_form_template = 'admin/schulungstermin_change_form.html'
   list_display = ('schulung', 'datum_von', 'buchbar', 'freie_plaetze')
   inlines = (SchulungsTerminPersonInline, )
   ordering = ('datum_von', )
   actions = [export_schulungsterminperson_to_csv]
-
 
 
 class BetriebAdmin(admin.ModelAdmin):

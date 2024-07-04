@@ -1,0 +1,29 @@
+{% extends "../components/base.html" %}
+{% block content %}
+<div class="container">
+    <h2>Checkout</h2>
+    <p>Schulung: {{ schulung.name }}</p>
+    <p>Beschreibung: {{ schulung.beschreibung }}</p>
+    <p>Preis: €<span id="preis-standard">{{ preis_standard }}</span></p>
+    
+    <form id="checkout-form">
+        <div class="form-group">
+            <label for="quantity">Menge:</label>
+            <input type="number" id="quantity" name="quantity" value="1" min="1" class="form-control" onchange="calculateTotal()">
+        </div>
+        <div class="form-group">
+            <label for="total-price">Gesamtpreis: €<span id="total-price">{{ preis_standard }}</span></label>
+        </div>
+        <button type="submit" class="btn btn-primary">Jetzt Kaufen</button>
+    </form>
+</div>
+
+<script>
+    function calculateTotal() {
+        var pricePerItem = parseFloat(document.getElementById('preis-standard').innerText);
+        var quantity = parseInt(document.getElementById('quantity').value);
+        var totalPrice = pricePerItem * quantity;
+        document.getElementById('total-price').innerText = totalPrice.toFixed(2);
+    }
+</script>
+{% endblock content %}

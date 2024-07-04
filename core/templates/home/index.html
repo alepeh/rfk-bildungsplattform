@@ -1,4 +1,5 @@
 {% extends "../components/base.html" %}
+{% load bootstrap_icons %}
 {% block content %}
 <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
     <h4>Herzlich Willkommen auf der Bildungsplattform der burgenländischen Rauchfangkehrer!
@@ -48,7 +49,8 @@
                             Dein Betrieb ist angemeldet <a href="/register/{{ schulungstermin.id }}/" 
                                                           class="btn btn-success">Ändern</a>
                             {% elif schulungstermin.freie_plaetze > 0 %}
-                              <a href="/register/{{ schulungstermin.id }}/" class="btn btn-primary">Teilnehmen</a>
+                              <a href="/checkout/{{ schulungstermin.id }}/" class="btn btn-primary">{% bs_icon 'cart' %} Buchen
+</a>
                             {% else %}
                               Keine freien Plätze
                             {% endif %}
