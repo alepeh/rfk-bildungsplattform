@@ -25,3 +25,9 @@ jobs:
           context: .
           push: true
           tags: rg.fr-par.scw.cloud/rfk-bgld/rfk-bildungsplattform:latest
+          build-args: |
+            PGDATABASE=${{ secrets.PGDATABASE }}
+            PGHOST=${{ secrets.PGHOST }}
+            PGUSER=${{ secrets.PGUSER }}  
+            PGPORT=${{ secrets.PGPORT }}  
+            PGPASSWORD=${{ secrets.PGPASSWORD }}
