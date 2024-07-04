@@ -24,6 +24,7 @@ RUN python -m venv /opt/venv && \
     /opt/venv/bin/python -m pip install pip --upgrade && \
     /opt/venv/bin/python -m pip install -r requirements.txt
 RUN /opt/venv/bin/python manage.py collectstatic
+RUN /opt/venv/bin/python manage.py migrate
 
 EXPOSE 8000
 
