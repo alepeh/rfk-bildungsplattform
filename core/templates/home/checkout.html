@@ -1,21 +1,47 @@
 {% extends "../components/base.html" %}
 {% block content %}
 <div class="container">
-    <h2>Checkout</h2>
-    <p>Schulung: {{ schulung.name }}</p>
-    <p>Beschreibung: {{ schulung.beschreibung }}</p>
-    <p>Preis: €<span id="preis-standard">{{ preis_standard }}</span></p>
-    
-    <form id="checkout-form">
+    <div id="step-1" class="checkout-step">
+        <h1>Schulung: {{ schulungstermin.schulung.name }}</h1>
+        <p>Beschreibung: {{ schulungstermin.schulung.beschreibung }}</p>
+        <p>Preis pro Teilnehmer: €<span id="preis-standard">{{ preis }}</span></p>
+        <p>Noch {{ schulungstermin.freie_plaetze }} Plätze verfügbar</p>
+
+        <form id="checkout-form">
+            <div class="form-group">
+                <label for="quantity">Menge:</label>
+                <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ schulungstermin.freie_plaetze }}" class="form-control" onchange="calculateTotal()" required>
+                <!-- Display an error message -->
+                <p id="quantityError" style="color: red; display: none;">Nicht genügend freie Plätze</p>
+            </div>
+            <div class="form-group">
+                <h3>
+                    <label for="total-price">Gesamtpreis: €<span id="total-price">{{ preis }}</span></label>
+                </h3>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="nextStep(1)">Weiter</button>
+        </form>
+    </div>
+
+    <div id="step-2" class="checkout-step d-none">
+        <form id="details-form">
+            <div id="participants-details"></div>
+            <button type="button" class="btn btn-secondary" onclick="previousStep(2)">Zurück</button>
+            <button type="button" class="btn btn-primary" onclick="nextStep(2)">Weiter</button>
+        </form>
+    </div>
+
+    <div id="step-3" class="checkout-step d-none">
+        <h3>Bestellbestätigung</h3>
+        <div id="confirmation-details"></div>
+        <p>Gesamtbetrag: €<span id="total-amount"></span></p>
         <div class="form-group">
-            <label for="quantity">Menge:</label>
-            <input type="number" id="quantity" name="quantity" value="1" min="1" class="form-control" onchange="calculateTotal()">
+            <input type="checkbox" id="accept-terms" name="accept-terms" onclick="toggleConfirmButton()">
+            <label for="accept-terms">Ich akzeptiere die <a href="{% url 'terms_and_conditions' %}" target="_blank">AGB</a></label>
         </div>
-        <div class="form-group">
-            <label for="total-price">Gesamtpreis: €<span id="total-price">{{ preis_standard }}</span></label>
-        </div>
-        <button type="submit" class="btn btn-primary">Jetzt Kaufen</button>
-    </form>
+        <button type="button" class="btn btn-secondary" onclick="previousStep(3)">Zurück</button>
+        <button id="confirm-order-button" type="button" class="btn btn-primary" disabled>Zahlungspflichtig bestellen</button>
+    </div>
 </div>
 
 <script>
@@ -25,5 +51,188 @@
         var totalPrice = pricePerItem * quantity;
         document.getElementById('total-price').innerText = totalPrice.toFixed(2);
     }
+
+    function nextStep(currentStep) {
+        if (validateStep(currentStep)) {
+            document.getElementById('step-' + currentStep).classList.add('d-none');
+            document.getElementById('step-' + (currentStep + 1)).classList.remove('d-none');
+            if (currentStep === 1) {
+                var quantity = parseInt(document.getElementById('quantity').value);
+                var participantsDetails = '';
+                {% if related_persons %}
+                    for (var i = 0; i < quantity; i++) {
+                        participantsDetails += `
+                            <div class="participant-form">
+                                <h4>Teilnehmer ${i + 1}</h4>
+                                <div class="form-group">
+                                    <label for="person-${i}">Teilnehmer auswählen:</label>
+                                    <select id="person-${i}" name="person-${i}" class="form-control" required>
+                                        {% for person in related_persons %}
+                                            <option value="{{ person.id }}">{{ person.vorname }} {{ person.nachname }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="meal-${i}">Mahlzeitoption:</label>
+                                    <select id="meal-${i}" name="meal-${i}" class="form-control" required>
+                                        <option value="Standard">Standard</option>
+                                        <option value="Vegetarisch">Vegetarisch</option>
+                                    </select>
+                                </div>
+                            </div>
+                        `;
+                    }
+                {% else %}
+                    for (var i = 0; i < quantity; i++) {
+                        participantsDetails += `
+                            <div class="participant-form">
+                                <h4>Teilnehmer ${i + 1}</h4>
+                                <div class="form-group">
+                                    <label for="firstname-${i}">Vorname:</label>
+                                    <input type="text" id="firstname-${i}" name="firstname-${i}" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="lastname-${i}">Nachname:</label>
+                                    <input type="text" id="lastname-${i}" name="lastname-${i}" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email-${i}">E-Mail:</label>
+                                    <input type="email" id="email-${i}" name="email-${i}" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="meal-${i}">Mahlzeitoption:</label>
+                                    <select id="meal-${i}" name="meal-${i}" class="form-control" required>
+                                        <option value="Standard">Standard</option>
+                                        <option value="Vegetarisch">Vegetarisch</option>
+                                    </select>
+                                </div>
+                            </div>
+                        `;
+                    }
+                {% endif %}
+                document.getElementById('participants-details').innerHTML = participantsDetails;
+            } else if (currentStep === 2) {
+                // Collecting confirmation details
+                var detailsForm = document.getElementById('details-form');
+                var confirmationDetails = '<h4>Teilnehmer Details</h4>';
+                for (var i = 0; i < detailsForm.elements.length; i++) {
+                    var element = detailsForm.elements[i];
+                    if (element.name.startsWith('person-')) {
+                        var selectedPerson = element.options[element.selectedIndex].text;
+                        confirmationDetails += `<p>Teilnehmer: ${selectedPerson}</p>`;
+                    } else if (element.name.startsWith('firstname-')) {
+                        var firstname = element.value;
+                        var lastname = document.getElementById(`lastname-${i}`).value;
+                        confirmationDetails += `<p>Teilnehmer: ${firstname} ${lastname}</p>`;
+                    }
+                    if (element.name.startsWith('email-')) {
+                        confirmationDetails += `<p>E-Mail: ${element.value}</p>`;
+                    } else if (element.name.startsWith('meal-')) {
+                        confirmationDetails += `<p>Mahlzeitoption: ${element.value}</p>`;
+                    }
+                }
+                document.getElementById('confirmation-details').innerHTML = confirmationDetails;
+
+                // Displaying the total amount
+                var totalAmount = parseFloat(document.getElementById('total-price').innerText);
+                document.getElementById('total-amount').innerText = totalAmount.toFixed(2);
+            }
+        }
+    }
+
+    function previousStep(currentStep) {
+        document.getElementById('step-' + currentStep).classList.add('d-none');
+        document.getElementById('step-' + (currentStep - 1)).classList.remove('d-none');
+    }
+
+    function validateStep(currentStep) {
+        if (currentStep === 1) {
+            let isValid = true;
+            const form = document.getElementById('checkout-form');
+            form.querySelectorAll('input[required], select[required]').forEach((input) => {
+                if (!input.value) {
+                    isValid = false;
+                    input.classList.add('is-invalid');
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+            if (!isValid) {
+                return false;
+            } else {
+                return validateQuantity();
+            }
+        } else if (currentStep === 2) {
+            let isValid = true;
+            const form = document.getElementById('details-form');
+            form.querySelectorAll('input[required], select[required]').forEach((input) => {
+                if (!input.value) {
+                    input.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+            return isValid;
+        }
+        return true;
+    }
+
+    function validateQuantity() {
+        const quantityField = document.getElementById('quantity');
+        const maxQuantity = parseInt(quantityField.max, 10);
+        const selectedQuantity = parseInt(quantityField.value, 10);
+        if (selectedQuantity > maxQuantity) {
+            document.getElementById('quantityError').style.display = 'block';
+            return false; // Prevent form submission
+        }
+        document.getElementById('quantityError').style.display = 'none';
+        return true; // Allow form submission
+    }
+
+    function toggleConfirmButton() {
+        const checkbox = document.getElementById('accept-terms');
+        const confirmButton = document.getElementById('confirm-order-button');
+        confirmButton.disabled = !checkbox.checked;
+    }
+
+    document.getElementById('confirm-order-button').addEventListener('click', function() {
+        let formData = new FormData();
+        formData.append('schulungstermin_id', {{ schulungstermin.id }});
+        formData.append('quantity', document.getElementById('quantity').value);
+
+        // Append participant details
+        document.querySelectorAll('.participant-form').forEach((participant, index) => {
+            if (participant.querySelector(`[name=person-${index}]`)) {
+                formData.append(`person-${index}`, participant.querySelector(`[name=person-${index}]`).value);
+            } else {
+                formData.append(`firstname-${index}`, participant.querySelector(`[name=firstname-${index}]`).value);
+                formData.append(`lastname-${index}`, participant.querySelector(`[name=lastname-${index}]`).value);
+                formData.append(`email-${index}`, participant.querySelector(`[name=email-${index}]`).value);
+            }
+            formData.append(`meal-${index}`, participant.querySelector(`[name=meal-${index}]`).value);
+        });
+
+        fetch("{% url 'confirm_order' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Get the base URL from the Django template tag
+                let baseUrl = `{% url 'order_confirmation' 0 %}`;
+                // Replace the '0' with the actual id
+                let newUrl = baseUrl.replace('0', data.bestellung_id);
+                // Do something with the new URL (e.g., navigate to it)
+                window.location.href = newUrl;
+            } else {
+                alert('Fehler bei der Bestellung');
+            }
+        });
+    });
 </script>
 {% endblock content %}

@@ -26,10 +26,12 @@
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="/mitarbeiter">Mitarbeiter verwalten</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{% url 'order_list' %}">Meine Bestellungen</a>
+                </li>
                 {% endif %}
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="https://docs.google.com/document/d/e/2PACX-1vS16yzjhok2aywLq5QUUHJAqA16KNnqbEPF48BJc-8CY6Nke7MRft3cpzN3lw6I_sK4xNhDm3bq9FW6/pub" target="_blank">Hilfe</a>
-
                 </li>
             </ul>
             <div class="d-flex">
@@ -55,10 +57,9 @@
         <hr/>
         <div class="text-muted d-flex justify-content-between align-items-center pt-3">
             <p class="mb-0">Copyright © 2024 WTG Burgenland</p>
-
+            <a href="{% url 'terms_and_conditions' %}" target="_blank">AGB/Datenschutz</a>
         </div>
     </div>
 </footer>
 </body>
-
 </html>

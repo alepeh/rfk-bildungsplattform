@@ -1,0 +1,10 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block branding %}
+  {% if TEST_SYSTEM %}
+    <div style="color: lightcoral; padding: 10px; text-align: center;">
+      <strong>Test System</strong>
+    </div>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

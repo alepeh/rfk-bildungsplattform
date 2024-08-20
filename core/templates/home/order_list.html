@@ -1,0 +1,34 @@
+{% extends "../components/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Meine Bestellungen</h1>
+    <div class="alert alert-primary" role="alert">
+        Änderungen zu bereits getätigten Bestellungen können nur per e-mail an <b>bildungsplattform@rauchfangkehrer.or.at</b> erfolgen.
+    </div>
+    {% if bestellungen.exists %}
+        <ul class="list-group">
+        {% for bestellung in bestellungen %}
+            <li class="list-group-item mb-3">
+                <h5>Bestellung für Schulung: {{ bestellung.schulungstermin.schulung.name }}</h5>
+                <p><strong>Bestellnr:</strong> {{ bestellung.id }}</p>
+                <p><strong>Schulungstermin:</strong> {{ bestellung.schulungstermin.datum_von }}</p>
+                <p><strong>Anzahl:</strong> {{ bestellung.anzahl }}</p>
+                <p><strong>Gesamtpreis:</strong> €{{ bestellung.gesamtpreis }}</p>
+                <h6>Teilnehmer:</h6>
+                <ul>
+                    {% for teilnehmer in bestellung.teilnehmer_details %}
+                        <li>
+                            <p><strong>Name:</strong> {{ teilnehmer.vorname }} {{ teilnehmer.nachname }}</p>
+                            <p><strong>Verpflegung:</strong> {{ teilnehmer.get_verpflegung_display }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Sie haben noch keine Bestellungen gemacht.</p>
+    {% endif %}
+</div>
+{% endblock %}

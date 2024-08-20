@@ -9,7 +9,7 @@ from django.template import loader
 from django.urls import reverse
 from django.utils import timezone
 
-from core.models import Betrieb, Person, SchulungsTermin, SchulungsTerminPerson
+from core.models import Betrieb, Person, SchulungsTermin, SchulungsTeilnehmer
 from core.services.email import send_reminder_to_all_teilnehmer
 
 
@@ -30,7 +30,7 @@ def index(request):
 def is_overbooked(request, schulungsterminId):
   schulungstermin = SchulungsTermin.objects.get(id=schulungsterminId)
   teilnehmer = list(
-      SchulungsTerminPerson.objects.filter(
+      SchulungsTeilnehmer.objects.filter(
           schulungstermin=schulungstermin).values_list('person_id', flat=True))
   free_spots = schulungstermin.max_teilnehmer - len(teilnehmer)
   for param in list(request.POST.keys()):
@@ -71,7 +71,7 @@ def register(request: HttpRequest, id: int):
   betrieb = Betrieb.objects.get(geschaeftsfuehrer=person)
   mitarbeiter = Person.objects.filter(betrieb=betrieb)
   schulungstermin = SchulungsTermin.objects.get(id=id)
-  teilnehmer = SchulungsTerminPerson.objects.filter(
+  teilnehmer = SchulungsTeilnehmer.objects.filter(
       schulungstermin=schulungstermin).values_list('person', flat=True)
   template = loader.get_template("home/register.html")
   context = {
@@ -86,18 +86,18 @@ def register(request: HttpRequest, id: int):
 def addPersonToSchulungstermin(schulungsTerminId, personId):
   schulungstermin = SchulungsTermin.objects.get(id=schulungsTerminId)
   person = Person.objects.get(id=personId)
-  if (SchulungsTerminPerson.objects.filter(schulungstermin=schulungstermin,
+  if (SchulungsTeilnehmer.objects.filter(schulungstermin=schulungstermin,
                                            person=person).count() == 0):
-    SchulungsTerminPerson(schulungstermin=schulungstermin,
+    SchulungsTeilnehmer(schulungstermin=schulungstermin,
                           person=person).save()
 
 
 def removePersonFromSchulungstermin(schulungsTerminId, personId):
   schulungstermin = SchulungsTermin.objects.get(id=schulungsTerminId)
   person = Person.objects.get(id=personId)
-  if (SchulungsTerminPerson.objects.filter(schulungstermin=schulungstermin,
+  if (SchulungsTeilnehmer.objects.filter(schulungstermin=schulungstermin,
                                            person=person).count() > 0):
-    SchulungsTerminPerson.objects.get(schulungstermin=schulungstermin,
+    SchulungsTeilnehmer.objects.get(schulungstermin=schulungstermin,
                                       person=person).delete()
 
 
@@ -134,3 +134,6 @@ def send_reminder(request, pk):
     messages.error(request, f"Email konnte nicht versendet werden: {e}")
   return HttpResponseRedirect(
       reverse('admin:core_schulungstermin_change', args=(pk, )))
+
+def terms_and_conditions(request: HttpRequest):
+  return render(request, 'home/terms_and_conditions.html')

@@ -39,21 +39,17 @@ CSRF_TRUSTED_ORIGINS = [
     'https://3e13a2a1-5eb4-431b-a41d-ebc0c9e89c46-00-1pfa686cbln1x.janeway.replit.dev',
     'https://bildungsplattform-test.rauchfangkehrer.or.at',
     'https://bildungsplattform.rauchfangkehrer.or.at',
+    'https://rfk-bildungsplattform-alexanderpehm.replit.app',
 ]
 
 # Application definition
 
 INSTALLED_APPS = [
-    'core.apps.CoreConfig',
-    'erweiterungen.apps.ErweiterungenConfig',
+    'core.apps.CoreConfig', 'erweiterungen.apps.ErweiterungenConfig',
     'bildungsplattform.apps.BildungsplattformAdminConfig',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django_extensions',
-    'django_bootstrap5',
+    'django.contrib.auth', 'django.contrib.contenttypes',
+    'django.contrib.sessions', 'django.contrib.messages',
+    'django.contrib.staticfiles', 'django_extensions', 'django_bootstrap5',
     'django_bootstrap_icons'
 ]
 
@@ -80,6 +76,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'core.context_processors.test_system',
             ],
         },
     },
@@ -100,7 +100,7 @@ DATABASES = {
 
 # Use sqlite for tests, by default Django would use the same engine for testing
 if 'test' in sys.argv or 'test_coverage' in sys.argv:
-  DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
+    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -152,7 +152,6 @@ LOGOUT_REDIRECT_URL = "/"
 
 # Email configuration
 SCALEWAY_EMAIL_API_TOKEN = os.getenv('SCALEWAY_EMAIL_API_TOKEN')
-
 
 # django-extensions (generate diagrams for all applications)
 GRAPH_MODELS = {
