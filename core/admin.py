@@ -10,24 +10,23 @@ from core.models import (Betrieb, Funktion, Person, Schulung, SchulungsArt,
 
 def export_schulungsteilnehmer_to_csv(modeladmin, request, queryset):
   meta = modeladmin.model._meta
-
   # Define the HTTP response with the appropriate CSV header
   response = HttpResponse(content_type='text/csv')
-  response[
-      'Content-Disposition'] = 'attachment; filename="schulungsteilnehmer.csv"'
-
+  response['Content-Disposition'] = 'attachment; filename="schulungsteilnehmer.csv"'
   writer = csv.writer(response)
-
   # Write your CSV headers (adapt these fields as needed)
-  writer.writerow(['Person', 'Betrieb', 'SchulungsTermin'])
-
+  writer.writerow(['Person', 'Betrieb', 'SchulungsTermin', 'DSV akzeptiert'])
   # Gather related SchulungsTeilnehmer instances and write them to the CSV
   for schulungstermin in queryset:
-    for stp in schulungstermin.schulungsteilnehmer_set.all():
-      writer.writerow([stp.person, stp.person.betrieb, schulungstermin])
-
+      for stp in schulungstermin.schulungsteilnehmer_set.all():
+          dsv_akzeptiert = 'Ja' if stp.person.dsv_akzeptiert else 'Nein'
+          writer.writerow([
+              stp.person, 
+              stp.person.betrieb, 
+              schulungstermin, 
+              dsv_akzeptiert
+          ])
   return response
-
 
 export_schulungsteilnehmer_to_csv.short_description = "Schulungsteilnehmer CSV Export"
 

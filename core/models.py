@@ -154,6 +154,7 @@ class Person(BaseModel):
   vorname = models.CharField(max_length=150)
   nachname = models.CharField(max_length=150)
   email = models.EmailField(null=True, blank=True)
+  dsv_akzeptiert = models.BooleanField(default=False, verbose_name="Datenschutzvereinbarung akzeptiert")
   funktion = models.ForeignKey(
       Funktion,
       on_delete=models.SET_NULL,
