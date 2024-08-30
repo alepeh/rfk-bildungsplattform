@@ -17,6 +17,7 @@
     <div class="card-body">
       <form method="post" class="needs-validation" novalidate>
         {% csrf_token %}
+        {{ formset.management_form }}
         {% for form in formset %}
           <div class="row mb-3">
             {{ form.id }}

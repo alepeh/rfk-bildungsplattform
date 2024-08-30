@@ -87,18 +87,17 @@ def addPersonToSchulungstermin(schulungsTerminId, personId):
   schulungstermin = SchulungsTermin.objects.get(id=schulungsTerminId)
   person = Person.objects.get(id=personId)
   if (SchulungsTeilnehmer.objects.filter(schulungstermin=schulungstermin,
-                                           person=person).count() == 0):
-    SchulungsTeilnehmer(schulungstermin=schulungstermin,
-                          person=person).save()
+                                         person=person).count() == 0):
+    SchulungsTeilnehmer(schulungstermin=schulungstermin, person=person).save()
 
 
 def removePersonFromSchulungstermin(schulungsTerminId, personId):
   schulungstermin = SchulungsTermin.objects.get(id=schulungsTerminId)
   person = Person.objects.get(id=personId)
   if (SchulungsTeilnehmer.objects.filter(schulungstermin=schulungstermin,
-                                           person=person).count() > 0):
+                                         person=person).count() > 0):
     SchulungsTeilnehmer.objects.get(schulungstermin=schulungstermin,
-                                      person=person).delete()
+                                    person=person).delete()
 
 
 def mitarbeiter(request):
@@ -134,6 +133,7 @@ def send_reminder(request, pk):
     messages.error(request, f"Email konnte nicht versendet werden: {e}")
   return HttpResponseRedirect(
       reverse('admin:core_schulungstermin_change', args=(pk, )))
+
 
 def terms_and_conditions(request: HttpRequest):
   return render(request, 'home/terms_and_conditions.html')
