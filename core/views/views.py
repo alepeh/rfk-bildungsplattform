@@ -4,10 +4,12 @@ from django.contrib import messages
 from django.db.models import Q
 from django.forms import inlineformset_factory
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.template import loader
 from django.urls import reverse
 from django.utils import timezone
+from django.http import JsonResponse
+from django.contrib.admin.views.decorators import staff_member_required
 
 from core.models import Betrieb, Person, SchulungsTermin, SchulungsTeilnehmer
 from core.services.email import send_reminder_to_all_teilnehmer
@@ -127,7 +129,8 @@ def mitarbeiter(request):
 def send_reminder(request, pk):
   try:
     send_reminder_to_all_teilnehmer(pk)
-    messages.success(request, "Erinnerung an alle Teilnehmer verschickt.")
+    messages.success(
+        request, "Erinnerung an alle Teilnehmer mit email-adresse verschickt.")
   except requests.exceptions.RequestException as e:
     # Handle request errors
     messages.error(request, f"Email konnte nicht versendet werden: {e}")
@@ -137,3 +140,14 @@ def send_reminder(request, pk):
 
 def terms_and_conditions(request: HttpRequest):
   return render(request, 'home/terms_and_conditions.html')
+
+
+@staff_member_required
+def get_person_details(request, person_id):
+  print(person_id)
+  person = get_object_or_404(Person, id=person_id)
+  return JsonResponse({
+      'vorname': person.vorname,
+      'nachname': person.nachname,
+      'email': person.email,
+  })

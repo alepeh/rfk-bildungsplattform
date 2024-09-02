@@ -9,10 +9,10 @@ def send_reminder_to_all_teilnehmer(schulungsterminId):
     schulungstermin = SchulungsTermin.objects.get(pk=schulungsterminId)
 
     emails = list(
-        schulungstermin.schulungsterminperson_set.exclude(
-            Q(person__benutzer__email='')
-            | Q(person__benutzer__isnull=True)).values_list(
-                'person__benutzer__email', flat=True))
+        schulungstermin.schulungsteilnehmer_set.exclude(
+            email__isnull=True
+        ).values_list('email', flat=True)
+    )
     schulung_beginn = schulungstermin.datum_von.strftime("%d.%m.%Y um %H:%M")
     subject = f'Schulungserinnerung: {schulungstermin.schulung} am {schulung_beginn}'
 

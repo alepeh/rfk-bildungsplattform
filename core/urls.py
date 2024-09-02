@@ -18,4 +18,5 @@ urlpatterns = [
     path('meine_bestellungen/',
          orders_view.UserBestellungenListView.as_view(),
          name='order_list'),
+    path('admin/get_person_details/<int:person_id>/', views.get_person_details, name='get_person_details'),
 ]

@@ -64,6 +64,12 @@ class SchulungsTeilnehmerInline(admin.TabularInline):
   def betrieb(self, obj):
     return obj.person.betrieb
 
+  def get_formset(self, request, obj=None, **kwargs):
+    formset = super().get_formset(request, obj, **kwargs)
+    form = formset.form
+    form.base_fields['person'].widget.attrs['onchange'] = 'populateFields(this);'
+    return formset
+
   betrieb.short_description = 'Betrieb'
 
 
@@ -92,6 +98,9 @@ class SchulungsTerminAdmin(admin.ModelAdmin):
   inlines = (SchulungsTeilnehmerInline, )
   ordering = ('datum_von', )
   actions = [export_schulungsteilnehmer_to_csv]
+
+  class Media:
+    js = ('js/schulungsteilnehmer_admin.js',)
 
 
 class BetriebAdmin(admin.ModelAdmin):
