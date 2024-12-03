@@ -141,6 +141,8 @@ def send_reminder(request, pk):
 def terms_and_conditions(request: HttpRequest):
   return render(request, 'home/terms_and_conditions.html')
 
+def impressum(request):
+  return render(request, 'home/impressum.html')
 
 @staff_member_required
 def get_person_details(request, person_id):

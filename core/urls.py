@@ -12,6 +12,7 @@ urlpatterns = [
          checkout_view.order_confirmation,
          name='order_confirmation'),
     path('terms-and-conditions/', views.terms_and_conditions, name='terms_and_conditions'),
+    path('impressum/', views.impressum, name='impressum'),
     path('mitarbeiter', views.mitarbeiter, name='mitarbeiter'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('send-reminder/<int:pk>/', views.send_reminder, name='send_reminder'),
