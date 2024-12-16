@@ -59,16 +59,28 @@ def confirm_order(request: HttpRequest):
         status='Bestellt')
     bestellung.save()
 
-    # Create SchulungsTeilnehmer objects using selected persons
+    # Create SchulungsTeilnehmer objects
     for i in range(int(anzahl_str)):
-        person_id = data[f'person-{i}']
-        person = get_object_or_404(Person, id=person_id)
+        if f'person-{i}' in data:
+            # For related persons
+            person_id = data[f'person-{i}']
+            person = get_object_or_404(Person, id=person_id)
+            vorname = person.vorname
+            nachname = person.nachname
+            email = person.email
+        else:
+            # For non-related persons
+            vorname = data[f'firstname-{i}']
+            nachname = data[f'lastname-{i}']
+            email = data[f'email-{i}']
+            person = None
+            
         SchulungsTeilnehmer.objects.create(
             schulungstermin=schulungstermin,
             bestellung=bestellung,
-            vorname=person.vorname,
-            nachname=person.nachname,
-            email=person.email,  # Assuming email is a field on Person
+            vorname=vorname,
+            nachname=nachname,
+            email=email,
             verpflegung=data[f'meal-{i}'],
             person=person,
             status='Angemeldet')
