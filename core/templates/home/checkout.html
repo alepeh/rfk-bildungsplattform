@@ -4,7 +4,7 @@
     <div id="step-1" class="checkout-step">
         <h1>Schulung: {{ schulungstermin.schulung.name }}</h1>
         <p>Beschreibung: {{ schulungstermin.schulung.beschreibung }}</p>
-        <p>Preis pro Teilnehmer: €<span id="preis-standard">{{ preis }}</span></p>
+        <p>Preis pro Teilnehmer: €<span id="preis-standard">{{ preis|default:"0.00" }}</span></p>
         <p>Noch {{ schulungstermin.freie_plaetze }} Plätze verfügbar</p>
 
         <form id="checkout-form">
@@ -16,7 +16,7 @@
             </div>
             <div class="form-group">
                 <h3>
-                    <label for="total-price">Gesamtpreis: €<span id="total-price">{{ preis }}</span></label>
+                    <label for="total-price">Gesamtpreis: €<span id="total-price">{{ preis|default:"0.00" }}</span></label>
                 </h3>
             </div>
             <button type="button" class="btn btn-primary" onclick="nextStep(1)">Weiter</button>
