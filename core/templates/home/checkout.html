@@ -46,10 +46,11 @@
 
 <script>
     function calculateTotal() {
-        var pricePerItem = parseFloat(document.getElementById('preis-standard').innerText) || 0;
+        var pricePerItem = (parseFloat(document.getElementById('preis-standard').innerText.replace(',', '.')) || 0).toFixed(2);
         var quantity = parseInt(document.getElementById('quantity').value) || 0;
-        var totalPrice = pricePerItem * quantity;
-        document.getElementById('total-price').innerText = totalPrice.toFixed(2);
+        var totalPrice = (parseFloat(pricePerItem) * quantity).toFixed(2);
+        document.getElementById('total-price').innerText = totalPrice;
+        document.getElementById('total-amount').innerText = totalPrice;
     }
 
     function nextStep(currentStep) {
