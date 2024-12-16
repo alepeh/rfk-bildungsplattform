@@ -46,8 +46,8 @@
 
 <script>
     function calculateTotal() {
-        var pricePerItem = parseFloat(document.getElementById('preis-standard').innerText);
-        var quantity = parseInt(document.getElementById('quantity').value);
+        var pricePerItem = parseFloat(document.getElementById('preis-standard').innerText) || 0;
+        var quantity = parseInt(document.getElementById('quantity').value) || 0;
         var totalPrice = pricePerItem * quantity;
         document.getElementById('total-price').innerText = totalPrice.toFixed(2);
     }
