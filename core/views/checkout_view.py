@@ -50,12 +50,14 @@ def confirm_order(request: HttpRequest):
         preis = schulungstermin.schulung.preis_standard
 
     # Create the Bestellung object
+    einzelpreis = preis or 0  # Default to 0 if preis is None
+    anzahl = int(anzahl_str)
     bestellung = Bestellung(
         person=person,  # Assume the user is linked to a Person
         schulungstermin=schulungstermin,
-        anzahl=int(anzahl_str),
-        einzelpreis=preis,
-        gesamtpreis=int(anzahl_str) * preis,
+        anzahl=anzahl,
+        einzelpreis=einzelpreis,
+        gesamtpreis=anzahl * einzelpreis,
         status='Bestellt')
     bestellung.save()
 
