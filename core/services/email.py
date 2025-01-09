@@ -32,23 +32,19 @@ def send_reminder_to_all_teilnehmer(schulungsterminId):
     send_email(subject, html_content, emails)
 
 
-def send_order_confirmation_email(to_email, bestellung, bank_details):
+def send_order_confirmation_email(to_email, bestellung):
     subject = 'Bestellbestätigung'
     html_message = f'''
     <html>
     <body>
       <p>Sehr geehrte Damen und Herren,</p>
-      <p>Ihre Bestellung wurde erfolgreich aufgegeben.</p>
+      <p>Ihre Bestellung war erfolgreich.</p>
       <p><strong>Bestellnummer:</strong> {bestellung.id}</p>
       <p><strong>Gesamtpreis:</strong> €{bestellung.gesamtpreis}</p>
       <p><strong>Schulungs-Termin:</strong> {bestellung.schulungstermin.schulung.name}</p>
       <p><strong>Datum:</strong> {bestellung.schulungstermin.datum_von.strftime("%d.%m.%Y um %H:%M")}</p>
       <p><strong>Ort:</strong> {bestellung.schulungstermin.ort.name}</p>
-      <p>Bitte den gesamten Rechnungsbetrag innerhalb von 14 Werktagen auf nachstehendes Konto überweisen.<br/>
-      Empfänger: {bank_details["account_owner"]}<br/>
-      Bankname: {bank_details["bank_name"]}<br/>
-      IBAN: {bank_details["iban"]}<br/>
-      BIC: {bank_details["bic"]}
+      <p>Die Rechnung wird separat zugestellt und ist vor Schulungsbeginn zu begleichen.
       </p>
       <p>Vielen Dank für Ihre Bestellung.</p>
       <p>Mit freundlichen Grüßen,<br>Ihr Team</p>

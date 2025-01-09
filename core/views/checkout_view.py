@@ -87,14 +87,7 @@ def confirm_order(request: HttpRequest):
             person=person,
             status='Angemeldet')
 
-    bank_details = {
-        "account_owner": "Wärmetechnische Gesellschaft Burgenland",
-        "bank_name": "Raiffeisenbank Burgenland Mitte",
-        "iban": "AT87 3306 5001 0019 1767",
-        "bic": "RLBBAT2E065"
-    }
-
-    send_order_confirmation_email(request.user.email, bestellung, bank_details)
+    send_order_confirmation_email(request.user.email, bestellung)
 
     # Redirect to the confirmation page
     return JsonResponse({'status': 'success', 'bestellung_id': bestellung.id})
@@ -102,14 +95,7 @@ def confirm_order(request: HttpRequest):
 
 def order_confirmation(request: HttpRequest, bestellung_id: int):
     bestellung = get_object_or_404(Bestellung, id=bestellung_id)
-    bank_details = {
-        "account_owner": "Wärmetechnische Gesellschaft Burgenland",
-        "bank_name": "Raiffeisenbank Burgenland Mitte",
-        "iban": "AT87 3306 5001 0019 1767",
-        "bic": "RLBBAT2E065"
-    }
     context = {
         'bestellung': bestellung,
-        'bank_details': bank_details,
     }
     return render(request, 'home/order_confirmation.html', context)

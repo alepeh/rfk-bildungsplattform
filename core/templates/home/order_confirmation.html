@@ -4,14 +4,9 @@
     <h1>Bestellbestätigung</h1>
 
     {% if bestellung %}
-        <p>Vielen Dank für Deine Bestellung. Deine Bestellung war erfolgreich. Bitte den gesamten Rechnungsbetrag innerhalb von 14 Werktagen auf nachstehendes Konto überwiesen.</p>
+        <p>Vielen Dank für Deine Bestellung. Deine Bestellung war erfolgreich. Die Rechnung wird separat zugestellt und ist vor dem Schulungstermin zu begleichen.</p>
         <p>Bestellnummer: {{ bestellung.id }}</p>
         <p>Gesamtpreis: €{{ bestellung.gesamtpreis|default:"0.00" }}</p>
-        <h3>Bankdaten für die Überweisung:</h3>
-        <p>Empfänger: {{ bank_details.account_owner }}</p>
-        <p>Bankname: {{ bank_details.bank_name }}</p>
-        <p>IBAN: {{ bank_details.iban }}</p>
-        <p>BIC: {{ bank_details.bic }}</p>
     {% else %}
         <p>Fehler bei der Bestellung. Bitte versuchen Sie es erneut.</p>
     {% endif %}
