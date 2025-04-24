@@ -122,6 +122,9 @@ def mitarbeiter(request):
       formset.save()
       messages.success(request, 'Mitarbeiter erfolgreich gespeichert!')
   else:
+    formset = PersonFormSet(instance=betrieb, queryset=queryset)
+  return render(request, "home/mitarbeiter.html", {"formset": formset})
+
 
 def export_schulungsteilnehmer_pdf(request, pk):
     from reportlab.lib import colors
@@ -187,9 +190,6 @@ def export_schulungsteilnehmer_pdf(request, pk):
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="teilnehmerliste_{schulungstermin.pk}.pdf"'
     return response
-
-    formset = PersonFormSet(instance=betrieb, queryset=queryset)
-  return render(request, "home/mitarbeiter.html", {"formset": formset})
 
 
 def send_reminder(request, pk):
