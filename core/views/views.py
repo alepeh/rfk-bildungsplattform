@@ -139,8 +139,8 @@ def export_schulungsteilnehmer_pdf(request, pk):
     doc = SimpleDocTemplate(
         buffer,
         pagesize=A4,
-        rightMargin=30,
-        leftMargin=30,
+        rightMargin=15,
+        leftMargin=15,
         topMargin=30,
         bottomMargin=30
     )
