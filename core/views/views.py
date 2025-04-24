@@ -149,11 +149,13 @@ def export_schulungsteilnehmer_pdf(request, pk):
     
     # Add title
     styles = getSampleStyleSheet()
-    title = Paragraph(f"{schulungstermin.schulung.name} - {schulungstermin.datum_von.strftime('%d.%m.%Y')}", styles['Heading1'])
+    title_style = styles['Heading2']
+    title_style.alignment = 1  # Center alignment
+    title = Paragraph(f"{schulungstermin.schulung.name} - {schulungstermin.datum_von.strftime('%d.%m.%Y')}", title_style)
     elements.append(title)
     
     # Create table data
-    data = [['Name', 'Betrieb', 'Email', 'Telefon', 'Unterschrift', 'DSV akzeptiert']]
+    data = [['Name', 'Betrieb', 'Email', 'Telefon', 'Unterschrift', 'DSV*']]
     for teilnehmer in schulungstermin.schulungsteilnehmer_set.all():
         if teilnehmer.person:
             data.append([
@@ -177,7 +179,7 @@ def export_schulungsteilnehmer_pdf(request, pk):
     data.append([''] * 6)
     
     # Create table with adjusted column widths
-    colWidths = [130, 130, 140, 100, 100, 100]
+    colWidths = [130, 130, 140, 100, 100, 60]
     table = Table(data, colWidths=colWidths)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
@@ -193,6 +195,13 @@ def export_schulungsteilnehmer_pdf(request, pk):
         ('BOTTOMPADDING', (0, 1), (-1, -1), 12),
     ]))
     elements.append(table)
+    
+    # Add footnote
+    footnote_style = styles['Normal']
+    footnote_style.fontSize = 8
+    footnote = Paragraph("* DSV = Datenschutzvereinbarung akzeptiert", footnote_style)
+    elements.append(Paragraph("<br/><br/>", footnote_style))  # Add some space
+    elements.append(footnote)
     
     # Build PDF
     doc.build(elements)
