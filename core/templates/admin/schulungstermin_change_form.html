@@ -4,5 +4,8 @@
 <li>
     <a href="{% url 'send_reminder' object_id %}" class="button">Erinnerungsemail senden</a>
 </li>
+<li>
+    <a href="{% url 'export_teilnehmer_pdf' object_id %}" class="button">Teilnehmerliste PDF</a>
+</li>
 {{ block.super }}
 {% endblock %}
