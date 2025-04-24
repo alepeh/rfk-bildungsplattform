@@ -95,7 +95,11 @@ class PersonAdmin(admin.ModelAdmin):
 
 class SchulungsTerminAdmin(admin.ModelAdmin):
   change_form_template = 'admin/schulungstermin_change_form.html'
-  list_display = ('schulung', 'datum_von', 'buchbar', 'freie_plaetze')
+  list_display = ('schulung', 'datum_von', 'buchbar', 'freie_plaetze', 'teilnehmer_count')
+
+  def teilnehmer_count(self, obj):
+    return obj.schulungsteilnehmer_set.count()
+  teilnehmer_count.short_description = 'Teilnehmer'
   inlines = (SchulungsTeilnehmerInline, )
   ordering = ('datum_von', )
   actions = [export_schulungsteilnehmer_to_csv]
