@@ -92,6 +92,10 @@ class SchulungsTermin(BaseModel):
       betriebe.add(schulungsteilnehmer.person.betrieb)
     return betriebe
 
+  @property
+  def teilnehmer_count(self):
+    return self.schulungsteilnehmer_set.count()
+
   def __str__(self):
     return f"{self.schulung.name} am {self.datum_von}"
 
