@@ -173,9 +173,12 @@ def export_schulungsteilnehmer_pdf(request, pk):
                 '',  # Empty signature column
                 ''
             ])
+    # Add empty row at the end
+    data.append([''] * 6)
     
-    # Create table
-    table = Table(data)
+    # Create table with column widths
+    colWidths = [120, 120, 140, 100, 100, 80]
+    table = Table(data, colWidths=colWidths)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
