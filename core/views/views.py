@@ -135,7 +135,16 @@ def export_schulungsteilnehmer_pdf(request, pk):
 
     schulungstermin = get_object_or_404(SchulungsTermin, pk=pk)
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    # Use landscape orientation and add margins
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=30,
+        leftMargin=30,
+        topMargin=30,
+        bottomMargin=30
+    )
+    doc.pagesize = A4[1], A4[0]  # Swap dimensions for landscape
     elements = []
     
     # Add title
