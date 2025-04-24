@@ -5,6 +5,7 @@ run = "python3 manage.py runserver 0.0.0.0:3000"
 
 [nix]
 channel = "stable-23_05"
+packages = ["postgresql"]
 
 [languages]
 
