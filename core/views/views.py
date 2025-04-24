@@ -176,8 +176,8 @@ def export_schulungsteilnehmer_pdf(request, pk):
     # Add empty row at the end
     data.append([''] * 6)
     
-    # Create table with column widths
-    colWidths = [120, 120, 140, 100, 100, 80]
+    # Create table with adjusted column widths
+    colWidths = [130, 130, 140, 100, 100, 100]
     table = Table(data, colWidths=colWidths)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
