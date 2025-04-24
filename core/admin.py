@@ -97,7 +97,7 @@ class SchulungsTerminAdmin(admin.ModelAdmin):
   change_form_template = 'admin/schulungstermin_change_form.html'
   list_display = ('schulung', 'datum_von', 'buchbar', 'freie_plaetze', 'teilnehmer_count')
   inlines = (SchulungsTeilnehmerInline, )
-  ordering = ('datum_von', )
+  ordering = ('-datum_von', )
   actions = [export_schulungsteilnehmer_to_csv]
 
   class Media:
