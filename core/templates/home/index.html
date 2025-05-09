@@ -1,16 +1,16 @@
 {% extends "../components/base.html" %}
 {% load bootstrap_icons %}
 {% block content %}
-<div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-    <h4>Herzlich Willkommen auf der Bildungsplattform der burgenländischen Rauchfangkehrer!
-    </h4>
-    <p class="lead">Hier könnt ihr euch direkt für die bereits geplanten Schulungen anmelden.</p>
+<div class="text-center mb-5">
+    <h2 class="mb-3 fw-bold text-primary">Herzlich Willkommen auf der Bildungsplattform</h2>
+    <p class="lead text-muted">Hier könnt ihr euch direkt für die bereits geplanten Schulungen anmelden.</p>
 </div>
-<div class='container d-flex flex-column align-items-center'>
+<div class="row g-4">
     {% if schulungstermine %}
     {% for schulungstermin in schulungstermine %}
     {% if schulungstermin.buchbar %}
-    <div class="card w-75 mb-3" style="max-width: 900px;">
+    <div class="col-12">
+        <div class="card h-100">
         <div class="card-header">
             <div class="row g-0">
                 <div class="col-md-4">
