@@ -5,9 +5,9 @@ from django.db import models
 
 
 def get_unique_upload_path(instance, filename):
-    ext = filename.split('.')[-1]
-    unique_filename = f"{uuid.uuid4().hex}.{ext}"
-    return unique_filename
+    name, ext = os.path.splitext(filename)
+    unique_hash = uuid.uuid4().hex[:8]
+    return f"{name}_{unique_hash}{ext}"
 
 
 class BaseModel(models.Model):
