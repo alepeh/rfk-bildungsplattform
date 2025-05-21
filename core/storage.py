@@ -1,6 +1,5 @@
 
 from django.core.files.storage import Storage
-from django.conf import settings
 from replit.object_storage import Client
 import os
 
@@ -16,7 +15,7 @@ class ReplitObjectStorage(Storage):
         return self.client.get_file(name)
         
     def url(self, name):
-        return self.client.get_download_url(name)
+        return self.client.get_url(name)
         
     def exists(self, name):
         try:
