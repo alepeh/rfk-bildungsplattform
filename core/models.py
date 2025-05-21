@@ -54,6 +54,11 @@ class Schulung(BaseModel):
                                          decimal_places=2,
                                          null=True,
                                          blank=True)
+  suitable_for_funktionen = models.ManyToManyField(
+      Funktion,
+      blank=True,
+      help_text="Leer lassen für keine Einschränkung"
+  )
 
   def __str__(self):
     return str(self.name)

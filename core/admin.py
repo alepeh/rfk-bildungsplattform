@@ -52,6 +52,7 @@ class SchulungsTerminInline(admin.TabularInline):
 class SchulungAdmin(admin.ModelAdmin):
   model = Schulung
   inlines = (SchulungsTerminInline, )
+  filter_horizontal = ('suitable_for_funktionen',)
 
 
 class SchulungsTeilnehmerInline(admin.TabularInline):
