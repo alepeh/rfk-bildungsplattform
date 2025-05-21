@@ -1,5 +1,13 @@
 from django.contrib.auth.models import User
+import uuid
+import os
 from django.db import models
+
+
+def get_unique_upload_path(instance, filename):
+    ext = filename.split('.')[-1]
+    unique_filename = f"{uuid.uuid4().hex}.{ext}"
+    return unique_filename
 
 
 class BaseModel(models.Model):
@@ -271,7 +279,7 @@ from core.storage import ScalewayObjectStorage
 class Document(BaseModel):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
-    file = models.FileField(storage=ScalewayObjectStorage())
+    file = models.FileField(upload_to=get_unique_upload_path, storage=ScalewayObjectStorage())
     allowed_funktionen = models.ManyToManyField(
         Funktion, blank=True,
         help_text="Leave empty to make document visible to all users"
