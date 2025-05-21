@@ -20,6 +20,23 @@ class SchulungsArt(BaseModel):
     verbose_name_plural = "Schulungsarten"
 
 
+class Funktion(BaseModel):
+  name = models.CharField(max_length=100)
+  sortierung = models.IntegerField(default=0)
+  schulungsanforderung = models.ManyToManyField(
+      SchulungsArt,
+      through='SchulungsArtFunktion',
+      through_fields=('funktion', 'schulungsart'),
+  )
+
+  def __str__(self):
+    return str(self.name)
+
+  class Meta:
+    ordering = ['sortierung']
+    verbose_name_plural = "funktionen"
+
+
 class SchulungsOrt(BaseModel):
   name = models.CharField(max_length=100)
   adresse = models.CharField(max_length=100, null=True, blank=True)
@@ -55,10 +72,7 @@ class Schulung(BaseModel):
                                          null=True,
                                          blank=True)
   suitable_for_funktionen = models.ManyToManyField(
-      Funktion,
-      blank=True,
-      help_text="Leer lassen für keine Einschränkung"
-  )
+      Funktion, blank=True, help_text="Leer lassen für keine Einschränkung")
 
   def __str__(self):
     return str(self.name)
@@ -108,23 +122,6 @@ class SchulungsTermin(BaseModel):
     verbose_name_plural = "Schulungstermine"
 
 
-class Funktion(BaseModel):
-  name = models.CharField(max_length=100)
-  sortierung = models.IntegerField(default=0)
-  schulungsanforderung = models.ManyToManyField(
-      SchulungsArt,
-      through='SchulungsArtFunktion',
-      through_fields=('funktion', 'schulungsart'),
-  )
-
-  def __str__(self):
-    return str(self.name)
-
-  class Meta:
-    ordering = ['sortierung']
-    verbose_name_plural = "funktionen"
-
-
 class Betrieb(BaseModel):
   name = models.CharField(max_length=100)
   kehrgebiet = models.CharField(max_length=10, null=True, blank=True)
@@ -164,7 +161,8 @@ class Person(BaseModel):
   nachname = models.CharField(max_length=150)
   email = models.EmailField(null=True, blank=True)
   telefon = models.CharField(max_length=30, null=True, blank=True)
-  dsv_akzeptiert = models.BooleanField(default=False, verbose_name="Datenschutzvereinbarung akzeptiert")
+  dsv_akzeptiert = models.BooleanField(
+      default=False, verbose_name="Datenschutzvereinbarung akzeptiert")
   funktion = models.ForeignKey(
       Funktion,
       on_delete=models.SET_NULL,
