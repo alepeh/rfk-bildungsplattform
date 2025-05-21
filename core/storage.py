@@ -15,7 +15,7 @@ class ReplitObjectStorage(Storage):
         return self.client.get_file(name)
         
     def url(self, name):
-        return self.client.get_url(name)
+        return self.client.get_download_url(name)
         
     def exists(self, name):
         try:
