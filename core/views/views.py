@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.forms import inlineformset_factory
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
+from core.models import Document
 from django.template import loader
 from django.urls import reverse
 from django.utils import timezone
