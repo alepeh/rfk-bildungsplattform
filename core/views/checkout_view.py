@@ -17,10 +17,15 @@ def checkout(request: HttpRequest, schulungstermin_id: int):
         preis = schulungstermin.schulung.preis_standard
 
     if person.betrieb is not None:
-        related_persons = Person.objects.filter(betrieb=person.betrieb)
+        # Exclude persons who are already registered for this schulungstermin
+        existing_teilnehmer = SchulungsTeilnehmer.objects.filter(
+            schulungstermin=schulungstermin
+        ).values_list('person_id', flat=True)
+        related_persons = Person.objects.filter(betrieb=person.betrieb).exclude(
+            id__in=existing_teilnehmer
+        )
     else:
-        related_persons = Person.objects.none(
-        )  # No related persons if no betrieb
+        related_persons = Person.objects.none()
 
     context = {
         'schulungstermin': schulungstermin,
@@ -37,6 +42,11 @@ def confirm_order(request: HttpRequest):
     print(data)
     schulungstermin = get_object_or_404(SchulungsTermin,
                                         id=data['schulungstermin_id'])
+    
+    # Check for existing registrations
+    existing_teilnehmer = set(SchulungsTeilnehmer.objects.filter(
+        schulungstermin=schulungstermin
+    ).values_list('person_id', flat=True))
 
     anzahl_str = data.get('quantity')
     if isinstance(anzahl_str, list):
@@ -67,6 +77,14 @@ def confirm_order(request: HttpRequest):
             # For related persons
             person_id = data[f'person-{i}']
             person = get_object_or_404(Person, id=person_id)
+            
+            # Check if person is already registered
+            if person.id in existing_teilnehmer:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': f'{person.vorname} {person.nachname} ist bereits für diese Schulung angemeldet.'
+                }, status=400)
+                
             vorname = person.vorname
             nachname = person.nachname
             email = person.email
