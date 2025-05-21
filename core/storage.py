@@ -1,31 +1,13 @@
+from django.conf import settings
+from storages.backends.s3boto3 import S3Boto3Storage
 
-from django.core.files.storage import Storage
-from replit.object_storage import Client
-import os
-
-class ReplitObjectStorage(Storage):
-    def __init__(self):
-        self.client = Client()
-        
-    def _save(self, name, content):
-        self.client.upload_file(name, content)
-        return name
-        
-    def _open(self, name, mode='rb'):
-        return self.client.get_file(name)
-        
-    def url(self, name):
-        return self.client.get_download_url(name)
-        
-    def exists(self, name):
-        try:
-            self.client.get_file(name)
-            return True
-        except:
-            return False
-        
-    def size(self, name):
-        return self.client.get_file_size(name)
-        
-    def delete(self, name):
-        self.client.delete_file(name)
+class ScalewayObjectStorage(S3Boto3Storage):
+    access_key = settings.SCALEWAY_ACCESS_KEY
+    secret_key = settings.SCALEWAY_SECRET_KEY
+    bucket_name = settings.SCALEWAY_BUCKET_NAME
+    region_name = settings.SCALEWAY_REGION
+    endpoint_url = f'https://s3.{settings.SCALEWAY_REGION}.scw.cloud'
+    object_parameters = {
+        'ACL': 'public-read'
+    }
+    querystring_auth = False

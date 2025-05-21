@@ -142,6 +142,15 @@ STATIC_URL = 'static/'
 # matches the directory from where nginx is fetching the files
 STATIC_ROOT = '/www/data/static/'
 
+# Scaleway Object Storage settings
+SCALEWAY_ACCESS_KEY = os.getenv('SCALEWAY_ACCESS_KEY')
+SCALEWAY_SECRET_KEY = os.getenv('SCALEWAY_SECRET_KEY')
+SCALEWAY_BUCKET_NAME = os.getenv('SCALEWAY_BUCKET_NAME')
+SCALEWAY_REGION = os.getenv('SCALEWAY_REGION', 'fr-par')
+
+# Configure default file storage
+DEFAULT_FILE_STORAGE = 'core.storage.ScalewayObjectStorage'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
