@@ -68,8 +68,9 @@
                                 <div class="form-group">
                                     <label for="person-${i}">Teilnehmer auswählen:</label>
                                     <select id="person-${i}" name="person-${i}" class="form-control" required>
+                                        <option value="">Bitte auswählen</option>
                                         {% for person in related_persons %}
-                                            <option value="{{ person.id }}">{{ person.vorname }} {{ person.nachname }}</option>
+                                            <option value="{{ person.id }}" data-name="{{ person.vorname }} {{ person.nachname }}">{{ person.vorname }} {{ person.nachname }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -112,6 +113,7 @@
                     }
                 {% endif %}
                 document.getElementById('participants-details').innerHTML = participantsDetails;
+                updatePersonSelects(); // Call the function here after populating the select elements.
             } else if (currentStep === 2) {
                 // Collecting confirmation details
                 var detailsForm = document.getElementById('details-form');
@@ -196,6 +198,37 @@
         const confirmButton = document.getElementById('confirm-order-button');
         confirmButton.disabled = !checkbox.checked;
     }
+
+    function updatePersonSelects() {
+        var quantity = parseInt(document.getElementById('quantity').value);
+        var selectedPeople = [];
+
+        for (var i = 0; i < quantity; i++) {
+            var selectElement = document.getElementById(`person-${i}`);
+            if (selectElement) {
+                var selectedValue = selectElement.value;
+                if (selectedValue) {
+                    selectedPeople.push(selectedValue);
+                }
+            }
+        }
+
+        for (var i = 0; i < quantity; i++) {
+            var selectElement = document.getElementById(`person-${i}`);
+            if (selectElement) {
+                for (var j = 0; j < selectElement.options.length; j++) {
+                    var option = selectElement.options[j];
+                    if (option.value) {
+                        option.disabled = selectedPeople.includes(option.value) && ! (selectedPeople.indexOf(option.value) == i && selectedValue == option.value); //Allow the current selectElement's selected value to be reselected.
+                    }
+                }
+                selectElement.addEventListener('change', function() {
+                    updatePersonSelects();
+                });
+            }
+        }
+    }
+
 
     document.getElementById('confirm-order-button').addEventListener('click', function() {
         let formData = new FormData();
