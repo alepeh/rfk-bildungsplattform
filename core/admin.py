@@ -133,3 +133,10 @@ admin.site.register(SchulungsOrt)
 admin.site.register(SchulungsTermin, SchulungsTerminAdmin)
 admin.site.register(Bestellung, BestellungAdmin)
 admin.site.register(Organisation, OrganisationAdmin)
+
+class DocumentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'created', 'updated')
+    filter_horizontal = ('allowed_funktionen',)
+    search_fields = ('name', 'description')
+
+admin.site.register(Document, DocumentAdmin)

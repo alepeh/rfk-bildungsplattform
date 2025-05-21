@@ -264,3 +264,19 @@ class Bestellung(BaseModel):
 
   class Meta:
     verbose_name_plural = "Bestellungen"
+
+
+class Document(BaseModel):
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True)
+    file = models.FileField(upload_to='documents/')
+    allowed_funktionen = models.ManyToManyField(
+        Funktion, blank=True,
+        help_text="Leave empty to make document visible to all users"
+    )
+    
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "dokumente"

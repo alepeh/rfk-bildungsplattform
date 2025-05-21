@@ -182,6 +182,23 @@ def export_schulungsteilnehmer_pdf(request, pk):
     colWidths = [160, 160, 170, 120, 120, 70]
     table = Table(data, colWidths=colWidths)
     table.setStyle(TableStyle([
+
+
+@login_required
+def documents(request):
+    user = request.user
+    try:
+        person = Person.objects.get(benutzer=user)
+        # Get documents with no restrictions or where user's function is allowed
+        documents = Document.objects.filter(
+            Q(allowed_funktionen__isnull=True) |
+            Q(allowed_funktionen=person.funktion)
+        ).distinct()
+    except Person.DoesNotExist:
+        documents = Document.objects.filter(allowed_funktionen__isnull=True)
+    
+    return render(request, 'home/documents.html', {'documents': documents})
+
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),

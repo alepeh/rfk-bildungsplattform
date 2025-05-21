@@ -21,4 +21,5 @@ urlpatterns = [
          name='order_list'),
     path('admin/get_person_details/<int:person_id>/', views.get_person_details, name='get_person_details'),
     path('schulungstermin/<int:pk>/export-pdf/', views.export_schulungsteilnehmer_pdf, name='export_teilnehmer_pdf'),
+    path('documents/', views.documents, name='documents'),
 ]

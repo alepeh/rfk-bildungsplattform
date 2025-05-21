@@ -1,0 +1,31 @@
+
+{% extends "../components/base.html" %}
+{% load bootstrap_icons %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Allgemeine Dokumente</h2>
+    
+    {% if documents %}
+        <div class="row g-4">
+            {% for document in documents %}
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ document.name }}</h5>
+                        {% if document.description %}
+                            <p class="card-text text-muted">{{ document.description }}</p>
+                        {% endif %}
+                        <a href="{{ document.file.url }}" class="btn btn-primary" target="_blank">
+                            {% bs_icon 'file-earmark-text' %} Öffnen
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">Keine Dokumente verfügbar.</p>
+    {% endif %}
+</div>
+{% endblock %}
