@@ -266,12 +266,12 @@ class Bestellung(BaseModel):
     verbose_name_plural = "Bestellungen"
 
 
-from core.storage import ReplitObjectStorage
+from core.storage import ScalewayObjectStorage
 
 class Document(BaseModel):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
-    file = models.FileField(storage=ReplitObjectStorage)
+    file = models.FileField(storage=ScalewayObjectStorage())
     allowed_funktionen = models.ManyToManyField(
         Funktion, blank=True,
         help_text="Leave empty to make document visible to all users"
