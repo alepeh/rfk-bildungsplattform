@@ -32,22 +32,7 @@
             </div>
             <div class="col-md-8">
                 <div class="card-body">
-                    <h5 class="card-title">
-                        {{ schulungstermin.schulung }}
-                        {% if schulungstermin.schulung.suitable_for_funktionen.exists %}
-                            <span class="badge bg-warning text-dark ms-2">
-                                <i class="bi bi-exclamation-triangle-fill me-1"></i>Eingeschränkte Teilnahme
-                            </span>
-                            <div class="mt-2 text-warning">
-                                <i class="bi bi-info-circle me-1"></i>
-                                <small>Diese Schulung ist nur für folgende Personen geeignet: 
-                                {% for funktion in schulungstermin.schulung.suitable_for_funktionen.all %}
-                                    {{ funktion.name }}{% if not forloop.last %}, {% endif %}
-                                {% endfor %}
-                                </small>
-                            </div>
-                        {% endif %}
-                    </h5>
+                    <h5 class="card-title">{{ schulungstermin.schulung }}</h5>
                     <p class="card-text">{{ schulungstermin.schulung.beschreibung }}</p>
                 </div>
             </div>
@@ -58,7 +43,7 @@
                     <span class="badge text-bg-success fw-normal">{{ schulungstermin.freie_plaetze }} Freie Plätze</span>
                 </div>
                 <div class="col-md-8 text-end">
-
+                    
                         {% if user.is_authenticated %}
                             {% if person.betrieb in schulungstermin.registrierte_betriebe %}
                             Dein Betrieb ist angemeldet
@@ -76,7 +61,7 @@
                               Keine freien Plätze
                           {% endif %}
                         {% endif %}
-
+                
                 </div>
             </div>
         </div>
