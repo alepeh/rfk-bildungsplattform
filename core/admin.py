@@ -5,7 +5,7 @@ from django.http import HttpResponse
 
 from core.models import (Betrieb, Funktion, Person, Schulung, SchulungsArt,
                          SchulungsArtFunktion, SchulungsOrt, SchulungsTermin,
-                         SchulungsTeilnehmer, Bestellung, Organisation)
+                         SchulungsTeilnehmer, Bestellung, Organisation, Document)
 
 
 def export_schulungsteilnehmer_to_csv(modeladmin, request, queryset):
