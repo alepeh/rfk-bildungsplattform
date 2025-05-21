@@ -182,7 +182,50 @@ def export_schulungsteilnehmer_pdf(request, pk):
     colWidths = [160, 160, 170, 120, 120, 70]
     table = Table(data, colWidths=colWidths)
     table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 14),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 12),
+        ('TOPPADDING', (0, 1), (-1, -1), 12),
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 12),
+    ]))
+    elements.append(table)
+    
+    # Add footnote
+    footnote_style = styles['Normal']
+    footnote_style.fontSize = 8
+    footnote = Paragraph("* DSV = Datenschutzvereinbarung akzeptiert", footnote_style)
+    elements.append(Paragraph("<br/><br/>", footnote_style))  # Add some space
+    elements.append(footnote)
+    
+    # Build PDF
+    doc.build(elements)
+    buffer.seek(0)
+    
+    # Create response
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="teilnehmerliste_{schulungstermin.pk}.pdf"'
+    return response
 
+
+def send_reminder(request, pk):
+    try:
+        send_reminder_to_all_teilnehmer(pk)
+        messages.success(
+            request, "Erinnerung an alle Teilnehmer mit email-adresse verschickt.")
+    except requests.exceptions.RequestException as e:
+        # Handle request errors
+        messages.error(request, f"Email konnte nicht versendet werden: {e}")
+    return HttpResponseRedirect(
+        reverse('admin:core_schulungstermin_change', args=(pk, )))
+
+
+from django.contrib.auth.decorators import login_required
 
 @login_required
 def documents(request):
