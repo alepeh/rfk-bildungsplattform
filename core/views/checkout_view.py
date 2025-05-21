@@ -21,9 +21,16 @@ def checkout(request: HttpRequest, schulungstermin_id: int):
         existing_teilnehmer = SchulungsTeilnehmer.objects.filter(
             schulungstermin=schulungstermin
         ).values_list('person_id', flat=True)
+        
+        # Start with basic query excluding already registered persons
         related_persons = Person.objects.filter(betrieb=person.betrieb).exclude(
             id__in=existing_teilnehmer
         )
+        
+        # If schulung has suitable_for_funktionen restrictions, apply them
+        suitable_funktionen = schulungstermin.schulung.suitable_for_funktionen.all()
+        if suitable_funktionen.exists():
+            related_persons = related_persons.filter(funktion__in=suitable_funktionen)
     else:
         related_persons = Person.objects.none()
 
