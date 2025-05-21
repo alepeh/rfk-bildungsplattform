@@ -271,7 +271,7 @@ from core.storage import ReplitObjectStorage
 class Document(BaseModel):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
-    file = models.FileField(storage=ReplitObjectStorage())
+    file = models.FileField(storage=ReplitObjectStorage)
     allowed_funktionen = models.ManyToManyField(
         Funktion, blank=True,
         help_text="Leave empty to make document visible to all users"
