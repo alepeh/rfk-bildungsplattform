@@ -14,6 +14,7 @@ urlpatterns = [
     path('terms-and-conditions/', views.terms_and_conditions, name='terms_and_conditions'),
     path('impressum/', views.impressum, name='impressum'),
     path('mitarbeiter', views.mitarbeiter, name='mitarbeiter'),
+    path('accounts/logout/', views.logout_view, name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('send-reminder/<int:pk>/', views.send_reminder, name='send_reminder'),
     path('meine_bestellungen/',

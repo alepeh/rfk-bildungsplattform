@@ -311,3 +311,9 @@ def get_person_details(request, person_id):
       'nachname': person.nachname,
       'email': person.email,
   })
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+
+def logout_view(request):
+    logout(request)
+    return redirect('index')
