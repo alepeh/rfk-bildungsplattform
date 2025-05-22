@@ -240,11 +240,6 @@ def my_schulungen(request):
     
     return render(request, 'home/my_schulungen.html', {'schulungen': schulungen})
 
-        # Handle request errors
-        messages.error(request, f"Email konnte nicht versendet werden: {e}")
-    return HttpResponseRedirect(
-        reverse('admin:core_schulungstermin_change', args=(pk, )))
-
 
 from django.contrib.auth.decorators import login_required
 
