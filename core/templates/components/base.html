@@ -95,10 +95,10 @@
                     <a class="nav-link" href="{% url 'order_list' %}">Meine Bestellungen</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'documents' %}">Allgemeine Dokumente</a>
+                    <a class="nav-link" href="{% url 'my_schulungen' %}">Meine Schulungen</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'my_schulungen' %}">Meine Schulungen</a>
+                    <a class="nav-link" href="{% url 'documents' %}">Allgemeine Dokumente</a>
                 </li>
                 {% endif %}
                 {% if user.is_authenticated %}
