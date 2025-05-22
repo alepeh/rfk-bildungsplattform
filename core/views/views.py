@@ -220,6 +220,10 @@ def send_reminder(request, pk):
         messages.success(
             request, "Erinnerung an alle Teilnehmer mit email-adresse verschickt.")
     except requests.exceptions.RequestException as e:
+        # Handle request errors
+        messages.error(request, f"Email konnte nicht versendet werden: {e}")
+    return HttpResponseRedirect(
+        reverse('admin:core_schulungstermin_change', args=(pk,)))
 
 
 @login_required
