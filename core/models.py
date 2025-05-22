@@ -5,9 +5,9 @@ from django.db import models
 
 
 def get_unique_upload_path(instance, filename):
-    name, ext = os.path.splitext(filename)
-    unique_hash = uuid.uuid4().hex[:8]
-    return f"{name}_{unique_hash}{ext}"
+  name, ext = os.path.splitext(filename)
+  unique_hash = uuid.uuid4().hex[:8]
+  return f"{name}_{unique_hash}{ext}"
 
 
 class BaseModel(models.Model):
@@ -276,17 +276,19 @@ class Bestellung(BaseModel):
 
 from core.storage import ScalewayObjectStorage
 
-class Document(BaseModel):
-    name = models.CharField(max_length=200)
-    description = models.TextField(blank=True, null=True)
-    file = models.FileField(upload_to=get_unique_upload_path, storage=ScalewayObjectStorage())
-    allowed_funktionen = models.ManyToManyField(
-        Funktion, blank=True,
-        help_text="Leave empty to make document visible to all users"
-    )
-    
-    def __str__(self):
-        return self.name
 
-    class Meta:
-        verbose_name_plural = "dokumente"
+class Document(BaseModel):
+  name = models.CharField(max_length=200)
+  description = models.TextField(blank=True, null=True)
+  file = models.FileField(upload_to=get_unique_upload_path,
+                          storage=ScalewayObjectStorage())
+  allowed_funktionen = models.ManyToManyField(
+      Funktion,
+      blank=True,
+      help_text="Leer lassen um das Dokument für alle freizugeben")
+
+  def __str__(self):
+    return self.name
+
+  class Meta:
+    verbose_name_plural = "dokumente"
