@@ -80,6 +80,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
                 'core.context_processors.test_system',
+                'core.context_processors.person_context',
             ],
         },
     },
