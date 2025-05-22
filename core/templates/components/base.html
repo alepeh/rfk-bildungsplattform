@@ -107,6 +107,12 @@
                 <li class="nav-item">
                     <span class="nav-link">Servus {{ user.username }}!</span>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'password_change' %}">Passwort ändern</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Abmelden</a>
+                </li>
                 {% else %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'login' %}">Log In</a>
