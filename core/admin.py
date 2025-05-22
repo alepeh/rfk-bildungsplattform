@@ -3,31 +3,43 @@ import csv
 from django.contrib import admin
 from django.http import HttpResponse
 
-from core.models import (Betrieb, Funktion, Person, Schulung, SchulungsArt,
-                         SchulungsArtFunktion, SchulungsOrt, SchulungsTermin,
-                         SchulungsTeilnehmer, Bestellung, Organisation, Document)
+from core.models import (
+  Bestellung,
+  Betrieb,
+  Document,
+  Funktion,
+  Organisation,
+  Person,
+  Schulung,
+  SchulungsArt,
+  SchulungsArtFunktion,
+  SchulungsOrt,
+  SchulungsTeilnehmer,
+  SchulungsTermin,
+  SchulungsUnterlage,
+)
+
 
 
 def export_schulungsteilnehmer_to_csv(modeladmin, request, queryset):
   meta = modeladmin.model._meta
   # Define the HTTP response with the appropriate CSV header
   response = HttpResponse(content_type='text/csv')
-  response['Content-Disposition'] = 'attachment; filename="schulungsteilnehmer.csv"'
+  response[
+      'Content-Disposition'] = 'attachment; filename="schulungsteilnehmer.csv"'
   writer = csv.writer(response)
   # Write your CSV headers (adapt these fields as needed)
   writer.writerow(['Person', 'Betrieb', 'Email', 'Telefon', 'DSV akzeptiert'])
   # Gather related SchulungsTeilnehmer instances and write them to the CSV
   for schulungstermin in queryset:
-      for stp in schulungstermin.schulungsteilnehmer_set.all():
-          dsv_akzeptiert = 'Ja' if stp.person.dsv_akzeptiert else 'Nein'
-          writer.writerow([
-              stp.person, 
-              stp.person.betrieb, 
-              stp.person.email,
-              stp.person.telefon,
-              dsv_akzeptiert
-          ])
+    for stp in schulungstermin.schulungsteilnehmer_set.all():
+      dsv_akzeptiert = 'Ja' if stp.person.dsv_akzeptiert else 'Nein'
+      writer.writerow([
+          stp.person, stp.person.betrieb, stp.person.email, stp.person.telefon,
+          dsv_akzeptiert
+      ])
   return response
+
 
 export_schulungsteilnehmer_to_csv.short_description = "Schulungsteilnehmer CSV Export"
 
@@ -49,10 +61,15 @@ class SchulungsTerminInline(admin.TabularInline):
   extra = 1
 
 
+class SchulungsUnterlageInline(admin.TabularInline):
+  model = SchulungsUnterlage
+  extra = 1
+
+
 class SchulungAdmin(admin.ModelAdmin):
   model = Schulung
-  inlines = (SchulungsTerminInline, )
-  filter_horizontal = ('suitable_for_funktionen',)
+  inlines = (SchulungsTerminInline, SchulungsUnterlageInline)
+  filter_horizontal = ('suitable_for_funktionen', )
 
 
 class SchulungsTeilnehmerInline(admin.TabularInline):
@@ -69,7 +86,8 @@ class SchulungsTeilnehmerInline(admin.TabularInline):
   def get_formset(self, request, obj=None, **kwargs):
     formset = super().get_formset(request, obj, **kwargs)
     form = formset.form
-    form.base_fields['person'].widget.attrs['onchange'] = 'populateFields(this);'
+    form.base_fields['person'].widget.attrs[
+        'onchange'] = 'populateFields(this);'
     return formset
 
   betrieb.short_description = 'Betrieb'
@@ -96,13 +114,14 @@ class PersonAdmin(admin.ModelAdmin):
 
 class SchulungsTerminAdmin(admin.ModelAdmin):
   change_form_template = 'admin/schulungstermin_change_form.html'
-  list_display = ('schulung', 'datum_von', 'buchbar', 'freie_plaetze', 'teilnehmer_count')
+  list_display = ('schulung', 'datum_von', 'buchbar', 'freie_plaetze',
+                  'teilnehmer_count')
   inlines = (SchulungsTeilnehmerInline, )
   ordering = ('-datum_von', )
   actions = [export_schulungsteilnehmer_to_csv]
 
   class Media:
-    js = ('js/schulungsteilnehmer_admin.js',)
+    js = ('js/schulungsteilnehmer_admin.js', )
 
 
 class BetriebAdmin(admin.ModelAdmin):
@@ -110,11 +129,13 @@ class BetriebAdmin(admin.ModelAdmin):
       PersonInline,
   ]
 
+
 class SchulungsTeilnehmerBestellungInline(admin.TabularInline):
   model = SchulungsTeilnehmer
   extra = 0
   fields = ('vorname', 'nachname', 'email', 'verpflegung', 'person', 'status')
-  
+
+
 class BestellungAdmin(admin.ModelAdmin):
   list_display = ('schulungstermin', 'anzahl', 'created')
   inlines = [SchulungsTeilnehmerBestellungInline]
@@ -134,9 +155,12 @@ admin.site.register(SchulungsTermin, SchulungsTerminAdmin)
 admin.site.register(Bestellung, BestellungAdmin)
 admin.site.register(Organisation, OrganisationAdmin)
 
+
 class DocumentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'created', 'updated')
-    filter_horizontal = ('allowed_funktionen',)
-    search_fields = ('name', 'description')
+  list_display = ('name', 'created', 'updated')
+  filter_horizontal = ('allowed_funktionen', )
+  search_fields = ('name', 'description')
+
 
 admin.site.register(Document, DocumentAdmin)
+admin.site.register(SchulungsUnterlage)

@@ -292,3 +292,18 @@ class Document(BaseModel):
 
   class Meta:
     verbose_name_plural = "dokumente"
+
+
+class SchulungsUnterlage(BaseModel):
+  schulung = models.ForeignKey(Schulung, on_delete=models.CASCADE, related_name='unterlagen')
+  name = models.CharField(max_length=200)
+  description = models.TextField(blank=True, null=True)
+  file = models.FileField(upload_to=get_unique_upload_path,
+                         storage=ScalewayObjectStorage())
+
+  def __str__(self):
+    return f"{self.schulung} - {self.name}"
+
+  class Meta:
+    verbose_name = "Schulungsunterlage"
+    verbose_name_plural = "Schulungsunterlagen"
