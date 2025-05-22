@@ -57,13 +57,15 @@
                     
                         {% if user.is_authenticated %}
                             {% if person.betrieb in schulungstermin.registrierte_betriebe %}
-                            Dein Betrieb ist angemeldet
-                            {% endif %}
-                            {% if schulungstermin.freie_plaetze > 0 %}
-                              <a href="/checkout/{{ schulungstermin.id }}/" class="btn btn-primary">{% bs_icon 'cart' %} Buchen</a>
-
+                                Dein Betrieb ist angemeldet
                             {% else %}
-                              Keine freien Plätze
+                                {% if schulungstermin.freie_plaetze > 0 %}
+                                    {% if person.betrieb and person.betrieb.geschaeftsfuehrer == person %}
+                                        <a href="/checkout/{{ schulungstermin.id }}/" class="btn btn-primary">{% bs_icon 'cart' %} Buchen</a>
+                                    {% endif %}
+                                {% else %}
+                                    Keine freien Plätze
+                                {% endif %}
                             {% endif %}
                         {% else %}
                           {% if schulungstermin.freie_plaetze > 0 %}
