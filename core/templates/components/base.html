@@ -101,9 +101,6 @@
                     <a class="nav-link" href="{% url 'my_schulungen' %}">Meine Schulungen</a>
                 </li>
                 {% endif %}
-                <li class="nav-item">
-                    <a class="nav-link" href="https://docs.google.com/document/d/e/2PACX-1vS16yzjhok2aywLq5QUUHJAqA16KNnqbEPF48BJc-8CY6Nke7MRft3cpzN3lw6I_sK4xNhDm3bq9FW6/pub" target="_blank">Hilfe</a>
-                </li>
                 {% if user.is_authenticated %}
                 <li class="nav-item">
                     <span class="nav-link">Servus {{ user.username }}!</span>
