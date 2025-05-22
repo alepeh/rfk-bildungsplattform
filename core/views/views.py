@@ -220,6 +220,22 @@ def send_reminder(request, pk):
         messages.success(
             request, "Erinnerung an alle Teilnehmer mit email-adresse verschickt.")
     except requests.exceptions.RequestException as e:
+
+
+@login_required
+def my_schulungen(request):
+    user = request.user
+    try:
+        person = Person.objects.get(benutzer=user)
+        schulungen = SchulungsTeilnehmer.objects.filter(
+            person=person,
+            status='Teilgenommen'
+        ).select_related('schulungstermin', 'schulungstermin__schulung', 'schulungstermin__ort')
+    except Person.DoesNotExist:
+        schulungen = []
+    
+    return render(request, 'home/my_schulungen.html', {'schulungen': schulungen})
+
         # Handle request errors
         messages.error(request, f"Email konnte nicht versendet werden: {e}")
     return HttpResponseRedirect(

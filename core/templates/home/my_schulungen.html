@@ -1,0 +1,38 @@
+
+{% extends "../components/base.html" %}
+{% load bootstrap_icons %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Meine Schulungen</h2>
+    
+    {% if schulungen %}
+        <div class="row">
+            {% for schulung in schulungen %}
+                <div class="col-12 mb-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-4">{{ schulung.schulungstermin.schulung.art }}</div>
+                                <div class="col-md-8 text-end">⌖{{ schulung.schulungstermin.ort }}</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ schulung.schulungstermin.schulung.name }}</h5>
+                            <p class="card-text">{{ schulung.schulungstermin.schulung.beschreibung }}</p>
+                            <p class="text-muted">
+                                Datum: {{ schulung.schulungstermin.datum_von|date:"d. b Y" }}
+                                {% if schulung.schulungstermin.dauer %}
+                                    <br>Dauer: {{ schulung.schulungstermin.dauer }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Du hast noch keine Schulungen abgeschlossen.</p>
+    {% endif %}
+</div>
+{% endblock content %}
