@@ -88,12 +88,14 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 {% if user.is_authenticated %}
+                {% if person.betrieb and person.betrieb.geschaeftsfuehrer == person %}
                 <li class="nav-item">
                     <a class="nav-link" href="/mitarbeiter">Mitarbeiter verwalten</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'order_list' %}">Meine Bestellungen</a>
                 </li>
+                {% endif %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'my_schulungen' %}">Meine Schulungen</a>
                 </li>
