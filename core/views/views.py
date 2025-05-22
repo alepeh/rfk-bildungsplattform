@@ -243,7 +243,10 @@ def my_schulungen(request):
     except Person.DoesNotExist:
         schulungen = []
     
-    return render(request, 'home/my_schulungen.html', {'schulungen': schulungen})
+    return render(request, 'home/my_schulungen.html', {
+        'schulungen': schulungen,
+        'person': person
+    })
 
 
 from django.contrib.auth.decorators import login_required
