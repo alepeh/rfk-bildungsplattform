@@ -26,6 +26,25 @@
                                     <br>Dauer: {{ schulung.schulungstermin.dauer }}
                                 {% endif %}
                             </p>
+                            {% with unterlagen=schulung.schulungstermin.schulung.unterlagen.all %}
+                                {% if unterlagen %}
+                                    <div class="mt-3">
+                                        <h6>Schulungsunterlagen:</h6>
+                                        <ul class="list-unstyled">
+                                            {% for unterlage in unterlagen %}
+                                                <li class="mb-2">
+                                                    <a href="{{ unterlage.file.url }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                                                        {% bs_icon 'download' %} {{ unterlage.name }}
+                                                    </a>
+                                                    {% if unterlage.description %}
+                                                        <small class="text-muted d-block">{{ unterlage.description }}</small>
+                                                    {% endif %}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
                         </div>
                     </div>
                 </div>

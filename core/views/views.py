@@ -235,7 +235,11 @@ def my_schulungen(request):
         schulungen = SchulungsTeilnehmer.objects.filter(
             person=person,
             status='Teilgenommen'
-        ).select_related('schulungstermin', 'schulungstermin__schulung', 'schulungstermin__ort')
+        ).select_related(
+            'schulungstermin',
+            'schulungstermin__schulung',
+            'schulungstermin__ort'
+        ).prefetch_related('schulungstermin__schulung__unterlagen')
     except Person.DoesNotExist:
         schulungen = []
     
