@@ -104,14 +104,15 @@
                 </li>
                 {% endif %}
                 {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <span class="nav-link">Servus {{ user.username }}!</span>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'password_change' %}">Passwort ändern</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Abmelden</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Servus {{ user.username }}!
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="{% url 'password_change' %}">Passwort ändern</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'logout' %}">Abmelden</a></li>
+                    </ul>
                 </li>
                 {% else %}
                 <li class="nav-item">
