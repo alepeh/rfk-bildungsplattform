@@ -31,3 +31,13 @@ jobs:
             PGUSER=${{ secrets.PGUSER }}  
             PGPORT=${{ secrets.PGPORT }}  
             PGPASSWORD=${{ secrets.PGPASSWORD }}
+
+      - name: Trigger Serverless Container Redeployment
+        env:
+          SCW_SECRET_KEY: ${{ secrets.SCW_SECRET_KEY }}
+          SCW_DEFAULT_ORGANIZATION_ID: ${{ secrets.SCW_ORGANIZATION_ID }}
+        run: |
+          curl -X POST \
+            -H "X-Auth-Token: $SCW_SECRET_KEY" \
+            -H "Content-Type: application/json" \
+            "https://api.scaleway.com/containers/v1beta1/regions/fr-par/containers/${{ secrets.SCW_CONTAINER_ID }}/deploy"
