@@ -5,44 +5,56 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0032_rename_schulungsterminperson_schulungsteilnehmer_and_more'),
+        ("core", "0032_rename_schulungsterminperson_schulungsteilnehmer_and_more"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='schulungsteilnehmer',
-            options={'verbose_name_plural': 'Schulungsteilnehmer'},
+            name="schulungsteilnehmer",
+            options={"verbose_name_plural": "Schulungsteilnehmer"},
         ),
         migrations.AddField(
-            model_name='schulungsteilnehmer',
-            name='bestellung',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='core.bestellung'),
+            model_name="schulungsteilnehmer",
+            name="bestellung",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="core.bestellung",
+            ),
         ),
         migrations.AddField(
-            model_name='schulungsteilnehmer',
-            name='email',
+            model_name="schulungsteilnehmer",
+            name="email",
             field=models.EmailField(blank=True, max_length=254, null=True),
         ),
         migrations.AddField(
-            model_name='schulungsteilnehmer',
-            name='nachname',
+            model_name="schulungsteilnehmer",
+            name="nachname",
             field=models.CharField(max_length=150, null=True),
         ),
         migrations.AddField(
-            model_name='schulungsteilnehmer',
-            name='verpflegung',
-            field=models.CharField(choices=[('Standard', 'Standard'), ('Vegetarisch', 'Vegetarisch')], default='Standard', max_length=50),
+            model_name="schulungsteilnehmer",
+            name="verpflegung",
+            field=models.CharField(
+                choices=[("Standard", "Standard"), ("Vegetarisch", "Vegetarisch")],
+                default="Standard",
+                max_length=50,
+            ),
         ),
         migrations.AddField(
-            model_name='schulungsteilnehmer',
-            name='vorname',
+            model_name="schulungsteilnehmer",
+            name="vorname",
             field=models.CharField(max_length=150, null=True),
         ),
         migrations.AlterField(
-            model_name='schulungsteilnehmer',
-            name='person',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='core.person'),
+            model_name="schulungsteilnehmer",
+            name="person",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="core.person",
+            ),
         ),
     ]

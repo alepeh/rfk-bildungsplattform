@@ -4,25 +4,39 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0038_schulung_suitable_for_funktionen'),
+        ("core", "0038_schulung_suitable_for_funktionen"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Document',
+            name="Document",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=200)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('file', models.FileField(upload_to='documents/')),
-                ('allowed_funktionen', models.ManyToManyField(blank=True, help_text='Leave empty to make document visible to all users', to='core.funktion')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=200)),
+                ("description", models.TextField(blank=True, null=True)),
+                ("file", models.FileField(upload_to="documents/")),
+                (
+                    "allowed_funktionen",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="Leave empty to make document visible to all users",
+                        to="core.funktion",
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'dokumente',
+                "verbose_name_plural": "dokumente",
             },
         ),
     ]

@@ -4,15 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0037_person_telefon'),
+        ("core", "0037_person_telefon"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='schulung',
-            name='suitable_for_funktionen',
-            field=models.ManyToManyField(blank=True, help_text='Leer lassen für keine Einschränkung', to='core.funktion'),
+            model_name="schulung",
+            name="suitable_for_funktionen",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="Leer lassen für keine Einschränkung",
+                to="core.funktion",
+            ),
         ),
     ]

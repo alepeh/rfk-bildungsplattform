@@ -94,14 +94,14 @@ jobs:
         fail_ci_if_error: false
         
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-results-${{ matrix.python-version }}
         path: junit/test-*.xml
         
     - name: Upload coverage report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: matrix.python-version == '3.11'
       with:
         name: coverage-report
@@ -156,7 +156,7 @@ jobs:
         DISPLAY: :99
         
     - name: Upload E2E test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: e2e-test-results
@@ -209,7 +209,7 @@ jobs:
         
     - name: Run safety (security vulnerabilities in dependencies)
       run: |
-        safety check --json
+        safety scan --json
         
     - name: Run bandit (security issues in code)
       run: |

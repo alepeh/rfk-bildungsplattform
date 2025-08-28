@@ -4,13 +4,12 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0025_betrieb_geschaeftsfuehrer'),
+        ("core", "0025_betrieb_geschaeftsfuehrer"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='PersonBetrieb',
+            name="PersonBetrieb",
         ),
     ]

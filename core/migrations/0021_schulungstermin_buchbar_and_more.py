@@ -4,20 +4,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0020_alter_schulung_beschreibung_alter_schulung_name'),
+        ("core", "0020_alter_schulung_beschreibung_alter_schulung_name"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='schulungstermin',
-            name='buchbar',
+            model_name="schulungstermin",
+            name="buchbar",
             field=models.BooleanField(default=1),
         ),
         migrations.AddField(
-            model_name='schulungstermin',
-            name='min_teilnehmer',
-            field=models.IntegerField(default=0, verbose_name='Mininum Teilnehmeranzahl'),
+            model_name="schulungstermin",
+            name="min_teilnehmer",
+            field=models.IntegerField(
+                default=0, verbose_name="Mininum Teilnehmeranzahl"
+            ),
         ),
     ]

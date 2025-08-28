@@ -4,40 +4,39 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0015_alter_schulungstermin_ort'),
+        ("core", "0015_alter_schulungstermin_ort"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='schulungsort',
-            name='adresse',
+            model_name="schulungsort",
+            name="adresse",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
         migrations.AddField(
-            model_name='schulungsort',
-            name='email',
+            model_name="schulungsort",
+            name="email",
             field=models.EmailField(blank=True, max_length=254, null=True),
         ),
         migrations.AddField(
-            model_name='schulungsort',
-            name='kontakt',
+            model_name="schulungsort",
+            name="kontakt",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
         migrations.AddField(
-            model_name='schulungsort',
-            name='ort',
+            model_name="schulungsort",
+            name="ort",
             field=models.CharField(blank=True, max_length=50, null=True),
         ),
         migrations.AddField(
-            model_name='schulungsort',
-            name='plz',
+            model_name="schulungsort",
+            name="plz",
             field=models.CharField(blank=True, max_length=20, null=True),
         ),
         migrations.AddField(
-            model_name='schulungsort',
-            name='telefon',
+            model_name="schulungsort",
+            name="telefon",
             field=models.CharField(blank=True, max_length=30, null=True),
         ),
     ]

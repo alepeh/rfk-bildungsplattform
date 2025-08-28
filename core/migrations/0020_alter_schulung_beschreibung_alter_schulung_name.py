@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0019_alter_personbetrieb_options_and_more'),
+        ("core", "0019_alter_personbetrieb_options_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='schulung',
-            name='beschreibung',
+            model_name="schulung",
+            name="beschreibung",
             field=models.TextField(max_length=1000),
         ),
         migrations.AlterField(
-            model_name='schulung',
-            name='name',
+            model_name="schulung",
+            name="name",
             field=models.CharField(max_length=200),
         ),
     ]

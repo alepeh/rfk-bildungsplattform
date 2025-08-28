@@ -5,19 +5,25 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0018_alter_schulungsterminperson_person_and_more'),
+        ("core", "0018_alter_schulungsterminperson_person_and_more"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='personbetrieb',
-            options={'verbose_name': 'Betriebsinhaber', 'verbose_name_plural': 'Betriebsinhaber'},
+            name="personbetrieb",
+            options={
+                "verbose_name": "Betriebsinhaber",
+                "verbose_name_plural": "Betriebsinhaber",
+            },
         ),
         migrations.AlterField(
-            model_name='personbetrieb',
-            name='inhaber',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='Betriebsinhaber', to='core.person'),
+            model_name="personbetrieb",
+            name="inhaber",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="Betriebsinhaber",
+                to="core.person",
+            ),
         ),
     ]

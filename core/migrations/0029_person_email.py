@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0028_alter_funktion_options_funktion_sortierung'),
+        ("core", "0028_alter_funktion_options_funktion_sortierung"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='person',
-            name='email',
+            model_name="person",
+            name="email",
             field=models.EmailField(blank=True, max_length=254, null=True),
         ),
     ]

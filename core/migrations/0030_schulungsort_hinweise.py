@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0029_person_email'),
+        ("core", "0029_person_email"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='schulungsort',
-            name='hinweise',
+            model_name="schulungsort",
+            name="hinweise",
             field=models.TextField(blank=True, null=True),
         ),
     ]

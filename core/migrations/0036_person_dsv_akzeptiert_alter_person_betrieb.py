@@ -5,20 +5,27 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0035_organisation_alter_person_betrieb_and_more'),
+        ("core", "0035_organisation_alter_person_betrieb_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='person',
-            name='dsv_akzeptiert',
-            field=models.BooleanField(default=False, verbose_name='Datenschutzvereinbarung akzeptiert'),
+            model_name="person",
+            name="dsv_akzeptiert",
+            field=models.BooleanField(
+                default=False, verbose_name="Datenschutzvereinbarung akzeptiert"
+            ),
         ),
         migrations.AlterField(
-            model_name='person',
-            name='betrieb',
-            field=models.ForeignKey(blank=True, help_text='Nur relevant für Bgld. Rauchfangkehrer', null=True, on_delete=django.db.models.deletion.SET_NULL, to='core.betrieb'),
+            model_name="person",
+            name="betrieb",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="Nur relevant für Bgld. Rauchfangkehrer",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="core.betrieb",
+            ),
         ),
     ]
