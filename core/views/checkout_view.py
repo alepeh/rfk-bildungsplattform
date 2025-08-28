@@ -1,3 +1,5 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
@@ -6,9 +8,18 @@ from core.models import Bestellung, Person, SchulungsTeilnehmer, SchulungsTermin
 from core.services.email import send_order_confirmation_email
 
 
+@login_required
 def checkout(request: HttpRequest, schulungstermin_id: int):
     schulungstermin = get_object_or_404(SchulungsTermin, id=schulungstermin_id)
-    person = get_object_or_404(Person, benutzer=request.user)
+    
+    if not request.user.is_authenticated:
+        return redirect('login')
+        
+    try:
+        person = Person.objects.get(benutzer=request.user)
+    except Person.DoesNotExist:
+        messages.error(request, "Kein Personenprofil gefunden.")
+        return redirect('index')
     print(person)
     # Determine the price based on whether the person is related to an organisation
     if person.organisation:

@@ -56,6 +56,7 @@ def is_overbooked(request, schulungsterminId):
         return True
 
 
+@login_required
 def register(request: HttpRequest, id: int):
     # form has been submitted
     if request.method == "POST":
@@ -73,7 +74,11 @@ def register(request: HttpRequest, id: int):
             messages.success(request, "Anmeldung gespeichtert!")
 
     user = request.user
-    person = Person.objects.get(Q(benutzer=user))
+    try:
+        person = Person.objects.get(Q(benutzer=user))
+    except Person.DoesNotExist:
+        messages.error(request, "Kein Personenprofil gefunden.")
+        return redirect('index')
     betrieb = Betrieb.objects.get(geschaeftsfuehrer=person)
     mitarbeiter = Person.objects.filter(betrieb=betrieb)
     schulungstermin = SchulungsTermin.objects.get(id=id)
@@ -116,6 +121,7 @@ def removePersonFromSchulungstermin(schulungsTerminId, personId):
         ).delete()
 
 
+@login_required
 def mitarbeiter(request):
     PersonFormSet = inlineformset_factory(
         Betrieb,
