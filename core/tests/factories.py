@@ -12,10 +12,21 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from model_bakery import baker
 
-from core.models import (Bestellung, Betrieb, Document, Funktion, Organisation,
-                         Person, Schulung, SchulungsArt, SchulungsArtFunktion,
-                         SchulungsOrt, SchulungsTeilnehmer, SchulungsTermin,
-                         SchulungsUnterlage)
+from core.models import (
+    Bestellung,
+    Betrieb,
+    Document,
+    Funktion,
+    Organisation,
+    Person,
+    Schulung,
+    SchulungsArt,
+    SchulungsArtFunktion,
+    SchulungsOrt,
+    SchulungsTeilnehmer,
+    SchulungsTermin,
+    SchulungsUnterlage,
+)
 
 
 class UserFactory:
