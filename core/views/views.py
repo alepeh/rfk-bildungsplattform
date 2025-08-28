@@ -297,39 +297,6 @@ def documents(request):
         documents = Document.objects.filter(allowed_funktionen__isnull=True)
 
     return render(request, "home/documents.html", {"documents": documents})
-    elements.append(table)
-
-    # Add footnote
-    footnote_style = styles["Normal"]
-    footnote_style.fontSize = 8
-    footnote = Paragraph("* DSV = Datenschutzvereinbarung akzeptiert", footnote_style)
-    elements.append(Paragraph("<br/><br/>", footnote_style))  # Add some space
-    elements.append(footnote)
-
-    # Build PDF
-    doc.build(elements)
-    buffer.seek(0)
-
-    # Create response
-    response = HttpResponse(buffer, content_type="application/pdf")
-    response[
-        "Content-Disposition"
-    ] = f'attachment; filename="teilnehmerliste_{schulungstermin.pk}.pdf"'
-    return response
-
-
-def send_reminder(request, pk):
-    try:
-        send_reminder_to_all_teilnehmer(pk)
-        messages.success(
-            request, "Erinnerung an alle Teilnehmer mit email-adresse verschickt."
-        )
-    except requests.exceptions.RequestException as e:
-        # Handle request errors
-        messages.error(request, f"Email konnte nicht versendet werden: {e}")
-    return HttpResponseRedirect(
-        reverse("admin:core_schulungstermin_change", args=(pk,))
-    )
 
 
 def terms_and_conditions(request: HttpRequest):
