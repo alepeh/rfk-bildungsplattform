@@ -5,13 +5,15 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.forms import inlineformset_factory
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import (HttpRequest, HttpResponse, HttpResponseRedirect,
+                         JsonResponse)
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.urls import reverse
 from django.utils import timezone
 
-from core.models import Betrieb, Document, Person, SchulungsTeilnehmer, SchulungsTermin
+from core.models import (Betrieb, Document, Person, SchulungsTeilnehmer,
+                         SchulungsTermin)
 from core.services.email import send_reminder_to_all_teilnehmer
 
 
@@ -146,7 +148,8 @@ def export_schulungsteilnehmer_pdf(request, pk):
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.styles import getSampleStyleSheet
-    from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle
+    from reportlab.platypus import (Paragraph, SimpleDocTemplate, Table,
+                                    TableStyle)
 
     schulungstermin = get_object_or_404(SchulungsTermin, pk=pk)
     buffer = BytesIO()

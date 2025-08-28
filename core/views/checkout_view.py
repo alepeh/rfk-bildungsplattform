@@ -2,7 +2,8 @@ from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from core.models import Bestellung, Person, SchulungsTeilnehmer, SchulungsTermin
+from core.models import (Bestellung, Person, SchulungsTeilnehmer,
+                         SchulungsTermin)
 from core.services.email import send_order_confirmation_email
 
 

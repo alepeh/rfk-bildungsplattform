@@ -64,6 +64,10 @@ jobs:
       run: |
         python manage.py check_security
         
+    - name: Create logs directory
+      run: |
+        mkdir -p logs
+        
     - name: Run Django checks
       run: |
         python manage.py check --deploy

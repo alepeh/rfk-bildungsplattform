@@ -5,21 +5,10 @@ import pytest
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from core.models import (
-    Bestellung,
-    Betrieb,
-    Document,
-    Funktion,
-    Organisation,
-    Person,
-    Schulung,
-    SchulungsArt,
-    SchulungsArtFunktion,
-    SchulungsOrt,
-    SchulungsTeilnehmer,
-    SchulungsTermin,
-    SchulungsUnterlage,
-)
+from core.models import (Bestellung, Betrieb, Document, Funktion, Organisation,
+                         Person, Schulung, SchulungsArt, SchulungsArtFunktion,
+                         SchulungsOrt, SchulungsTeilnehmer, SchulungsTermin,
+                         SchulungsUnterlage)
 
 
 @pytest.mark.django_db

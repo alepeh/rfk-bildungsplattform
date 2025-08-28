@@ -3,21 +3,10 @@ import csv
 from django.contrib import admin
 from django.http import HttpResponse
 
-from core.models import (
-    Bestellung,
-    Betrieb,
-    Document,
-    Funktion,
-    Organisation,
-    Person,
-    Schulung,
-    SchulungsArt,
-    SchulungsArtFunktion,
-    SchulungsOrt,
-    SchulungsTeilnehmer,
-    SchulungsTermin,
-    SchulungsUnterlage,
-)
+from core.models import (Bestellung, Betrieb, Document, Funktion, Organisation,
+                         Person, Schulung, SchulungsArt, SchulungsArtFunktion,
+                         SchulungsOrt, SchulungsTeilnehmer, SchulungsTermin,
+                         SchulungsUnterlage)
 
 
 def export_schulungsteilnehmer_to_csv(modeladmin, request, queryset):

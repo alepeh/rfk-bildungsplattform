@@ -8,18 +8,9 @@ from django.test import Client, TransactionTestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from core.models import (
-    Bestellung,
-    Betrieb,
-    Funktion,
-    Organisation,
-    Person,
-    Schulung,
-    SchulungsArt,
-    SchulungsOrt,
-    SchulungsTeilnehmer,
-    SchulungsTermin,
-)
+from core.models import (Bestellung, Betrieb, Funktion, Organisation, Person,
+                         Schulung, SchulungsArt, SchulungsOrt,
+                         SchulungsTeilnehmer, SchulungsTermin)
 
 
 @pytest.mark.django_db
