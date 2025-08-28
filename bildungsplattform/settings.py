@@ -19,17 +19,58 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Environment detection
+ENVIRONMENT = os.getenv('ENVIRONMENT', 'development').lower()
+IS_PRODUCTION = ENVIRONMENT == 'production'
+IS_STAGING = ENVIRONMENT == 'staging'
+IS_DEVELOPMENT = ENVIRONMENT == 'development'
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY and IS_PRODUCTION:
+    raise ValueError("SECRET_KEY must be set in production environment")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Debug is enabled for development and staging, disabled for production
+DEBUG = os.getenv('DEBUG', str(not IS_PRODUCTION)).lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = ['*']
-X_FRAME_OPTIONS = '*'
+# Security check: never allow DEBUG in production
+if IS_PRODUCTION and DEBUG:
+    raise ValueError("DEBUG must be False in production environment")
+
+# Configure ALLOWED_HOSTS based on environment
+if IS_PRODUCTION:
+    ALLOWED_HOSTS = [
+        'bildungsplattform.rauchfangkehrer.or.at',
+        'www.bildungsplattform.rauchfangkehrer.or.at',
+    ]
+elif IS_STAGING:
+    ALLOWED_HOSTS = [
+        'bildungsplattform-test.rauchfangkehrer.or.at',
+        'rfkbgldbeqyiq7k-rfk-bildungsplattform-test.functions.fnc.fr-par.scw.cloud',
+    ]
+else:
+    # Development environment
+    ALLOWED_HOSTS = [
+        'localhost',
+        '127.0.0.1',
+        '0.0.0.0',
+        '.replit.dev',
+        '.replit.app',
+        '.ngrok.io',  # For local testing with ngrok
+    ]
+    # Allow any host in development if explicitly set
+    if os.getenv('DJANGO_ALLOW_ANY_HOST', '').lower() in ('true', '1', 'yes'):
+        ALLOWED_HOSTS = ['*']
+
+# Configure X_FRAME_OPTIONS based on environment
+if IS_PRODUCTION:
+    X_FRAME_OPTIONS = 'DENY'
+else:
+    X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
@@ -167,4 +208,92 @@ SCALEWAY_EMAIL_API_TOKEN = os.getenv('SCALEWAY_EMAIL_API_TOKEN')
 GRAPH_MODELS = {
     'app_labels': ["core"],
     'group_models': True,
+}
+
+# Security Settings
+if IS_PRODUCTION:
+    # HTTPS/SSL Settings
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    
+    # HSTS Settings (HTTP Strict Transport Security)
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # Session security
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Strict'
+    CSRF_COOKIE_SAMESITE = 'Strict'
+    
+    # Additional security
+    SECURE_REFERRER_POLICY = 'same-origin'
+    
+elif IS_STAGING:
+    # Staging should mimic production but allow some flexibility
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SAMESITE = 'Lax'
+    
+else:
+    # Development settings - less restrictive
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access in development for debugging
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SAMESITE = 'Lax'
+
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO' if IS_PRODUCTION else 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'django.log',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO' if IS_PRODUCTION else 'DEBUG',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'] if IS_PRODUCTION else ['console'],
+            'level': 'INFO' if IS_PRODUCTION else 'DEBUG',
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+    },
 }

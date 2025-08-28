@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: bildungsplattform
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: localpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      args:
+        ENVIRONMENT: development
+        PGDATABASE: bildungsplattform
+        PGUSER: postgres
+        PGPASSWORD: localpassword
+        PGHOST: db
+        PGPORT: 5432
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      ENVIRONMENT: development
+      DEBUG: "true"
+      SECRET_KEY: "development-secret-key-change-in-production"
+      PGDATABASE: bildungsplattform
+      PGUSER: postgres
+      PGPASSWORD: localpassword
+      PGHOST: db
+      PGPORT: 5432
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
+
+volumes:
+  postgres_data:
