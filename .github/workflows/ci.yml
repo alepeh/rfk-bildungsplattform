@@ -1,0 +1,245 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  ENVIRONMENT: test
+  DEBUG: False
+  SECRET_KEY: test-secret-key-for-ci-only
+  PGDATABASE: test_bildungsplattform
+  PGUSER: postgres
+  PGPASSWORD: postgres
+  PGHOST: localhost
+  PGPORT: 5432
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_bildungsplattform
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    strategy:
+      matrix:
+        python-version: [3.11, 3.12]
+        
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt', 'requirements-test.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-test.txt
+        
+    - name: Run security check
+      run: |
+        python manage.py check_security
+        
+    - name: Run Django checks
+      run: |
+        python manage.py check --deploy
+        
+    - name: Run migrations
+      run: |
+        python manage.py migrate --run-syncdb
+        
+    - name: Run unit tests
+      run: |
+        pytest core/tests/test_models.py core/tests/test_views.py -v --tb=short --junitxml=junit/test-results-unit.xml
+        
+    - name: Run integration tests
+      run: |
+        pytest core/tests/test_integration.py -v --tb=short --junitxml=junit/test-results-integration.xml
+        
+    - name: Run tests with coverage
+      run: |
+        pytest --cov=core --cov=erweiterungen --cov-report=xml --cov-report=term-missing --junitxml=junit/test-results-coverage.xml core/tests/test_models.py core/tests/test_views.py core/tests/test_integration.py
+        
+    - name: Upload coverage to Codecov
+      if: matrix.python-version == '3.11'
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+        
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results-${{ matrix.python-version }}
+        path: junit/test-*.xml
+        
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v3
+      if: matrix.python-version == '3.11'
+      with:
+        name: coverage-report
+        path: htmlcov/
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_bildungsplattform
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-test.txt
+        
+    - name: Set up Chrome
+      uses: browser-actions/setup-chrome@latest
+      with:
+        chrome-version: stable
+        
+    - name: Run migrations
+      run: |
+        python manage.py migrate --run-syncdb
+        
+    - name: Run E2E tests
+      run: |
+        pytest core/tests/test_e2e.py -v --tb=short -m e2e --junitxml=junit/test-results-e2e.xml
+      env:
+        DISPLAY: :99
+        
+    - name: Upload E2E test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: e2e-test-results
+        path: junit/test-results-e2e.xml
+
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements-test.txt
+        
+    - name: Run Black (code formatting check)
+      run: |
+        black --check --diff core/ erweiterungen/ bildungsplattform/
+        
+    - name: Run isort (import sorting check)  
+      run: |
+        isort --check-only --diff core/ erweiterungen/ bildungsplattform/
+        
+    - name: Run flake8 (linting)
+      run: |
+        flake8 core/ erweiterungen/ bildungsplattform/ --max-line-length=88 --extend-ignore=E203,W503
+
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install safety bandit
+        
+    - name: Run safety (security vulnerabilities in dependencies)
+      run: |
+        safety check --json
+        
+    - name: Run bandit (security issues in code)
+      run: |
+        bandit -r core/ erweiterungen/ bildungsplattform/ -f json
+      continue-on-error: true
+
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: [test, code-quality, security-scan]
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to staging
+      run: |
+        echo "Deploying to staging environment..."
+        echo "This would contain actual deployment steps"
+        # Add your staging deployment commands here
+        
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: [test, e2e-tests, code-quality, security-scan]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to production
+      run: |
+        echo "Deploying to production environment..."
+        echo "This would contain actual deployment steps"
+        # Add your production deployment commands here

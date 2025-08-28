@@ -1,0 +1,31 @@
+[run]
+source = .
+omit = 
+    */venv/*
+    */env/*
+    */migrations/*
+    manage.py
+    */settings.py
+    */wsgi.py
+    */asgi.py
+    */tests/*
+    */test_*.py
+    */__pycache__/*
+    */staticfiles/*
+    */node_modules/*
+    .tox/*
+    */htmlcov/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if settings.DEBUG
+    if TYPE_CHECKING
+
+[html]
+directory = htmlcov
+title = RFK Bildungsplattform Coverage Report

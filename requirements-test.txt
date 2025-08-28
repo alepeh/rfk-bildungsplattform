@@ -1,0 +1,23 @@
+# Testing dependencies
+pytest==7.4.3
+pytest-django==4.7.0
+pytest-cov==4.1.0
+pytest-xdist==3.5.0  # For parallel test execution
+factory-boy==3.3.0  # For test data factories
+faker==20.1.0  # For generating fake data
+freezegun==1.2.2  # For mocking time in tests
+responses==0.24.1  # For mocking HTTP requests
+
+# End-to-end testing
+selenium==4.16.0
+playwright==1.40.0
+
+# Code quality and coverage
+coverage==7.3.3
+black==23.12.0
+flake8==6.1.0
+isort==5.13.2
+
+# Additional testing utilities
+model-bakery==1.17.0  # Django model instances for testing
+django-debug-toolbar==4.2.0  # For debugging during development
