@@ -61,6 +61,8 @@ jobs:
         pip install -r requirements-test.txt
         
     - name: Run security check
+      env:
+        DJANGO_SETTINGS_MODULE: bildungsplattform.settings
       run: |
         python manage.py check_security
         
@@ -69,22 +71,32 @@ jobs:
         mkdir -p logs
         
     - name: Run Django checks
+      env:
+        DJANGO_SETTINGS_MODULE: bildungsplattform.settings
       run: |
         python manage.py check --deploy
         
     - name: Run migrations
+      env:
+        DJANGO_SETTINGS_MODULE: bildungsplattform.settings
       run: |
         python manage.py migrate --run-syncdb
         
     - name: Run unit tests
+      env:
+        DJANGO_SETTINGS_MODULE: bildungsplattform.settings
       run: |
         pytest core/tests/test_models.py core/tests/test_views.py -v --tb=short --junitxml=junit/test-results-unit.xml
         
     - name: Run integration tests
+      env:
+        DJANGO_SETTINGS_MODULE: bildungsplattform.settings
       run: |
         pytest core/tests/test_integration.py -v --tb=short --junitxml=junit/test-results-integration.xml
         
     - name: Run tests with coverage
+      env:
+        DJANGO_SETTINGS_MODULE: bildungsplattform.settings
       run: |
         pytest --cov=core --cov=erweiterungen --cov-report=xml --cov-report=term-missing --junitxml=junit/test-results-coverage.xml core/tests/test_models.py core/tests/test_views.py core/tests/test_integration.py
         
@@ -150,14 +162,17 @@ jobs:
         chrome-version: stable
         
     - name: Run migrations
+      env:
+        DJANGO_SETTINGS_MODULE: bildungsplattform.settings
       run: |
         python manage.py migrate --run-syncdb
         
     - name: Run E2E tests
+      env:
+        DJANGO_SETTINGS_MODULE: bildungsplattform.settings
+        DISPLAY: :99
       run: |
         pytest core/tests/test_e2e.py -v --tb=short -m e2e --junitxml=junit/test-results-e2e.xml
-      env:
-        DISPLAY: :99
         
     - name: Upload E2E test results
       uses: actions/upload-artifact@v4
