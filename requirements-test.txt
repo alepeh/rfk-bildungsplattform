@@ -9,8 +9,8 @@ freezegun==1.2.2  # For mocking time in tests
 responses==0.24.1  # For mocking HTTP requests
 
 # End-to-end testing
-selenium==4.16.0
-playwright==1.40.0
+# selenium==4.16.0  # Commented out due to greenlet Python 3.13 compatibility issues
+# playwright==1.45.0  # Commented out due to greenlet Python 3.13 compatibility issues
 
 # Code quality and coverage
 coverage==7.3.3

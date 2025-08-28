@@ -27,14 +27,13 @@ pillow==11.2.1
 proto-plus==1.26.1
 protobuf==6.31.0
 psycopg==3.1.18
-psycopg-binary==3.1.18
+psycopg-binary==3.2.9
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
 pydot==2.0.0
 pyparsing==3.1.2
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.0
-replit.object_storage==1.0.2
 reportlab==4.4.0
 requests==2.31.0
 rsa==4.9.1

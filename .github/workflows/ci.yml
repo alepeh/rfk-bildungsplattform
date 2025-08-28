@@ -2,9 +2,9 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, "feature/**" ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
 
 env:
   ENVIRONMENT: test
@@ -219,16 +219,30 @@ jobs:
   deploy-staging:
     runs-on: ubuntu-latest
     needs: [test, code-quality, security-scan]
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    if: startsWith(github.ref, 'refs/heads/feature/') && github.event_name == 'push'
     
     steps:
     - uses: actions/checkout@v4
     
-    - name: Deploy to staging
-      run: |
-        echo "Deploying to staging environment..."
-        echo "This would contain actual deployment steps"
-        # Add your staging deployment commands here
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+      
+    - name: Login to Scaleway registry
+      uses: docker/login-action@v2
+      with:
+        registry: rg.fr-par.scw.cloud/rfk-bgld
+        username: nologin
+        password: ${{ secrets.SCW_REGISTRY_TOKEN }}
+        
+    - name: Build and push staging image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: rg.fr-par.scw.cloud/rfk-bgld/rfk-bildungsplattform:dev
         
   deploy-production:
     runs-on: ubuntu-latest
@@ -238,8 +252,32 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Deploy to production
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+      
+    - name: Login to Scaleway registry
+      uses: docker/login-action@v2
+      with:
+        registry: rg.fr-par.scw.cloud/rfk-bgld
+        username: nologin
+        password: ${{ secrets.SCW_REGISTRY_TOKEN }}
+        
+    - name: Build and push production image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: rg.fr-par.scw.cloud/rfk-bgld/rfk-bildungsplattform:latest
+
+    - name: Trigger Serverless Container Redeployment
+      env:
+        SCW_SECRET_KEY: ${{ secrets.SCW_SECRET_KEY }}
+        SCW_DEFAULT_ORGANIZATION_ID: ${{ secrets.SCW_ORGANIZATION_ID }}
       run: |
-        echo "Deploying to production environment..."
-        echo "This would contain actual deployment steps"
-        # Add your production deployment commands here
+        curl -X POST \
+          -H "X-Auth-Token: $SCW_SECRET_KEY" \
+          -H "Content-Type: application/json" \
+          "https://api.scaleway.com/containers/v1beta1/regions/fr-par/containers/${{ secrets.SCW_CONTAINER_ID }}/deploy"

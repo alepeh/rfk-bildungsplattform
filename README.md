@@ -262,14 +262,49 @@ The application now features environment-aware security settings:
     - Add database migration testing
     - Create staging environment matching production
 
-## 🛠️ Development Setup
+## 🛠️ Development Setup & Workflow
 
 ### Prerequisites
 - Python 3.11+
 - PostgreSQL
+- Git
 - Poetry or pip for dependency management
 
-### Local Development
+### Development Workflow
+
+This project follows a **feature branch workflow** with protected main branch:
+
+#### 1. Feature Development Process
+```bash
+# 1. Create a new feature branch from main
+git checkout main
+git pull origin main
+git checkout -b feature/your-feature-name
+
+# 2. Make your changes and commit regularly
+git add .
+git commit -m "feat: implement user authentication"
+
+# 3. Push feature branch (triggers CI checks and staging deployment)
+git push origin feature/your-feature-name
+
+# 4. Create Pull Request to main branch
+# - All CI checks must pass (tests, quality, security)
+# - Requires code review and approval
+# - Main branch is protected - no direct pushes allowed
+```
+
+#### 2. Branch Protection Rules
+- **Main Branch**: Protected, requires PR with reviews
+- **Feature Branches**: Trigger quality checks and staging deployment
+- **Pull Requests**: Must pass all CI checks before merge
+
+#### 3. Automated CI/CD Pipeline
+- **Feature Branch Push**: Runs tests, quality checks, deploys to staging
+- **Main Branch Merge**: Runs full test suite + E2E tests, deploys to production
+- **Quality Gates**: Black formatting, isort, flake8, security scans
+
+### Local Development Setup
 
 1. Clone the repository
 ```bash
@@ -286,6 +321,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 3. Install dependencies
 ```bash
 pip install -r requirements.txt
+pip install -r requirements-test.txt
 ```
 
 4. Set up environment variables
@@ -307,6 +343,25 @@ python manage.py createsuperuser
 7. Run development server
 ```bash
 python manage.py runserver
+```
+
+### Code Quality Standards
+
+Before pushing, ensure your code meets quality standards:
+
+```bash
+# Format code
+black core/ erweiterungen/ bildungsplattform/
+isort core/ erweiterungen/ bildungsplattform/
+
+# Check code quality
+flake8 core/ erweiterungen/ bildungsplattform/ --max-line-length=88 --extend-ignore=E203,W503
+
+# Run tests locally
+pytest core/tests/ -v
+
+# Security check
+python manage.py check_security
 ```
 
 ### Generate Model Diagram
