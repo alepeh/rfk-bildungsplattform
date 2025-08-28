@@ -33,9 +33,16 @@
                                         <ul class="list-unstyled">
                                             {% for unterlage in unterlagen %}
                                                 <li class="mb-2">
-                                                    <a href="{{ unterlage.file.url }}" class="btn btn-outline-primary btn-sm" target="_blank">
-                                                        {% bs_icon 'download' %} {{ unterlage.name }}
-                                                    </a>
+                                                    {% if unterlage.file %}
+                                                        <a href="{{ unterlage.file.url }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                                                            {% bs_icon 'download' %} {{ unterlage.name }}
+                                                        </a>
+                                                    {% else %}
+                                                        <span class="btn btn-outline-secondary btn-sm disabled">
+                                                            {% bs_icon 'file-earmark' %} {{ unterlage.name }}
+                                                        </span>
+                                                        <small class="text-muted d-block">Datei nicht verfügbar</small>
+                                                    {% endif %}
                                                     {% if unterlage.description %}
                                                         <small class="text-muted d-block">{{ unterlage.description }}</small>
                                                     {% endif %}
