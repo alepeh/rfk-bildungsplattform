@@ -78,7 +78,7 @@ def register(request: HttpRequest, id: int):
         person = Person.objects.get(Q(benutzer=user))
     except Person.DoesNotExist:
         messages.error(request, "Kein Personenprofil gefunden.")
-        return redirect('index')
+        return redirect("index")
     betrieb = Betrieb.objects.get(geschaeftsfuehrer=person)
     mitarbeiter = Person.objects.filter(betrieb=betrieb)
     schulungstermin = SchulungsTermin.objects.get(id=id)

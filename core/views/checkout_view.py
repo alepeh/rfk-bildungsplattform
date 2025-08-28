@@ -11,15 +11,15 @@ from core.services.email import send_order_confirmation_email
 @login_required
 def checkout(request: HttpRequest, schulungstermin_id: int):
     schulungstermin = get_object_or_404(SchulungsTermin, id=schulungstermin_id)
-    
+
     if not request.user.is_authenticated:
-        return redirect('login')
-        
+        return redirect("login")
+
     try:
         person = Person.objects.get(benutzer=request.user)
     except Person.DoesNotExist:
         messages.error(request, "Kein Personenprofil gefunden.")
-        return redirect('index')
+        return redirect("index")
     print(person)
     # Determine the price based on whether the person is related to an organisation
     if person.organisation:
