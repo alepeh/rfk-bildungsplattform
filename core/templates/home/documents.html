@@ -16,9 +16,13 @@
                         {% if document.description %}
                             <p class="card-text text-muted">{{ document.description }}</p>
                         {% endif %}
+                        {% if document.file %}
                         <a href="{{ document.file.url }}" class="btn btn-primary" target="_blank">
                             {% bs_icon 'file-earmark-text' %} Öffnen
                         </a>
+                        {% else %}
+                        <span class="text-muted">Keine Datei verfügbar</span>
+                        {% endif %}
                     </div>
                 </div>
             </div>
