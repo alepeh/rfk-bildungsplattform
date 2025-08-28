@@ -19,6 +19,7 @@ from core.models import (
     SchulungsOrt,
     SchulungsTeilnehmer,
     SchulungsTermin,
+    SchulungsUnterlage,
 )
 
 
