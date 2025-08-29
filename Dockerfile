@@ -16,13 +16,14 @@ ENV PGPASSWORD=$PGPASSWORD
 ENV SECRET_KEY=$SECRET_KEY
 ENV ENVIRONMENT=$ENVIRONMENT
 
-# install nginx and PostgreSQL client development libraries
+# install nginx and PostgreSQL client development libraries  
 RUN apt-get update && apt-get install -y \
     default-libmysqlclient-dev \
     gcc \
     nginx \
     libpq-dev \
-    python3-dev
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
 # copy our nginx configuration to overwrite nginx defaults
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 # link nginx logs to container stdout
