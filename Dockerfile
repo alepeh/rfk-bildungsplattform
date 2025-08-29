@@ -36,11 +36,14 @@ COPY manage.py ./app/
 # change our working directory to the django projcet roo
 WORKDIR /app
 
+# Create logs directory
+RUN mkdir -p /app/logs
+
 RUN python -m venv /opt/venv && \
     /opt/venv/bin/python -m pip install pip --upgrade && \
     /opt/venv/bin/python -m pip install -r requirements.txt
-RUN /opt/venv/bin/python manage.py collectstatic
-RUN /opt/venv/bin/python manage.py migrate
+RUN /opt/venv/bin/python manage.py collectstatic --noinput
+RUN /opt/venv/bin/python manage.py migrate --noinput
 
 EXPOSE 8000
 
