@@ -262,6 +262,8 @@ jobs:
         context: .
         push: true
         tags: rg.fr-par.scw.cloud/rfk-bgld/rfk-bildungsplattform:dev
+        build-args: |
+          SECRET_KEY=build-time-secret-key-for-staging
         
   deploy-production:
     runs-on: ubuntu-latest
@@ -290,6 +292,8 @@ jobs:
         context: .
         push: true
         tags: rg.fr-par.scw.cloud/rfk-bgld/rfk-bildungsplattform:latest
+        build-args: |
+          SECRET_KEY=build-time-secret-key-for-production
 
     - name: Trigger Serverless Container Redeployment
       env:
