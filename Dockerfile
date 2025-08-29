@@ -43,7 +43,7 @@ RUN python -m venv /opt/venv && \
     /opt/venv/bin/python -m pip install pip --upgrade && \
     /opt/venv/bin/python -m pip install -r requirements.txt
 RUN /opt/venv/bin/python manage.py collectstatic --noinput
-RUN /opt/venv/bin/python manage.py migrate --noinput
+# Migration will be done at runtime via entrypoint.sh, not during build
 
 EXPOSE 8000
 
