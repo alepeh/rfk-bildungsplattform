@@ -1,3 +1,4 @@
+import os
 from datetime import timedelta
 from decimal import Decimal
 
@@ -32,7 +33,10 @@ class BaseE2ETest(StaticLiveServerTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        # Check if we should use external URL instead of test server
+        cls.use_external_url = bool(os.getenv('E2E_BASE_URL'))
+        if not cls.use_external_url:
+            super().setUpClass()
 
         # Set up Chrome options for headless testing
         chrome_options = Options()
@@ -40,10 +44,20 @@ class BaseE2ETest(StaticLiveServerTestCase):
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--window-size=1920,1080")
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        chrome_options.add_experimental_option('useAutomationExtension', False)
 
         # Initialize WebDriver
         cls.driver = webdriver.Chrome(options=chrome_options)
         cls.driver.implicitly_wait(10)
+
+    @property
+    def live_server_url(self):
+        """Return the base URL for tests - either test server or external URL"""
+        if self.use_external_url:
+            return os.getenv('E2E_BASE_URL')
+        return super().live_server_url
 
     @classmethod
     def tearDownClass(cls):

@@ -57,12 +57,13 @@ The RFK Bildungsplattform (Education Platform) is a comprehensive Django-based l
 ## 🏗️ Architecture
 
 ### Technology Stack
-- **Backend**: Django 4.2+ (Python 3.11)
+- **Backend**: Django 5.2+ (Python 3.13)
 - **Database**: PostgreSQL
 - **Frontend**: Django Templates with Bootstrap 5
 - **Storage**: Scaleway Object Storage for documents
 - **Email**: Scaleway Transactional Email API
 - **Deployment**: Docker containerization with Nginx reverse proxy
+- **Testing**: Pytest with Selenium for E2E tests
 
 ### Project Structure
 
@@ -213,6 +214,7 @@ The application now features environment-aware security settings:
    - ✅ End-to-end tests for registration flow
    - ✅ Test coverage reporting and CI pipeline
    - ✅ GitHub Actions CI with automated testing
+   - ✅ Local and staging E2E test runner
 
 ### Medium Priority
 
@@ -300,9 +302,38 @@ git push origin feature/your-feature-name
 - **Pull Requests**: Must pass all CI checks before merge
 
 #### 3. Automated CI/CD Pipeline
-- **Feature Branch Push**: Runs tests, quality checks, deploys to staging
+- **Feature Branch Push**: Runs tests, quality checks, deploys to staging, runs staging E2E tests
 - **Main Branch Merge**: Runs full test suite + E2E tests, deploys to production
 - **Quality Gates**: Black formatting, isort, flake8, security scans
+
+#### 4. End-to-End Testing Workflow
+
+**Local E2E Testing** (fastest feedback):
+```bash
+# Start local development server
+python manage.py runserver
+
+# In another terminal, run E2E tests against local server
+./scripts/run_e2e_tests.sh local
+```
+
+**Staging E2E Testing** (realistic environment):
+```bash
+# E2E tests automatically run against staging after feature branch deployment
+# Or run manually against staging:
+./scripts/run_e2e_tests.sh staging
+```
+
+**Production E2E Testing** (use with caution):
+```bash
+# Only for critical verification
+./scripts/run_e2e_tests.sh production
+```
+
+The E2E test pipeline:
+1. **Feature branches**: Staging deployment → Staging E2E tests
+2. **Main branch**: Full E2E tests → Production deployment
+3. **Local development**: Run E2E tests before pushing
 
 ### Local Development Setup
 
