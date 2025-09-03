@@ -264,6 +264,7 @@ jobs:
         tags: rg.fr-par.scw.cloud/rfk-bgld/rfk-bildungsplattform:dev
         build-args: |
           SECRET_KEY=build-time-secret-key-for-staging
+          ENVIRONMENT=staging
         
     - name: Trigger Staging Container Redeployment
       env:

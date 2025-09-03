@@ -52,6 +52,7 @@ elif IS_STAGING:
     ALLOWED_HOSTS = [
         "bildungsplattform-test.rauchfangkehrer.or.at",
         "rfkbgldbeqyiq7k-rfk-bildungsplattform-test.functions.fnc.fr-par.scw.cloud",
+        "rfkbgldbeqyiq7k-bildungsplattform.functions.fnc.fr-par.scw.cloud",
     ]
 else:
     # Development environment
