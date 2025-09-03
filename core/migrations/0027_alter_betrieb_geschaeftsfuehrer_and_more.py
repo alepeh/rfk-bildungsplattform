@@ -6,61 +6,98 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0026_delete_personbetrieb'),
+        ("core", "0026_delete_personbetrieb"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='betrieb',
-            name='geschaeftsfuehrer',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='geschaeftsfuehrer', to='core.person'),
+            model_name="betrieb",
+            name="geschaeftsfuehrer",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="geschaeftsfuehrer",
+                to="core.person",
+            ),
         ),
         migrations.AlterField(
-            model_name='person',
-            name='benutzer',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL),
+            model_name="person",
+            name="benutzer",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='person',
-            name='betrieb',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='core.betrieb'),
+            model_name="person",
+            name="betrieb",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="core.betrieb",
+            ),
         ),
         migrations.AlterField(
-            model_name='person',
-            name='funktion',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='core.funktion'),
+            model_name="person",
+            name="funktion",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="core.funktion",
+            ),
         ),
         migrations.AlterField(
-            model_name='schulung',
-            name='art',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='core.schulungsart'),
+            model_name="schulung",
+            name="art",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="core.schulungsart",
+            ),
         ),
         migrations.AlterField(
-            model_name='schulungsartfunktion',
-            name='funktion',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.funktion'),
+            model_name="schulungsartfunktion",
+            name="funktion",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="core.funktion"
+            ),
         ),
         migrations.AlterField(
-            model_name='schulungsartfunktion',
-            name='schulungsart',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.schulungsart'),
+            model_name="schulungsartfunktion",
+            name="schulungsart",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="core.schulungsart"
+            ),
         ),
         migrations.AlterField(
-            model_name='schulungstermin',
-            name='ort',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='core.schulungsort'),
+            model_name="schulungstermin",
+            name="ort",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="core.schulungsort",
+            ),
         ),
         migrations.AlterField(
-            model_name='schulungsterminperson',
-            name='person',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.person'),
+            model_name="schulungsterminperson",
+            name="person",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="core.person"
+            ),
         ),
         migrations.AlterField(
-            model_name='schulungsterminperson',
-            name='schulungstermin',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.schulungstermin'),
+            model_name="schulungsterminperson",
+            name="schulungstermin",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="core.schulungstermin"
+            ),
         ),
     ]

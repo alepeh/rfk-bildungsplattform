@@ -5,15 +5,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0023_rename_datum_schulungstermin_datum_von'),
+        ("core", "0023_rename_datum_schulungstermin_datum_von"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='schulungstermin',
-            name='datum_bis',
+            model_name="schulungstermin",
+            name="datum_bis",
             field=models.DateTimeField(default=django.utils.timezone.now),
             preserve_default=False,
         ),

@@ -5,15 +5,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0014_alter_schulungstermin_ort'),
+        ("core", "0014_alter_schulungstermin_ort"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='schulungstermin',
-            name='ort',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='core.schulungsort'),
+            model_name="schulungstermin",
+            name="ort",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="core.schulungsort",
+            ),
         ),
     ]

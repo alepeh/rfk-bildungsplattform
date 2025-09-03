@@ -5,15 +5,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0024_schulungstermin_datum_bis'),
+        ("core", "0024_schulungstermin_datum_bis"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='betrieb',
-            name='geschaeftsfuehrer',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='geschaeftsfuehrer', to='core.person'),
+            model_name="betrieb",
+            name="geschaeftsfuehrer",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="geschaeftsfuehrer",
+                to="core.person",
+            ),
         ),
     ]

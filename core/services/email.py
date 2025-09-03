@@ -1,22 +1,24 @@
-from ..models import SchulungsTermin
+import json
+
+import requests
 from django.conf import settings
 from django.db.models import Q
-import requests
-import json
+
+from ..models import SchulungsTermin
 
 
 def send_reminder_to_all_teilnehmer(schulungsterminId):
     schulungstermin = SchulungsTermin.objects.get(pk=schulungsterminId)
 
     emails = list(
-        schulungstermin.schulungsteilnehmer_set.exclude(
-            email__isnull=True
-        ).values_list('email', flat=True)
+        schulungstermin.schulungsteilnehmer_set.exclude(email__isnull=True).values_list(
+            "email", flat=True
+        )
     )
     schulung_beginn = schulungstermin.datum_von.strftime("%d.%m.%Y um %H:%M")
-    subject = f'Schulungserinnerung: {schulungstermin.schulung} am {schulung_beginn}'
+    subject = f"Schulungserinnerung: {schulungstermin.schulung} am {schulung_beginn}"
 
-    html_content = f'''
+    html_content = f"""
   <div class=\"email-content\">
     <h2 class=\"email-heading\">Erinnerung: Schulungstermin am {schulung_beginn}</h2>
     <p>Sehr geehrte Damen und Herren,</p>
@@ -27,14 +29,14 @@ def send_reminder_to_all_teilnehmer(schulungsterminId):
     <p>Weitere Informationen finden Sie auf der Bildungsplattform: https://bildungsplattform.rauchfangkehrer.or.at </p>
     <p>Wir freuen uns auf Ihre Teilnahme und darauf, eine informative und bereichernde Schulung mit Ihnen zu erleben.</p>
     <p>Mit freundlichen Grüßen,<br>WTG Burgenland<br>
-  </div>'''
+  </div>"""
 
     send_email(subject, html_content, emails)
 
 
 def send_order_confirmation_email(to_email, bestellung):
-    subject = 'Bestellbestätigung'
-    html_message = f'''
+    subject = "Bestellbestätigung"
+    html_message = f"""
     <html>
     <body>
       <p>Sehr geehrte Damen und Herren,</p>
@@ -50,7 +52,7 @@ def send_order_confirmation_email(to_email, bestellung):
       <p>Mit freundlichen Grüßen,<br>Ihr Team</p>
     </body>
     </html>
-    '''
+    """
 
     send_email(
         subject,
@@ -67,20 +69,18 @@ def send_email(subject, message, to_emails):
         data = {
             "from": {
                 "email": "bildungsplattform@rauchfangkehrer.or.at",
-                "name":
-                "Bildungsplattform der burgenländischen Rauchfangkehrer"
+                "name": "Bildungsplattform der burgenländischen Rauchfangkehrer",
             },
-            "to": [{
-                "email": email_address
-            }],
+            "to": [{"email": email_address}],
             "subject": subject,
             "html": message,
-            "project_id": "03bc621b-579e-4758-8b97-87f6406b2a38"
+            "project_id": "03bc621b-579e-4758-8b97-87f6406b2a38",
         }
         print(data)
         response = requests.post(
             "https://api.scaleway.com/transactional-email/v1alpha1/regions/fr-par/emails",
             json=data,
-            headers=headers)
+            headers=headers,
+        )
         print(response.json())
         response.raise_for_status()

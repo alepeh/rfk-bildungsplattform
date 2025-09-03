@@ -5,43 +5,72 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0034_alter_bestellung_options_bestellung_created_and_more'),
+        ("core", "0034_alter_bestellung_options_bestellung_created_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Organisation',
+            name="Organisation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100)),
-                ('preisrabatt', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=100)),
+                ("preisrabatt", models.BooleanField(default=False)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.AlterField(
-            model_name='person',
-            name='betrieb',
-            field=models.ForeignKey(help_text='Nur relevant für Bgld. Rauchfangkehrer', null=True, on_delete=django.db.models.deletion.SET_NULL, to='core.betrieb'),
+            model_name="person",
+            name="betrieb",
+            field=models.ForeignKey(
+                help_text="Nur relevant für Bgld. Rauchfangkehrer",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="core.betrieb",
+            ),
         ),
         migrations.AlterField(
-            model_name='schulung',
-            name='preis_standard',
-            field=models.DecimalField(decimal_places=2, default=0, help_text='Preis für alle die weder WTG Mitglieder                                        noch ausgewählte Partner sind', max_digits=10),
+            model_name="schulung",
+            name="preis_standard",
+            field=models.DecimalField(
+                decimal_places=2,
+                default=0,
+                help_text="Preis für alle die weder WTG Mitglieder                                        noch ausgewählte Partner sind",
+                max_digits=10,
+            ),
         ),
         migrations.AlterField(
-            model_name='schulungsteilnehmer',
-            name='person',
-            field=models.ForeignKey(blank=True, help_text='Eine Person ist nur für bgld.                              Rauchfangkehrerbetriebe relevant. Für Partner                              reicht bei Teilnehmern Vorname, Nachname und opt Email.', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='schulungsteilnehmer', to='core.person'),
+            model_name="schulungsteilnehmer",
+            name="person",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="Eine Person ist nur für bgld.                              Rauchfangkehrerbetriebe relevant. Für Partner                              reicht bei Teilnehmern Vorname, Nachname und opt Email.",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="schulungsteilnehmer",
+                to="core.person",
+            ),
         ),
         migrations.AddField(
-            model_name='person',
-            name='organisation',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='core.organisation'),
+            model_name="person",
+            name="organisation",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="core.organisation",
+            ),
         ),
     ]

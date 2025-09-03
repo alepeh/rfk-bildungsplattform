@@ -5,18 +5,36 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0011_alter_schulung_art'),
+        ("core", "0011_alter_schulung_art"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='PersonBetrieb',
+            name="PersonBetrieb",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('betrieb', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='core.betrieb')),
-                ('inhaber', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='core.person')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "betrieb",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        to="core.betrieb",
+                    ),
+                ),
+                (
+                    "inhaber",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING, to="core.person"
+                    ),
+                ),
             ],
         ),
     ]

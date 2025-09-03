@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 import sys
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,22 +21,22 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Environment detection
-ENVIRONMENT = os.getenv('ENVIRONMENT', 'development').lower()
-IS_PRODUCTION = ENVIRONMENT == 'production'
-IS_STAGING = ENVIRONMENT == 'staging'
-IS_DEVELOPMENT = ENVIRONMENT == 'development'
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development").lower()
+IS_PRODUCTION = ENVIRONMENT == "production"
+IS_STAGING = ENVIRONMENT == "staging"
+IS_DEVELOPMENT = ENVIRONMENT == "development"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY and IS_PRODUCTION:
     raise ValueError("SECRET_KEY must be set in production environment")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Debug is enabled for development and staging, disabled for production
-DEBUG = os.getenv('DEBUG', str(not IS_PRODUCTION)).lower() in ('true', '1', 'yes')
+DEBUG = os.getenv("DEBUG", str(not IS_PRODUCTION)).lower() in ("true", "1", "yes")
 
 # Security check: never allow DEBUG in production
 if IS_PRODUCTION and DEBUG:
@@ -44,90 +45,96 @@ if IS_PRODUCTION and DEBUG:
 # Configure ALLOWED_HOSTS based on environment
 if IS_PRODUCTION:
     ALLOWED_HOSTS = [
-        'bildungsplattform.rauchfangkehrer.or.at',
-        'www.bildungsplattform.rauchfangkehrer.or.at',
+        "bildungsplattform.rauchfangkehrer.or.at",
+        "www.bildungsplattform.rauchfangkehrer.or.at",
     ]
 elif IS_STAGING:
     ALLOWED_HOSTS = [
-        'bildungsplattform-test.rauchfangkehrer.or.at',
-        'rfkbgldbeqyiq7k-rfk-bildungsplattform-test.functions.fnc.fr-par.scw.cloud',
+        "bildungsplattform-test.rauchfangkehrer.or.at",
+        "rfkbgldbeqyiq7k-rfk-bildungsplattform-test.functions.fnc.fr-par.scw.cloud",
+        "rfkbgldbeqyiq7k-bildungsplattform.functions.fnc.fr-par.scw.cloud",
     ]
 else:
     # Development environment
     ALLOWED_HOSTS = [
-        'localhost',
-        '127.0.0.1',
-        '0.0.0.0',
-        '.replit.dev',
-        '.replit.app',
-        '.ngrok.io',  # For local testing with ngrok
+        "localhost",
+        "127.0.0.1",
+        "0.0.0.0",
+        ".replit.dev",
+        ".replit.app",
+        ".ngrok.io",  # For local testing with ngrok
     ]
     # Allow any host in development if explicitly set
-    if os.getenv('DJANGO_ALLOW_ANY_HOST', '').lower() in ('true', '1', 'yes'):
-        ALLOWED_HOSTS = ['*']
+    if os.getenv("DJANGO_ALLOW_ANY_HOST", "").lower() in ("true", "1", "yes"):
+        ALLOWED_HOSTS = ["*"]
 
 # Configure X_FRAME_OPTIONS based on environment
 if IS_PRODUCTION:
-    X_FRAME_OPTIONS = 'DENY'
+    X_FRAME_OPTIONS = "DENY"
 else:
-    X_FRAME_OPTIONS = 'SAMEORIGIN'
+    X_FRAME_OPTIONS = "SAMEORIGIN"
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://127.0.0.1:8000',
-    'http://localhost:8000',
-    'https://rfkbgldbeqyiq7k-bildungsplattform.functions.fnc.fr-par.scw.cloud',
-    'https://rfkbgldbeqyiq7k-rfk-bildungsplattform-test.functions.fnc.fr-par.scw.cloud',
-    'https://3e13a2a1-5eb4-431b-a41d-ebc0c9e89c46-00-1pfa686cbln1x.janeway.replit.dev',
-    'https://bildungsplattform-test.rauchfangkehrer.or.at',
-    'https://bildungsplattform.rauchfangkehrer.or.at',
-    'https://rfk-bildungsplattform-alexanderpehm.replit.app',
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+    "https://rfkbgldbeqyiq7k-bildungsplattform.functions.fnc.fr-par.scw.cloud",
+    "https://rfkbgldbeqyiq7k-rfk-bildungsplattform-test.functions.fnc.fr-par.scw.cloud",
+    "https://3e13a2a1-5eb4-431b-a41d-ebc0c9e89c46-00-1pfa686cbln1x.janeway.replit.dev",
+    "https://bildungsplattform-test.rauchfangkehrer.or.at",
+    "https://bildungsplattform.rauchfangkehrer.or.at",
+    "https://rfk-bildungsplattform-alexanderpehm.replit.app",
 ]
 
 # Application definition
 
 INSTALLED_APPS = [
-    'core.apps.CoreConfig', 'erweiterungen.apps.ErweiterungenConfig',
-    'bildungsplattform.apps.BildungsplattformAdminConfig',
-    'django.contrib.auth', 'django.contrib.contenttypes',
-    'django.contrib.sessions', 'django.contrib.messages',
-    'django.contrib.staticfiles', 'django_extensions', 'django_bootstrap5',
-    'django_bootstrap_icons'
+    "core.apps.CoreConfig",
+    "erweiterungen.apps.ErweiterungenConfig",
+    "bildungsplattform.apps.BildungsplattformAdminConfig",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django_extensions",
+    "django_bootstrap5",
+    "django_bootstrap_icons",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'bildungsplattform.urls'
+ROOT_URLCONF = "bildungsplattform.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.media',
-                'django.template.context_processors.static',
-                'django.template.context_processors.tz',
-                'core.context_processors.test_system',
-                'core.context_processors.person_context',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "django.template.context_processors.media",
+                "django.template.context_processors.static",
+                "django.template.context_processors.tz",
+                "core.context_processors.test_system",
+                "core.context_processors.person_context",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'bildungsplattform.wsgi.application'
+WSGI_APPLICATION = "bildungsplattform.wsgi.application"
 
 DATABASES = {
     "default": {
@@ -141,37 +148,33 @@ DATABASES = {
 }
 
 # Use sqlite for tests, by default Django would use the same engine for testing
-if 'test' in sys.argv or 'test_coverage' in sys.argv:
-    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
+if "test" in sys.argv or "test_coverage" in sys.argv:
+    DATABASES["default"]["ENGINE"] = "django.db.backends.sqlite3"
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME':
-        'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME':
-        'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME':
-        'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME':
-        'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'de-at'
+LANGUAGE_CODE = "de-at"
 
-TIME_ZONE = 'Europe/Vienna'
+TIME_ZONE = "Europe/Vienna"
 
 USE_I18N = True
 
@@ -180,34 +183,34 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
 # matches the directory from where nginx is fetching the files
-STATIC_ROOT = '/www/data/static/'
+STATIC_ROOT = "/www/data/static/"
 
 # Scaleway Object Storage settings
-SCALEWAY_ACCESS_KEY = os.getenv('SCALEWAY_ACCESS_KEY')
-SCALEWAY_SECRET_KEY = os.getenv('SCALEWAY_SECRET_KEY')
-SCALEWAY_BUCKET_NAME = os.getenv('SCALEWAY_BUCKET_NAME')
-SCALEWAY_REGION = os.getenv('SCALEWAY_REGION', 'fr-par')
+SCALEWAY_ACCESS_KEY = os.getenv("SCALEWAY_ACCESS_KEY")
+SCALEWAY_SECRET_KEY = os.getenv("SCALEWAY_SECRET_KEY")
+SCALEWAY_BUCKET_NAME = os.getenv("SCALEWAY_BUCKET_NAME")
+SCALEWAY_REGION = os.getenv("SCALEWAY_REGION", "fr-par")
 
 # Configure default file storage
-DEFAULT_FILE_STORAGE = 'core.storage.ScalewayObjectStorage'
+DEFAULT_FILE_STORAGE = "core.storage.ScalewayObjectStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
 # Email configuration
-SCALEWAY_EMAIL_API_TOKEN = os.getenv('SCALEWAY_EMAIL_API_TOKEN')
+SCALEWAY_EMAIL_API_TOKEN = os.getenv("SCALEWAY_EMAIL_API_TOKEN")
 
 # django-extensions (generate diagrams for all applications)
 GRAPH_MODELS = {
-    'app_labels': ["core"],
-    'group_models': True,
+    "app_labels": ["core"],
+    "group_models": True,
 }
 
 # Security Settings
@@ -218,21 +221,21 @@ if IS_PRODUCTION:
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    
+
     # HSTS Settings (HTTP Strict Transport Security)
     SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-    
+
     # Session security
     SESSION_COOKIE_HTTPONLY = True
     CSRF_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = 'Strict'
-    CSRF_COOKIE_SAMESITE = 'Strict'
-    
+    SESSION_COOKIE_SAMESITE = "Strict"
+    CSRF_COOKIE_SAMESITE = "Strict"
+
     # Additional security
-    SECURE_REFERRER_POLICY = 'same-origin'
-    
+    SECURE_REFERRER_POLICY = "same-origin"
+
 elif IS_STAGING:
     # Staging should mimic production but allow some flexibility
     SESSION_COOKIE_SECURE = True
@@ -241,59 +244,59 @@ elif IS_STAGING:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SESSION_COOKIE_HTTPONLY = True
     CSRF_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = 'Lax'
-    CSRF_COOKIE_SAMESITE = 'Lax'
-    
+    SESSION_COOKIE_SAMESITE = "Lax"
+    CSRF_COOKIE_SAMESITE = "Lax"
+
 else:
     # Development settings - less restrictive
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
     SESSION_COOKIE_HTTPONLY = True
     CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access in development for debugging
-    SESSION_COOKIE_SAMESITE = 'Lax'
-    CSRF_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SAMESITE = "Lax"
+    CSRF_COOKIE_SAMESITE = "Lax"
 
 # Logging configuration
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
         },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': 'INFO' if IS_PRODUCTION else 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
-        'file': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'logs' / 'django.log',
-            'formatter': 'verbose',
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
         },
     },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO' if IS_PRODUCTION else 'DEBUG',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'] if IS_PRODUCTION else ['console'],
-            'level': 'INFO' if IS_PRODUCTION else 'DEBUG',
-            'propagate': False,
+    "handlers": {
+        "console": {
+            "level": "INFO" if IS_PRODUCTION else "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
         },
-        'django.security': {
-            'handlers': ['file'],
-            'level': 'WARNING',
-            'propagate': False,
+        "file": {
+            "level": "ERROR",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "logs" / "django.log",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO" if IS_PRODUCTION else "DEBUG",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"] if IS_PRODUCTION else ["console"],
+            "level": "INFO" if IS_PRODUCTION else "DEBUG",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["file"],
+            "level": "WARNING",
+            "propagate": False,
         },
     },
 }

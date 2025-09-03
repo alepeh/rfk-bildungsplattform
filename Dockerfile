@@ -1,10 +1,11 @@
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 ARG PGDATABASE
 ARG PGHOST
 ARG PGPORT
 ARG PGUSER
 ARG PGPASSWORD
+ARG SECRET_KEY
 ARG ENVIRONMENT=production
 
 ENV PGDATABASE=$PGDATABASE
@@ -12,10 +13,19 @@ ENV PGHOST=$PGHOST
 ENV PGPORT=$PGPORT
 ENV PGUSER=$PGUSER
 ENV PGPASSWORD=$PGPASSWORD
+ENV SECRET_KEY=$SECRET_KEY
 ENV ENVIRONMENT=$ENVIRONMENT
 
-# install nginx
-RUN apt-get update && apt-get install default-libmysqlclient-dev gcc nginx -y
+# install nginx and PostgreSQL client development libraries  
+RUN apt-get update && apt-get install -y \
+    default-libmysqlclient-dev \
+    gcc \
+    nginx \
+    libpq-dev \
+    python3-dev \
+    curl \
+    procps \
+    && rm -rf /var/lib/apt/lists/*
 # copy our nginx configuration to overwrite nginx defaults
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 # link nginx logs to container stdout
@@ -34,11 +44,14 @@ COPY manage.py ./app/
 # change our working directory to the django projcet roo
 WORKDIR /app
 
+# Create logs directory
+RUN mkdir -p /app/logs
+
 RUN python -m venv /opt/venv && \
     /opt/venv/bin/python -m pip install pip --upgrade && \
     /opt/venv/bin/python -m pip install -r requirements.txt
-RUN /opt/venv/bin/python manage.py collectstatic
-RUN /opt/venv/bin/python manage.py migrate
+RUN SECRET_KEY=build-time-secret /opt/venv/bin/python manage.py collectstatic --noinput
+# Migration will be done at runtime via entrypoint.sh, not during build
 
 EXPOSE 8000
 

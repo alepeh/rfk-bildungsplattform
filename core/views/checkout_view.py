@@ -1,3 +1,5 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
@@ -6,9 +8,18 @@ from core.models import Bestellung, Person, SchulungsTeilnehmer, SchulungsTermin
 from core.services.email import send_order_confirmation_email
 
 
+@login_required
 def checkout(request: HttpRequest, schulungstermin_id: int):
     schulungstermin = get_object_or_404(SchulungsTermin, id=schulungstermin_id)
-    person = get_object_or_404(Person, benutzer=request.user)
+
+    if not request.user.is_authenticated:
+        return redirect("login")
+
+    try:
+        person = Person.objects.get(benutzer=request.user)
+    except Person.DoesNotExist:
+        messages.error(request, "Kein Personenprofil gefunden.")
+        return redirect("index")
     print(person)
     # Determine the price based on whether the person is related to an organisation
     if person.organisation:
@@ -20,13 +31,13 @@ def checkout(request: HttpRequest, schulungstermin_id: int):
         # Exclude persons who are already registered for this schulungstermin
         existing_teilnehmer = SchulungsTeilnehmer.objects.filter(
             schulungstermin=schulungstermin
-        ).values_list('person_id', flat=True)
-        
+        ).values_list("person_id", flat=True)
+
         # Start with basic query excluding already registered persons
         related_persons = Person.objects.filter(betrieb=person.betrieb).exclude(
             id__in=existing_teilnehmer
         )
-        
+
         # If schulung has suitable_for_funktionen restrictions, apply them
         suitable_funktionen = schulungstermin.schulung.suitable_for_funktionen.all()
         if suitable_funktionen.exists():
@@ -35,27 +46,28 @@ def checkout(request: HttpRequest, schulungstermin_id: int):
         related_persons = Person.objects.none()
 
     context = {
-        'schulungstermin': schulungstermin,
-        'preis': preis,
-        'related_persons': related_persons,  # Add related persons to context
+        "schulungstermin": schulungstermin,
+        "preis": preis,
+        "related_persons": related_persons,  # Add related persons to context
     }
     print(related_persons)
-    return render(request, 'home/checkout.html', context)
+    return render(request, "home/checkout.html", context)
 
 
 @require_POST
 def confirm_order(request: HttpRequest):
     data = request.POST
     print(data)
-    schulungstermin = get_object_or_404(SchulungsTermin,
-                                        id=data['schulungstermin_id'])
-    
-    # Check for existing registrations
-    existing_teilnehmer = set(SchulungsTeilnehmer.objects.filter(
-        schulungstermin=schulungstermin
-    ).values_list('person_id', flat=True))
+    schulungstermin = get_object_or_404(SchulungsTermin, id=data["schulungstermin_id"])
 
-    anzahl_str = data.get('quantity')
+    # Check for existing registrations
+    existing_teilnehmer = set(
+        SchulungsTeilnehmer.objects.filter(schulungstermin=schulungstermin).values_list(
+            "person_id", flat=True
+        )
+    )
+
+    anzahl_str = data.get("quantity")
     if isinstance(anzahl_str, list):
         anzahl_str = anzahl_str[0]
 
@@ -75,52 +87,57 @@ def confirm_order(request: HttpRequest):
         anzahl=anzahl,
         einzelpreis=einzelpreis,
         gesamtpreis=anzahl * einzelpreis,
-        status='Bestellt')
+        status="Bestellt",
+    )
     bestellung.save()
 
     # Create SchulungsTeilnehmer objects
     for i in range(int(anzahl_str)):
-        if f'person-{i}' in data:
+        if f"person-{i}" in data:
             # For related persons
-            person_id = data[f'person-{i}']
+            person_id = data[f"person-{i}"]
             person = get_object_or_404(Person, id=person_id)
-            
+
             # Check if person is already registered
             if person.id in existing_teilnehmer:
-                return JsonResponse({
-                    'status': 'error',
-                    'message': f'{person.vorname} {person.nachname} ist bereits für diese Schulung angemeldet.'
-                }, status=400)
-                
+                return JsonResponse(
+                    {
+                        "status": "error",
+                        "message": f"{person.vorname} {person.nachname} ist bereits für diese Schulung angemeldet.",
+                    },
+                    status=400,
+                )
+
             vorname = person.vorname
             nachname = person.nachname
             email = person.email
         else:
             # For non-related persons
-            vorname = data[f'firstname-{i}']
-            nachname = data[f'lastname-{i}']
-            email = data[f'email-{i}']
+            vorname = data[f"firstname-{i}"]
+            nachname = data[f"lastname-{i}"]
+            email = data[f"email-{i}"]
             person = None
-            
+
         SchulungsTeilnehmer.objects.create(
             schulungstermin=schulungstermin,
             bestellung=bestellung,
             vorname=vorname,
             nachname=nachname,
             email=email,
-            verpflegung=data[f'meal-{i}'],
+            verpflegung=data[f"meal-{i}"],
             person=person,
-            status='Angemeldet')
+            status="Angemeldet",
+        )
 
     send_order_confirmation_email(request.user.email, bestellung)
 
     # Redirect to the confirmation page
-    return JsonResponse({'status': 'success', 'bestellung_id': bestellung.id})
+    return JsonResponse({"status": "success", "bestellung_id": bestellung.id})
 
 
 def order_confirmation(request: HttpRequest, bestellung_id: int):
     bestellung = get_object_or_404(Bestellung, id=bestellung_id)
     context = {
-        'bestellung': bestellung,
+        "bestellung": bestellung,
     }
-    return render(request, 'home/order_confirmation.html', context)
+    return render(request, "home/order_confirmation.html", context)

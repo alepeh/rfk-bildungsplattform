@@ -4,19 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0027_alter_betrieb_geschaeftsfuehrer_and_more'),
+        ("core", "0027_alter_betrieb_geschaeftsfuehrer_and_more"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='funktion',
-            options={'ordering': ['sortierung'], 'verbose_name_plural': 'funktionen'},
+            name="funktion",
+            options={"ordering": ["sortierung"], "verbose_name_plural": "funktionen"},
         ),
         migrations.AddField(
-            model_name='funktion',
-            name='sortierung',
+            model_name="funktion",
+            name="sortierung",
             field=models.IntegerField(default=0),
         ),
     ]

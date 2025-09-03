@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0036_person_dsv_akzeptiert_alter_person_betrieb'),
+        ("core", "0036_person_dsv_akzeptiert_alter_person_betrieb"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='person',
-            name='telefon',
+            model_name="person",
+            name="telefon",
             field=models.CharField(blank=True, max_length=30, null=True),
         ),
     ]

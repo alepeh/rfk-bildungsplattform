@@ -4,15 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0021_schulungstermin_buchbar_and_more'),
+        ("core", "0021_schulungstermin_buchbar_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='schulungstermin',
-            name='dauer',
-            field=models.CharField(blank=True, help_text='Zeiteinheit auch angeben z.B. 8h, 2 Tage', max_length=20, null=True),
+            model_name="schulungstermin",
+            name="dauer",
+            field=models.CharField(
+                blank=True,
+                help_text="Zeiteinheit auch angeben z.B. 8h, 2 Tage",
+                max_length=20,
+                null=True,
+            ),
         ),
     ]
