@@ -23,6 +23,8 @@ RUN apt-get update && apt-get install -y \
     nginx \
     libpq-dev \
     python3-dev \
+    curl \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 # copy our nginx configuration to overwrite nginx defaults
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
@@ -48,7 +50,7 @@ RUN mkdir -p /app/logs
 RUN python -m venv /opt/venv && \
     /opt/venv/bin/python -m pip install pip --upgrade && \
     /opt/venv/bin/python -m pip install -r requirements.txt
-RUN /opt/venv/bin/python manage.py collectstatic --noinput
+RUN SECRET_KEY=build-time-secret /opt/venv/bin/python manage.py collectstatic --noinput
 # Migration will be done at runtime via entrypoint.sh, not during build
 
 EXPOSE 8000
