@@ -38,10 +38,16 @@ case $TARGET in
         export SECRET_KEY=test-secret-key-for-local-e2e
         export E2E_BASE_URL="http://127.0.0.1:8000"
         
+        # Use SQLite for local testing to avoid PostgreSQL dependency
+        export USE_SQLITE=true
+        
         # Check if local server is running
         if ! curl -s http://127.0.0.1:8000 >/dev/null 2>&1; then
             echo "ERROR: Local development server is not running on port 8000"
-            echo "Please start the server with: python manage.py runserver"
+            echo "Please start the server with:"
+            echo "  export ENVIRONMENT=development DEBUG=True SECRET_KEY=test-key USE_SQLITE=true"
+            echo "  python manage.py migrate"
+            echo "  python manage.py runserver"
             exit 1
         fi
         ;;
