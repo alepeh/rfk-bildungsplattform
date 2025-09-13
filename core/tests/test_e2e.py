@@ -185,6 +185,15 @@ class CourseRegistrationE2ETest(BaseE2ETest):
         assert "E2E Test Schulung" in self.driver.page_source
         assert "€150.00" in self.driver.page_source  # Discounted price
 
+        # Click "Weiter" to go to step 2
+        weiter_button = self.driver.find_element(By.XPATH, "//button[contains(text(), 'Weiter')]")
+        weiter_button.click()
+
+        # Wait for step 2 form fields to appear
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.NAME, "firstname-0"))
+        )
+
         # Fill out participant details
         firstname_field = self.driver.find_element(By.NAME, "firstname-0")
         lastname_field = self.driver.find_element(By.NAME, "lastname-0")
@@ -198,9 +207,21 @@ class CourseRegistrationE2ETest(BaseE2ETest):
         meal_select = self.driver.find_element(By.NAME, "meal-0")
         meal_select.send_keys("Standard")
 
-        # Submit the form
+        # Submit the form to go to step 3
         submit_button = self.driver.find_element(By.XPATH, "//button[@type='submit']")
         submit_button.click()
+
+        # Wait for step 3 and accept terms
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.ID, "accept-terms"))
+        )
+        
+        terms_checkbox = self.driver.find_element(By.ID, "accept-terms")
+        terms_checkbox.click()
+
+        # Click final order button
+        confirm_button = self.driver.find_element(By.ID, "confirm-order-button")
+        confirm_button.click()
 
         # Step 5: Verify confirmation page
         WebDriverWait(self.driver, 10).until(EC.url_contains("/order-confirmation/"))
@@ -272,9 +293,19 @@ class UserAccountE2ETest(BaseE2ETest):
         # Test login
         self.login("testuser", "testpass123")
 
-        # Verify logged in (look for user greeting or logout link)
+        # Verify logged in (look for user dropdown)
+        user_dropdown = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable(
+                (By.ID, "userDropdown")
+            )
+        )
+        
+        # Click the user dropdown to reveal logout link
+        user_dropdown.click()
+        
+        # Wait for and find logout link
         logout_link = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located(
+            EC.element_to_be_clickable(
                 (By.XPATH, "//a[contains(@href, '/accounts/logout/')]")
             )
         )
@@ -314,8 +345,10 @@ class UserAccountE2ETest(BaseE2ETest):
         # Navigate to my trainings page
         self.driver.get(f"{self.live_server_url}/meine-schulungen/")
 
-        # Verify training history is displayed
-        assert "Past Training" in self.driver.page_source
+        # Wait for page to load and verify training history is displayed
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: "Past Training" in driver.page_source
+        )
 
     def test_user_can_access_documents(self):
         """Test user can access documents"""
