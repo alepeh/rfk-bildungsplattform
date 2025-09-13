@@ -24,10 +24,10 @@
     </div>
 
     <div id="step-2" class="checkout-step d-none">
-        <form id="details-form">
+        <form id="details-form" onsubmit="event.preventDefault(); nextStep(2); return false;">
             <div id="participants-details"></div>
             <button type="button" class="btn btn-secondary" onclick="previousStep(2)">Zurück</button>
-            <button type="button" class="btn btn-primary" onclick="nextStep(2)">Weiter</button>
+            <button type="submit" class="btn btn-primary">Weiter</button>
         </form>
     </div>
 
