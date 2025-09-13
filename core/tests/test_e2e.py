@@ -65,12 +65,12 @@ class BaseE2ETest(StaticLiveServerTestCase):
         self.user = User.objects.create_user(
             username="testuser", password="testpass123", email="test@example.com"
         )
-        
+
         # Create a test business for the main test user
         self.test_betrieb = Betrieb.objects.create(
             name="Test Rauchfangkehrer", email="info@test.com"
         )
-        
+
         self.person = Person.objects.create(
             benutzer=self.user,
             vorname="Max",
@@ -78,7 +78,7 @@ class BaseE2ETest(StaticLiveServerTestCase):
             email="max@example.com",
             betrieb=self.test_betrieb,
         )
-        
+
         # Make person the business owner
         self.test_betrieb.geschaeftsfuehrer = self.person
         self.test_betrieb.save()
@@ -197,7 +197,9 @@ class CourseRegistrationE2ETest(BaseE2ETest):
         assert "€150.00" in self.driver.page_source  # Discounted price
 
         # Click "Weiter" to go to step 2
-        weiter_button = self.driver.find_element(By.XPATH, "//button[contains(text(), 'Weiter')]")
+        weiter_button = self.driver.find_element(
+            By.XPATH, "//button[contains(text(), 'Weiter')]"
+        )
         weiter_button.click()
 
         # Wait for step 2 form fields to appear
@@ -226,7 +228,7 @@ class CourseRegistrationE2ETest(BaseE2ETest):
         WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.ID, "accept-terms"))
         )
-        
+
         terms_checkbox = self.driver.find_element(By.ID, "accept-terms")
         terms_checkbox.click()
 
@@ -307,14 +309,12 @@ class UserAccountE2ETest(BaseE2ETest):
 
         # Verify logged in (look for user dropdown)
         user_dropdown = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(
-                (By.ID, "userDropdown")
-            )
+            EC.element_to_be_clickable((By.ID, "userDropdown"))
         )
-        
+
         # Click the user dropdown to reveal logout link
         user_dropdown.click()
-        
+
         # Wait for and find logout link
         logout_link = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable(
