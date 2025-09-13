@@ -61,17 +61,27 @@ class BaseE2ETest(StaticLiveServerTestCase):
             name="Test Organisation", preisrabatt=True
         )
 
-        # Create user and person
+        # Create user and person as business owner
         self.user = User.objects.create_user(
             username="testuser", password="testpass123", email="test@example.com"
         )
+        
+        # Create a test business for the main test user
+        self.test_betrieb = Betrieb.objects.create(
+            name="Test Rauchfangkehrer", email="info@test.com"
+        )
+        
         self.person = Person.objects.create(
             benutzer=self.user,
             vorname="Max",
             nachname="Mustermann",
             email="max@example.com",
-            organisation=self.organisation,
+            betrieb=self.test_betrieb,
         )
+        
+        # Make person the business owner
+        self.test_betrieb.geschaeftsfuehrer = self.person
+        self.test_betrieb.save()
 
         # Create business owner scenario
         self.owner_user = User.objects.create_user(
