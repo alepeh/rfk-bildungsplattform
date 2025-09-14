@@ -192,6 +192,30 @@ class Person(BaseModel):
         blank=True,
         help_text="Nur relevant für Bgld. Rauchfangkehrer",
     )
+    # Activation fields for registration approval workflow
+    is_activated = models.BooleanField(
+        default=False,
+        verbose_name="Konto aktiviert",
+        help_text="Gibt an, ob das Konto vom Administrator genehmigt wurde",
+    )
+    activation_requested_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Aktivierung angefordert am",
+    )
+    activated_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Aktiviert am",
+    )
+    activated_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="activated_persons",
+        verbose_name="Aktiviert von",
+    )
 
     def __str__(self):
         return f"{self.vorname} {self.nachname}"

@@ -1,0 +1,66 @@
+{% extends "../components/base.html" %}
+{% block title %}Registrierung erfolgreich{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="mb-4">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                </div>
+                
+                <h2 class="card-title text-success mb-4">Registrierung erfolgreich!</h2>
+                
+                <p class="card-text mb-4">
+                    Vielen Dank für Ihre Registrierung auf der Bildungsplattform der burgenländischen Rauchfangkehrer.
+                </p>
+                
+                <div class="alert alert-info" role="alert">
+                    <h6 class="alert-heading">Was passiert als nächstes?</h6>
+                    <p class="mb-2">
+                        Ihr Konto wird von einem Administrator geprüft und freigeschaltet. 
+                        Dies kann einige Zeit in Anspruch nehmen.
+                    </p>
+                    <hr>
+                    <p class="mb-0">
+                        <strong>Sie erhalten eine E-Mail-Bestätigung, sobald Ihr Konto aktiviert wurde.</strong>
+                    </p>
+                </div>
+                
+                <div class="card bg-light mb-4">
+                    <div class="card-body">
+                        <h6 class="card-title">Wichtige Hinweise:</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="bi bi-info-circle text-primary me-2"></i>
+                                Sie können sich bereits anmelden, haben aber noch keinen Zugang zu Buchungen
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-envelope text-primary me-2"></i>
+                                Prüfen Sie regelmäßig Ihre E-Mails für Updates
+                            </li>
+                            <li>
+                                <i class="bi bi-telephone text-primary me-2"></i>
+                                Bei Fragen kontaktieren Sie uns unter: 
+                                <a href="mailto:bildungsplattform@rauchfangkehrer.or.at">
+                                    bildungsplattform@rauchfangkehrer.or.at
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'login' %}" class="btn btn-primary">
+                        Zur Anmeldung
+                    </a>
+                    <a href="{% url 'index' %}" class="btn btn-outline-secondary">
+                        Zur Startseite
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

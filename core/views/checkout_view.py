@@ -4,11 +4,12 @@ from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
+from core.decorators import login_and_activation_required
 from core.models import Bestellung, Person, SchulungsTeilnehmer, SchulungsTermin
 from core.services.email import send_order_confirmation_email
 
 
-@login_required
+@login_and_activation_required
 def checkout(request: HttpRequest, schulungstermin_id: int):
     schulungstermin = get_object_or_404(SchulungsTermin, id=schulungstermin_id)
 
@@ -55,6 +56,7 @@ def checkout(request: HttpRequest, schulungstermin_id: int):
 
 
 @require_POST
+@login_and_activation_required
 def confirm_order(request: HttpRequest):
     data = request.POST
     print(data)

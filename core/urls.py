@@ -1,6 +1,6 @@
 from django.urls import include, path
 
-from .views import checkout_view, orders_view, views
+from .views import auth_views, checkout_view, orders_view, views
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -18,6 +18,9 @@ urlpatterns = [
     path("impressum/", views.impressum, name="impressum"),
     path("mitarbeiter", views.mitarbeiter, name="mitarbeiter"),
     path("accounts/logout/", views.logout_view, name="logout"),
+    path("accounts/register/", auth_views.register, name="account_register"),
+    path("accounts/registration-success/", auth_views.registration_success, name="registration_success"),
+    path("accounts/activation-pending/", auth_views.activation_pending, name="activation_pending"),
     path("accounts/", include("django.contrib.auth.urls")),
     path("send-reminder/<int:pk>/", views.send_reminder, name="send_reminder"),
     path(
