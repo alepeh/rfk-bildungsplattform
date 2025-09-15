@@ -318,7 +318,7 @@ class TestCourseCapacityManagement:
                 username=f"user{i}", password="testpass", email=f"user{i}@example.com"
             )
             person = Person.objects.create(
-                benutzer=user, vorname=f"User{i}", nachname="Test"
+                benutzer=user, vorname=f"User{i}", nachname="Test", is_activated=True
             )
             self.users.append(user)
             self.persons.append(person)
