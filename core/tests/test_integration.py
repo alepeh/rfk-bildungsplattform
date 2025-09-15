@@ -45,6 +45,7 @@ class TestCompleteRegistrationWorkflow:
             nachname="Mustermann",
             email="max@example.com",
             organisation=self.organisation,
+            is_activated=True,
         )
 
         # Create course setup
@@ -170,6 +171,7 @@ class TestBusinessOwnerRegistrationWorkflow:
             vorname="Hans",
             nachname="Müller",
             betrieb=self.betrieb,
+            is_activated=True,
         )
         self.betrieb.geschaeftsfuehrer = self.owner
         self.betrieb.save()
@@ -406,7 +408,7 @@ class TestUserSchulungsHistory:
 
         self.user = User.objects.create_user(username="student", password="studentpass")
         self.person = Person.objects.create(
-            benutzer=self.user, vorname="Student", nachname="Test"
+            benutzer=self.user, vorname="Student", nachname="Test", is_activated=True
         )
 
         # Create various courses and participations

@@ -150,4 +150,3 @@ class CombinedRegistrationForm:
         errors.update(self.user_form.errors)
         errors.update(self.person_form.errors)
         return errors
-

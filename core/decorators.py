@@ -62,4 +62,3 @@ def check_activation_status(user):
 login_and_activation_required_method = method_decorator(
     login_and_activation_required, name="dispatch"
 )
-

@@ -99,4 +99,3 @@ def check_activation_status(user):
         return person.is_activated
     except Person.DoesNotExist:
         return False
-

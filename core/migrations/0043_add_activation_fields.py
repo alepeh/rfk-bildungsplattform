@@ -8,29 +8,44 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0042_schulungsunterlage'),
+        ("core", "0042_schulungsunterlage"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='person',
-            name='activated_at',
-            field=models.DateTimeField(blank=True, null=True, verbose_name='Aktiviert am'),
+            model_name="person",
+            name="activated_at",
+            field=models.DateTimeField(
+                blank=True, null=True, verbose_name="Aktiviert am"
+            ),
         ),
         migrations.AddField(
-            model_name='person',
-            name='activated_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='activated_persons', to=settings.AUTH_USER_MODEL, verbose_name='Aktiviert von'),
+            model_name="person",
+            name="activated_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="activated_persons",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Aktiviert von",
+            ),
         ),
         migrations.AddField(
-            model_name='person',
-            name='activation_requested_at',
-            field=models.DateTimeField(blank=True, null=True, verbose_name='Aktivierung angefordert am'),
+            model_name="person",
+            name="activation_requested_at",
+            field=models.DateTimeField(
+                blank=True, null=True, verbose_name="Aktivierung angefordert am"
+            ),
         ),
         migrations.AddField(
-            model_name='person',
-            name='is_activated',
-            field=models.BooleanField(default=False, help_text='Gibt an, ob das Konto vom Administrator genehmigt wurde', verbose_name='Konto aktiviert'),
+            model_name="person",
+            name="is_activated",
+            field=models.BooleanField(
+                default=False,
+                help_text="Gibt an, ob das Konto vom Administrator genehmigt wurde",
+                verbose_name="Konto aktiviert",
+            ),
         ),
     ]
