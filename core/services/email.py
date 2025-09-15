@@ -95,19 +95,24 @@ def send_admin_registration_notification(person):
     """
     # Get admin emails - users with staff status
     admin_emails = list(
-        User.objects.filter(is_staff=True, email__isnull=False).exclude(email="").values_list("email", flat=True)
+        User.objects.filter(is_staff=True, email__isnull=False)
+        .exclude(email="")
+        .values_list("email", flat=True)
     )
-    
+
     if not admin_emails:
         # Fallback to default admin email if no staff users with emails
         admin_emails = ["bildungsplattform@rauchfangkehrer.or.at"]
-    
+
     subject = f"Neue Registrierung: {person.vorname} {person.nachname} - Aktivierung erforderlich"
-    
-    html_content = render_to_string('emails/admin_registration_notification.html', {
-        'person': person,
-    })
-    
+
+    html_content = render_to_string(
+        "emails/admin_registration_notification.html",
+        {
+            "person": person,
+        },
+    )
+
     send_email(subject, html_content, admin_emails)
 
 
@@ -116,9 +121,12 @@ def send_user_activation_notification(person):
     Send confirmation email to user after account activation.
     """
     subject = "Ihr Konto wurde aktiviert - Bildungsplattform der burgenländischen Rauchfangkehrer"
-    
-    html_content = render_to_string('emails/user_activation_notification.html', {
-        'person': person,
-    })
-    
+
+    html_content = render_to_string(
+        "emails/user_activation_notification.html",
+        {
+            "person": person,
+        },
+    )
+
     send_email(subject, html_content, [person.email])

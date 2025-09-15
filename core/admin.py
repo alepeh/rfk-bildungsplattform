@@ -52,7 +52,7 @@ export_schulungsteilnehmer_to_csv.short_description = "Schulungsteilnehmer CSV E
 def activate_users(modeladmin, request, queryset):
     """Admin action to activate selected user accounts."""
     from core.services.email import send_user_activation_notification
-    
+
     activated_count = 0
     for person in queryset.filter(is_activated=False):
         # Activate the Person
@@ -60,27 +60,27 @@ def activate_users(modeladmin, request, queryset):
         person.activated_at = timezone.now()
         person.activated_by = request.user
         person.save()
-        
+
         # Activate the associated User account
         if person.benutzer:
             person.benutzer.is_active = True
             person.benutzer.save()
-        
+
         # Send notification email to user
         try:
             send_user_activation_notification(person)
         except Exception as e:
             messages.warning(
-                request, 
-                f"Konto von {person.vorname} {person.nachname} wurde aktiviert, aber E-Mail-Benachrichtigung fehlgeschlagen: {e}"
+                request,
+                f"Konto von {person.vorname} {person.nachname} wurde aktiviert, aber E-Mail-Benachrichtigung fehlgeschlagen: {e}",
             )
-        
+
         activated_count += 1
-    
+
     if activated_count > 0:
         messages.success(
             request,
-            f"{activated_count} Benutzer wurde(n) erfolgreich aktiviert und benachrichtigt."
+            f"{activated_count} Benutzer wurde(n) erfolgreich aktiviert und benachrichtigt.",
         )
 
 
@@ -93,18 +93,17 @@ def deactivate_users(modeladmin, request, queryset):
         person.activated_at = None
         person.activated_by = None
         person.save()
-        
+
         # Deactivate the associated User account
         if person.benutzer:
             person.benutzer.is_active = False
             person.benutzer.save()
-        
+
         deactivated_count += 1
-    
+
     if deactivated_count > 0:
         messages.success(
-            request,
-            f"{deactivated_count} Benutzer wurde(n) erfolgreich deaktiviert."
+            request, f"{deactivated_count} Benutzer wurde(n) erfolgreich deaktiviert."
         )
 
 
@@ -193,22 +192,29 @@ class PersonAdmin(admin.ModelAdmin):
     search_fields = ("nachname", "vorname", "email", "benutzer__username")
     readonly_fields = ("activated_at", "activated_by", "activation_requested_at")
     actions = [activate_users, deactivate_users]
-    
+
     fieldsets = (
-        ("Persönliche Daten", {
-            "fields": ("benutzer", "vorname", "nachname", "email", "telefon")
-        }),
-        ("Berufliche Zuordnung", {
-            "fields": ("betrieb", "funktion", "organisation")
-        }),
-        ("Aktivierungsstatus", {
-            "fields": ("is_activated", "activation_requested_at", "activated_at", "activated_by"),
-            "description": "Verwaltung der Kontoaktivierung für neue Registrierungen"
-        }),
-        ("Sonstige", {
-            "fields": ("dsv_akzeptiert", "anmerkungen"),
-            "classes": ("collapse",)
-        })
+        (
+            "Persönliche Daten",
+            {"fields": ("benutzer", "vorname", "nachname", "email", "telefon")},
+        ),
+        ("Berufliche Zuordnung", {"fields": ("betrieb", "funktion", "organisation")}),
+        (
+            "Aktivierungsstatus",
+            {
+                "fields": (
+                    "is_activated",
+                    "activation_requested_at",
+                    "activated_at",
+                    "activated_by",
+                ),
+                "description": "Verwaltung der Kontoaktivierung für neue Registrierungen",
+            },
+        ),
+        (
+            "Sonstige",
+            {"fields": ("dsv_akzeptiert", "anmerkungen"), "classes": ("collapse",)},
+        ),
     )
 
     def activation_status(self, obj):
@@ -219,11 +225,15 @@ class PersonAdmin(admin.ModelAdmin):
             return "⏳ Wartend"
         else:
             return "❌ Inaktiv"
-    
+
     activation_status.short_description = "Status"
-    
+
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('benutzer', 'betrieb', 'funktion', 'activated_by')
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("benutzer", "betrieb", "funktion", "activated_by")
+        )
 
 
 class SchulungsTerminAdmin(admin.ModelAdmin):

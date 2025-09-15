@@ -12,25 +12,26 @@ def activation_required(view_func):
     Decorator that requires user to be both authenticated and activated.
     Redirects non-activated users to the activation pending page.
     """
+
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
         # First check if user is authenticated
         if not request.user.is_authenticated:
-            return redirect('login')
-        
+            return redirect("login")
+
         # Check if user is activated
         try:
             person = Person.objects.get(benutzer=request.user)
             if not person.is_activated:
                 # Redirect to activation pending page
-                return redirect('activation_pending')
+                return redirect("activation_pending")
         except Person.DoesNotExist:
             # User has no Person record, redirect to activation pending
-            return redirect('activation_pending')
-        
+            return redirect("activation_pending")
+
         # User is authenticated and activated, proceed
         return view_func(request, *args, **kwargs)
-    
+
     return _wrapped_view
 
 
@@ -49,7 +50,7 @@ def check_activation_status(user):
     """
     if not user.is_authenticated or not user.is_active:
         return False
-    
+
     try:
         person = Person.objects.get(benutzer=user)
         return person.is_activated
@@ -58,4 +59,7 @@ def check_activation_status(user):
 
 
 # Decorator for class-based views
-login_and_activation_required_method = method_decorator(login_and_activation_required, name='dispatch')
+login_and_activation_required_method = method_decorator(
+    login_and_activation_required, name="dispatch"
+)
+

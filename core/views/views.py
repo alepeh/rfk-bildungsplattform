@@ -242,9 +242,9 @@ def export_schulungsteilnehmer_pdf(request, pk):
 
     # Create response
     response = HttpResponse(buffer, content_type="application/pdf")
-    response[
-        "Content-Disposition"
-    ] = f'attachment; filename="teilnehmerliste_{schulungstermin.pk}.pdf"'
+    response["Content-Disposition"] = (
+        f'attachment; filename="teilnehmerliste_{schulungstermin.pk}.pdf"'
+    )
     return response
 
 

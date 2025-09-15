@@ -35,7 +35,9 @@ class TestIndexView:
 
     def test_index_view_authenticated(self):
         user = User.objects.create_user(username="testuser", password="testpass")
-        person = Person.objects.create(benutzer=user, vorname="Test", nachname="User")
+        person = Person.objects.create(
+            benutzer=user, vorname="Test", nachname="User", is_activated=True
+        )
 
         self.client.login(username="testuser", password="testpass")
         response = self.client.get(reverse("index"))
@@ -80,7 +82,11 @@ class TestRegisterView:
         self.user = User.objects.create_user(username="gf", password="testpass")
         self.betrieb = Betrieb.objects.create(name="Test Betrieb")
         self.geschaeftsfuehrer = Person.objects.create(
-            benutzer=self.user, vorname="Boss", nachname="Person", betrieb=self.betrieb
+            benutzer=self.user,
+            vorname="Boss",
+            nachname="Person",
+            betrieb=self.betrieb,
+            is_activated=True,
         )
         self.betrieb.geschaeftsfuehrer = self.geschaeftsfuehrer
         self.betrieb.save()
@@ -196,6 +202,7 @@ class TestCheckoutView:
             vorname="Test",
             nachname="User",
             organisation=self.organisation,
+            is_activated=True,
         )
 
         self.schulung = Schulung.objects.create(
@@ -288,6 +295,7 @@ class TestConfirmOrderView:
             vorname="Test",
             nachname="User",
             email="test@example.com",
+            is_activated=True,
         )
 
         self.schulung = Schulung.objects.create(
@@ -374,7 +382,11 @@ class TestMitarbeiterView:
         self.user = User.objects.create_user(username="gf", password="testpass")
         self.betrieb = Betrieb.objects.create(name="Test Betrieb")
         self.geschaeftsfuehrer = Person.objects.create(
-            benutzer=self.user, vorname="Boss", nachname="Person", betrieb=self.betrieb
+            benutzer=self.user,
+            vorname="Boss",
+            nachname="Person",
+            betrieb=self.betrieb,
+            is_activated=True,
         )
         self.betrieb.geschaeftsfuehrer = self.geschaeftsfuehrer
         self.betrieb.save()
@@ -400,7 +412,7 @@ class TestMySchulungenView:
         self.client = Client()
         self.user = User.objects.create_user(username="testuser", password="testpass")
         self.person = Person.objects.create(
-            benutzer=self.user, vorname="Test", nachname="User"
+            benutzer=self.user, vorname="Test", nachname="User", is_activated=True
         )
 
     def test_my_schulungen_requires_authentication(self):
@@ -445,7 +457,11 @@ class TestDocumentsView:
         self.user = User.objects.create_user(username="testuser", password="testpass")
         self.funktion = Funktion.objects.create(name="Meister")
         self.person = Person.objects.create(
-            benutzer=self.user, vorname="Test", nachname="User", funktion=self.funktion
+            benutzer=self.user,
+            vorname="Test",
+            nachname="User",
+            funktion=self.funktion,
+            is_activated=True,
         )
 
     def test_documents_requires_authentication(self):
