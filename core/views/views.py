@@ -282,9 +282,6 @@ def my_schulungen(request):
     )
 
 
-from django.contrib.auth.decorators import login_required
-
-
 @login_and_activation_required
 def documents(request):
     user = request.user
