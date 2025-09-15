@@ -4,11 +4,10 @@ RUN_PORT="8001"
 
 echo "=== Starting Django Application ==="
 
-# Set default ENVIRONMENT if not provided
-if [ -z "$ENVIRONMENT" ]; then
-    export ENVIRONMENT="staging"
-    echo "Setting ENVIRONMENT to staging (default for container deployment)"
-fi
+# Force ENVIRONMENT to staging for container deployments
+# (The container environment might have ENVIRONMENT=production set incorrectly)
+export ENVIRONMENT="staging"
+echo "Forcing ENVIRONMENT to staging for container deployment"
 
 # Set default SECRET_KEY if not provided (for staging/development)
 if [ -z "$SECRET_KEY" ]; then
