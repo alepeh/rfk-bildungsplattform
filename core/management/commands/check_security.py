@@ -64,9 +64,7 @@ class Command(BaseCommand):
                     self.stdout.write(style.ERROR(f"✗ {description}: {value}"))
                 else:
                     self.stdout.write(
-                        style.WARNING(
-                            f"⚠️  {description}: {value} (OK for development)"
-                        )
+                        style.WARNING(f"⚠️  {description}: {value} (OK for development)")
                     )
 
         # HSTS Settings
@@ -117,9 +115,7 @@ class Command(BaseCommand):
                 )
             else:
                 self.stdout.write(
-                    style.ERROR(
-                        "⚠️  Production security configuration needs attention!"
-                    )
+                    style.ERROR("⚠️  Production security configuration needs attention!")
                 )
         else:
             self.stdout.write(
