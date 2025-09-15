@@ -298,32 +298,23 @@ class Bestellung(BaseModel):
     status = models.CharField(
         max_length=50, choices=STATUS_CHOICES, default="Angemeldet"
     )
-    
+
     # Rechnungsadresse fields
     rechnungsadresse_name = models.CharField(
         max_length=200,
         verbose_name="Name/Firma",
         help_text="Name oder Firmenname für die Rechnung",
         null=True,
-        blank=True
+        blank=True,
     )
     rechnungsadresse_strasse = models.CharField(
-        max_length=200,
-        verbose_name="Straße und Hausnummer",
-        null=True,
-        blank=True
+        max_length=200, verbose_name="Straße und Hausnummer", null=True, blank=True
     )
     rechnungsadresse_plz = models.CharField(
-        max_length=20,
-        verbose_name="Postleitzahl",
-        null=True,
-        blank=True
+        max_length=20, verbose_name="Postleitzahl", null=True, blank=True
     )
     rechnungsadresse_ort = models.CharField(
-        max_length=100,
-        verbose_name="Ort",
-        null=True,
-        blank=True
+        max_length=100, verbose_name="Ort", null=True, blank=True
     )
 
     def __str__(self):

@@ -126,7 +126,7 @@ class TestCompleteRegistrationWorkflow:
         assert bestellung.einzelpreis == Decimal("150.00")
         assert bestellung.gesamtpreis == Decimal("300.00")
         assert bestellung.status == "Bestellt"
-        
+
         # Verify invoice address saved
         assert bestellung.rechnungsadresse_name == "Max Mustermann"
         assert bestellung.rechnungsadresse_strasse == "Teststraße 123"

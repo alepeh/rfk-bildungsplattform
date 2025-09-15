@@ -21,7 +21,7 @@ def checkout(request: HttpRequest, schulungstermin_id: int):
     except Person.DoesNotExist:
         messages.error(request, "Kein Personenprofil gefunden.")
         return redirect("index")
-    
+
     # Check if person has booking permission
     if not person.can_book_schulungen:
         messages.error(request, "Sie haben keine Berechtigung, Schulungen zu buchen.")
@@ -99,7 +99,7 @@ def confirm_order(request: HttpRequest):
 
     # Fetch the person and determine the price based on organization relationship
     person = get_object_or_404(Person, benutzer=request.user)
-    
+
     # Check if person has booking permission
     if not person.can_book_schulungen:
         return JsonResponse(

@@ -146,7 +146,9 @@ DATABASES = {
         "HOST": os.getenv("PGHOST"),
         "PORT": os.getenv("PGPORT"),
         "OPTIONS": {
-            "sslmode": os.getenv("PGSSLMODE", "require"),  # Default to 'require' if not set
+            "sslmode": os.getenv(
+                "PGSSLMODE", "disable" if ENVIRONMENT == "test" else "require"
+            ),  # Disable SSL for test environment
         },
     }
 }

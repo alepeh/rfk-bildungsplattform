@@ -274,12 +274,30 @@ class BestellungAdmin(admin.ModelAdmin):
     list_display = ("schulungstermin", "anzahl", "rechnungsadresse_name", "created")
     inlines = [SchulungsTeilnehmerBestellungInline]
     fieldsets = (
-        ("Bestelldetails", {
-            "fields": ("person", "schulungstermin", "anzahl", "einzelpreis", "gesamtpreis", "status")
-        }),
-        ("Rechnungsadresse", {
-            "fields": ("rechnungsadresse_name", "rechnungsadresse_strasse", "rechnungsadresse_plz", "rechnungsadresse_ort")
-        }),
+        (
+            "Bestelldetails",
+            {
+                "fields": (
+                    "person",
+                    "schulungstermin",
+                    "anzahl",
+                    "einzelpreis",
+                    "gesamtpreis",
+                    "status",
+                )
+            },
+        ),
+        (
+            "Rechnungsadresse",
+            {
+                "fields": (
+                    "rechnungsadresse_name",
+                    "rechnungsadresse_strasse",
+                    "rechnungsadresse_plz",
+                    "rechnungsadresse_ort",
+                )
+            },
+        ),
     )
 
 

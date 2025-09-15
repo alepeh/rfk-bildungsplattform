@@ -77,11 +77,11 @@ class TestIndexView:
     def test_index_booking_button_visibility_with_permission(self):
         user = User.objects.create_user(username="testuser", password="testpass")
         person = Person.objects.create(
-            benutzer=user, 
-            vorname="Test", 
-            nachname="User", 
+            benutzer=user,
+            vorname="Test",
+            nachname="User",
             is_activated=True,
-            can_book_schulungen=True
+            can_book_schulungen=True,
         )
 
         schulung = Schulung.objects.create(
@@ -101,7 +101,7 @@ class TestIndexView:
 
         self.client.login(username="testuser", password="testpass")
         response = self.client.get(reverse("index"))
-        
+
         # Button should be visible for users with booking permission
         content = response.content.decode()
         assert "Buchen" in content
@@ -110,11 +110,11 @@ class TestIndexView:
     def test_index_booking_button_blocked_without_permission(self):
         user = User.objects.create_user(username="testuser", password="testpass")
         person = Person.objects.create(
-            benutzer=user, 
-            vorname="Test", 
-            nachname="User", 
+            benutzer=user,
+            vorname="Test",
+            nachname="User",
             is_activated=True,
-            can_book_schulungen=False
+            can_book_schulungen=False,
         )
 
         schulung = Schulung.objects.create(
@@ -134,7 +134,7 @@ class TestIndexView:
 
         self.client.login(username="testuser", password="testpass")
         response = self.client.get(reverse("index"))
-        
+
         # Button should show "Buchung nicht erlaubt" message
         content = response.content.decode()
         assert "Buchung nicht erlaubt" in content
@@ -298,7 +298,7 @@ class TestCheckoutView:
         assert response.status_code == 200
         assert response.context["schulungstermin"] == self.termin
         assert response.context["preis"] == Decimal("100.00")  # Discounted price
-        
+
     def test_checkout_includes_invoice_data(self):
         self.client.login(username="testuser", password="testpass")
 
@@ -363,10 +363,7 @@ class TestCheckoutView:
 
     def test_checkout_prepopulates_betrieb_invoice_data(self):
         betrieb = Betrieb.objects.create(
-            name="Test Company GmbH",
-            adresse="Musterstraße 123",
-            plz="1010",
-            ort="Wien"
+            name="Test Company GmbH", adresse="Musterstraße 123", plz="1010", ort="Wien"
         )
         self.person.betrieb = betrieb
         self.person.save()
@@ -375,7 +372,7 @@ class TestCheckoutView:
 
         response = self.client.get(reverse("checkout", args=[self.termin.id]))
         assert response.status_code == 200
-        
+
         invoice_data = response.context["invoice_data"]
         assert invoice_data["name"] == "Test Company GmbH"
         assert invoice_data["strasse"] == "Musterstraße 123"
@@ -390,7 +387,7 @@ class TestCheckoutView:
 
         response = self.client.get(reverse("checkout", args=[self.termin.id]))
         assert response.status_code == 302  # Redirect to index
-        
+
     def test_checkout_allowed_with_booking_permission(self):
         self.person.can_book_schulungen = True
         self.person.save()
@@ -460,7 +457,7 @@ class TestConfirmOrderView:
         assert bestellung.anzahl == 2
         assert bestellung.einzelpreis == Decimal("100.00")
         assert bestellung.gesamtpreis == Decimal("200.00")
-        
+
         # Check invoice address saved
         assert bestellung.rechnungsadresse_name == "Test Customer"
         assert bestellung.rechnungsadresse_strasse == "Test Street 123"
