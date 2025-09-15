@@ -63,12 +63,12 @@ class UserRegistrationForm(UserCreationForm):
         self.fields["password2"].label = "Passwort bestätigen"
 
         # Update help texts
-        self.fields["username"].help_text = (
-            "Wählen Sie einen eindeutigen Benutzernamen."
-        )
-        self.fields["password1"].help_text = (
-            "Ihr Passwort sollte mindestens 8 Zeichen lang sein."
-        )
+        self.fields[
+            "username"
+        ].help_text = "Wählen Sie einen eindeutigen Benutzernamen."
+        self.fields[
+            "password1"
+        ].help_text = "Ihr Passwort sollte mindestens 8 Zeichen lang sein."
 
     def clean_email(self):
         email = self.cleaned_data["email"]
