@@ -1,24 +1,68 @@
 {% extends "../components/base.html" %}
-{% block title %}Login{% endblock %}
+{% block title %}Anmelden{% endblock %}
 
 {% block content %}
-<h2>Anmelden</h2>
-<form method="post" class="needs-validation" novalidate>
-    {% csrf_token %}
-    <div class="mb-3">
-        <label for="usernameInput" class="form-label">Benutzername</label>
-        <input type="text" name="username" class="form-control" id="usernameInput" placeholder="3 Buchstaben Vorname, 3 Buchstaben Nachname" required>
-        <div class="invalid-feedback">
-            Bitte Benutzernamen eingeben.
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Anmelden</h2>
+            </div>
+            <div class="card-body">
+                {% if form.errors %}
+                <div class="alert alert-danger" role="alert">
+                    <h6>Anmeldung fehlgeschlagen:</h6>
+                    <ul class="mb-0">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% if form.non_field_errors %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="usernameInput" class="form-label">Benutzername</label>
+                        <input type="text" name="username" class="form-control" id="usernameInput" placeholder="Ihr Benutzername" required>
+                        <div class="invalid-feedback">
+                            Bitte Benutzernamen eingeben.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="passwordInput" class="form-label">Passwort</label>
+                        <input type="password" name="password" class="form-control" id="passwordInput" placeholder="Ihr Passwort" required>
+                        <div class="invalid-feedback">
+                            Bitte Passwort eingeben.
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Anmelden</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-light">
+                <div class="text-center">
+                    <p class="mb-2">Noch kein Konto?</p>
+                    <a href="{% url 'account_register' %}" class="btn btn-outline-primary">
+                        Jetzt registrieren
+                    </a>
+                </div>
+                <hr class="my-3">
+                <div class="text-center">
+                    <small class="text-muted">
+                        <a href="#" class="text-decoration-none">Passwort vergessen?</a>
+                    </small>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="mb-3">
-        <label for="passwordInput" class="form-label">Passwort</label>
-        <input type="password" name="password" class="form-control" id="passwordInput" placeholder="Passwort" required>
-        <div class="invalid-feedback">
-            Bitte Passwort eingeben.
-        </div>
-    </div>
-    <button type="submit" class="btn btn-primary">Anmelden</button>
-</form>
+</div>
 {% endblock %}

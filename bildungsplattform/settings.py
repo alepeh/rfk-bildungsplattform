@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+
 import os
 import sys
 from pathlib import Path
@@ -144,6 +145,11 @@ DATABASES = {
         "PASSWORD": os.getenv("PGPASSWORD"),
         "HOST": os.getenv("PGHOST"),
         "PORT": os.getenv("PGPORT"),
+        "OPTIONS": {
+            "sslmode": os.getenv(
+                "PGSSLMODE", "disable" if ENVIRONMENT == "test" else "require"
+            ),  # Disable SSL for test environment
+        },
     }
 }
 

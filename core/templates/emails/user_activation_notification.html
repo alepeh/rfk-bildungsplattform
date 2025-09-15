@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        .email-content {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .email-header {
+            background-color: #28a745;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .email-body {
+            background-color: white;
+            padding: 30px;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .success-box {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #0056b3;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+        }
+        .btn-success {
+            background-color: #28a745;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            color: #6c757d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-content">
+        <div class="email-header">
+            <h2>Ihr Konto wurde aktiviert!</h2>
+        </div>
+        
+        <div class="email-body">
+            <p>Hallo {{ person.vorname }} {{ person.nachname }},</p>
+            
+            <div class="success-box">
+                <h3 style="color: #28a745; margin: 0;">✓ Konto erfolgreich aktiviert</h3>
+                <p style="margin: 10px 0 0 0;">Sie können jetzt alle Funktionen der Bildungsplattform nutzen!</p>
+            </div>
+            
+            <p>Ihr Konto auf der Bildungsplattform der burgenländischen Rauchfangkehrer wurde von einem Administrator geprüft und freigeschaltet.</p>
+            
+            <p><strong>Was Sie jetzt tun können:</strong></p>
+            <ul>
+                <li>Verfügbare Schulungen ansehen und buchen</li>
+                <li>Ihre Bestellungen verwalten</li>
+                <li>Schulungsunterlagen herunterladen</li>
+                <li>Ihr Profil verwalten</li>
+            </ul>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="https://bildungsplattform.rauchfangkehrer.or.at/accounts/login/" class="btn btn-success">
+                    Jetzt anmelden
+                </a>
+                <a href="https://bildungsplattform.rauchfangkehrer.or.at/" class="btn">
+                    Zur Startseite
+                </a>
+            </div>
+            
+            <p><strong>Ihre Kontodaten:</strong></p>
+            <ul>
+                <li><strong>Benutzername:</strong> {{ person.benutzer.username }}</li>
+                <li><strong>E-Mail:</strong> {{ person.email }}</li>
+                <li><strong>Aktiviert am:</strong> {{ person.activated_at|date:"d.m.Y H:i" }}</li>
+            </ul>
+            
+            <p>Falls Sie Ihr Passwort vergessen haben, können Sie es über den "Passwort vergessen"-Link auf der Anmeldeseite zurücksetzen.</p>
+        </div>
+        
+        <div class="footer">
+            <p>Willkommen bei der Bildungsplattform der burgenländischen Rauchfangkehrer!</p>
+            <p>Bei Fragen stehen wir Ihnen gerne zur Verfügung: bildungsplattform@rauchfangkehrer.or.at</p>
+        </div>
+    </div>
+</body>
+</html>

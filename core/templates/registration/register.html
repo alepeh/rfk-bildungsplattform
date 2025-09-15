@@ -1,0 +1,181 @@
+{% extends "../components/base.html" %}
+{% block title %}Registrierung{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Neues Konto erstellen</h2>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">
+                    Erstellen Sie ein neues Konto für die Bildungsplattform. 
+                    Nach der Registrierung wird Ihr Konto von einem Administrator geprüft und freigeschaltet.
+                </p>
+
+                {% if form.errors %}
+                <div class="alert alert-danger" role="alert">
+                    <h6>Bitte korrigieren Sie die folgenden Fehler:</h6>
+                    <ul class="mb-0">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- User Account Information -->
+                    <fieldset class="mb-4">
+                        <legend class="fs-5 mb-3">Kontoinformationen</legend>
+                        
+                        <div class="mb-3">
+                            <label for="{{ user_form.username.id_for_label }}" class="form-label">
+                                {{ user_form.username.label }}
+                            </label>
+                            {{ user_form.username }}
+                            {% if user_form.username.help_text %}
+                                <div class="form-text">{{ user_form.username.help_text }}</div>
+                            {% endif %}
+                            {% if user_form.username.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in user_form.username.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ user_form.email.id_for_label }}" class="form-label">
+                                {{ user_form.email.label }}
+                            </label>
+                            {{ user_form.email }}
+                            {% if user_form.email.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in user_form.email.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ user_form.first_name.id_for_label }}" class="form-label">
+                                    {{ user_form.first_name.label }}
+                                </label>
+                                {{ user_form.first_name }}
+                                {% if user_form.first_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in user_form.first_name.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ user_form.last_name.id_for_label }}" class="form-label">
+                                    {{ user_form.last_name.label }}
+                                </label>
+                                {{ user_form.last_name }}
+                                {% if user_form.last_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in user_form.last_name.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ user_form.password1.id_for_label }}" class="form-label">
+                                {{ user_form.password1.label }}
+                            </label>
+                            {{ user_form.password1 }}
+                            {% if user_form.password1.help_text %}
+                                <div class="form-text">{{ user_form.password1.help_text }}</div>
+                            {% endif %}
+                            {% if user_form.password1.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in user_form.password1.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ user_form.password2.id_for_label }}" class="form-label">
+                                {{ user_form.password2.label }}
+                            </label>
+                            {{ user_form.password2 }}
+                            {% if user_form.password2.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in user_form.password2.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </fieldset>
+
+                    <!-- Personal Information -->
+                    <fieldset class="mb-4">
+                        <legend class="fs-5 mb-3">Persönliche Angaben</legend>
+                        
+                        <div class="mb-3">
+                            <label for="{{ person_form.telefon.id_for_label }}" class="form-label">
+                                {{ person_form.telefon.label }}
+                            </label>
+                            {{ person_form.telefon }}
+                            {% if person_form.telefon.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in person_form.telefon.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-check mb-3">
+                            {{ person_form.dsv_akzeptiert }}
+                            <label class="form-check-label" for="{{ person_form.dsv_akzeptiert.id_for_label }}">
+                                {{ person_form.dsv_akzeptiert.label }}
+                            </label>
+                            {% if person_form.dsv_akzeptiert.help_text %}
+                                <div class="form-text">{{ person_form.dsv_akzeptiert.help_text }}</div>
+                            {% endif %}
+                            {% if person_form.dsv_akzeptiert.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in person_form.dsv_akzeptiert.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </fieldset>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            Registrierung abschließen
+                        </button>
+                        <a href="{% url 'login' %}" class="btn btn-outline-secondary">
+                            Zurück zur Anmeldung
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Bootstrap form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}
