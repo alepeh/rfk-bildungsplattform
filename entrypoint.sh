@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RUN_PORT="8000"
+RUN_PORT="8001"
 
 echo "=== Starting Django Application ==="
 
