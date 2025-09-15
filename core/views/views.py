@@ -11,6 +11,7 @@ from django.template import loader
 from django.urls import reverse
 from django.utils import timezone
 
+from core.decorators import login_and_activation_required
 from core.models import Betrieb, Document, Person, SchulungsTeilnehmer, SchulungsTermin
 from core.services.email import send_reminder_to_all_teilnehmer
 
@@ -56,7 +57,7 @@ def is_overbooked(request, schulungsterminId):
         return True
 
 
-@login_required
+@login_and_activation_required
 def register(request: HttpRequest, id: int):
     # form has been submitted
     if request.method == "POST":
@@ -121,7 +122,7 @@ def removePersonFromSchulungstermin(schulungsTerminId, personId):
         ).delete()
 
 
-@login_required
+@login_and_activation_required
 def mitarbeiter(request):
     PersonFormSet = inlineformset_factory(
         Betrieb,
@@ -261,7 +262,7 @@ def send_reminder(request, pk):
     )
 
 
-@login_required
+@login_and_activation_required
 def my_schulungen(request):
     user = request.user
     try:
@@ -281,10 +282,7 @@ def my_schulungen(request):
     )
 
 
-from django.contrib.auth.decorators import login_required
-
-
-@login_required
+@login_and_activation_required
 def documents(request):
     user = request.user
     try:

@@ -2,7 +2,7 @@
 {% load bootstrap_icons %}
 {% block content %}
 <div class="text-center mb-5">
-    <h2 class="mb-3 fw-bold">Herzlich Willkommen auf der Bildungsplattform</h2>
+    <h1 class="mb-3 fw-bold">Herzlich Willkommen auf der Bildungsplattform</h1>
     <p class="lead text-muted">Hier könnt ihr euch direkt für die bereits geplanten Schulungen anmelden.</p>
 </div>
 <div class="row g-3 mb-4">
@@ -60,8 +60,12 @@
                                 Dein Betrieb ist angemeldet
                             {% else %}
                                 {% if schulungstermin.freie_plaetze > 0 %}
-                                    {% if person.betrieb and person.betrieb.geschaeftsfuehrer == person %}
-                                        <a href="/checkout/{{ schulungstermin.id }}/" class="btn btn-primary">{% bs_icon 'cart' %} Buchen</a>
+                                    {% if person.can_book_schulungen %}
+                                        {% if not person.betrieb or person.betrieb.geschaeftsfuehrer == person %}
+                                            <a href="/checkout/{{ schulungstermin.id }}/" class="btn btn-primary">{% bs_icon 'cart' %} Buchen</a>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">Buchung nicht erlaubt</span>
                                     {% endif %}
                                 {% else %}
                                     Keine freien Plätze

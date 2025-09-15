@@ -3,8 +3,8 @@
 {% if person %}
 <ul class="messages">
     {% for message in messages %}
-    <div class="alert alert-primary" role="alert">
-        <div  {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </div>
+    <div class="alert alert-{{ message.tags|default:'primary' }}" role="alert">
+        {{ message }}
     </div>
     {% endfor %}
 </ul>
@@ -38,7 +38,7 @@
             {% endfor %}
         </ul>
     </div>
-    <input class="btn btn-primary" type="submit" value="Speichern">
+    <button class="btn btn-primary" type="submit">Speichern</button>
     <a href="/">Zurück zu den Schulungen</a>
 </form>
 </div>

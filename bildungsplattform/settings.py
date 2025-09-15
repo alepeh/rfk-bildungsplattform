@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+
 import os
 import sys
 from pathlib import Path
@@ -52,6 +53,7 @@ elif IS_STAGING:
     ALLOWED_HOSTS = [
         "bildungsplattform-test.rauchfangkehrer.or.at",
         "rfkbgldbeqyiq7k-rfk-bildungsplattform-test.functions.fnc.fr-par.scw.cloud",
+        "rfkbgldbeqyiq7k-bildungsplattform.functions.fnc.fr-par.scw.cloud",
     ]
 else:
     # Development environment
@@ -143,6 +145,9 @@ DATABASES = {
         "PASSWORD": os.getenv("PGPASSWORD"),
         "HOST": os.getenv("PGHOST"),
         "PORT": os.getenv("PGPORT"),
+        "OPTIONS": {
+            "sslmode": os.getenv("PGSSLMODE", "require"),  # Default to 'require' if not set
+        },
     }
 }
 
