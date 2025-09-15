@@ -74,6 +74,72 @@ class TestIndexView:
         assert future_termin in termine
         assert past_termin not in termine
 
+    def test_index_booking_button_visibility_with_permission(self):
+        user = User.objects.create_user(username="testuser", password="testpass")
+        person = Person.objects.create(
+            benutzer=user, 
+            vorname="Test", 
+            nachname="User", 
+            is_activated=True,
+            can_book_schulungen=True
+        )
+
+        schulung = Schulung.objects.create(
+            name="Future Training",
+            beschreibung="Test",
+            preis_standard=Decimal("100.00"),
+        )
+        ort = SchulungsOrt.objects.create(name="Test Location")
+        termin = SchulungsTermin.objects.create(
+            datum_von=timezone.now() + timedelta(days=7),
+            datum_bis=timezone.now() + timedelta(days=7, hours=4),
+            schulung=schulung,
+            ort=ort,
+            buchbar=True,
+            max_teilnehmer=10,
+        )
+
+        self.client.login(username="testuser", password="testpass")
+        response = self.client.get(reverse("index"))
+        
+        # Button should be visible for users with booking permission
+        content = response.content.decode()
+        assert "Buchen" in content
+        assert f"/checkout/{termin.id}/" in content
+
+    def test_index_booking_button_blocked_without_permission(self):
+        user = User.objects.create_user(username="testuser", password="testpass")
+        person = Person.objects.create(
+            benutzer=user, 
+            vorname="Test", 
+            nachname="User", 
+            is_activated=True,
+            can_book_schulungen=False
+        )
+
+        schulung = Schulung.objects.create(
+            name="Future Training",
+            beschreibung="Test",
+            preis_standard=Decimal("100.00"),
+        )
+        ort = SchulungsOrt.objects.create(name="Test Location")
+        termin = SchulungsTermin.objects.create(
+            datum_von=timezone.now() + timedelta(days=7),
+            datum_bis=timezone.now() + timedelta(days=7, hours=4),
+            schulung=schulung,
+            ort=ort,
+            buchbar=True,
+            max_teilnehmer=10,
+        )
+
+        self.client.login(username="testuser", password="testpass")
+        response = self.client.get(reverse("index"))
+        
+        # Button should show "Buchung nicht erlaubt" message
+        content = response.content.decode()
+        assert "Buchung nicht erlaubt" in content
+        assert f"/checkout/{termin.id}/" not in content
+
 
 @pytest.mark.django_db
 class TestRegisterView:
@@ -87,6 +153,7 @@ class TestRegisterView:
             nachname="Person",
             betrieb=self.betrieb,
             is_activated=True,
+            can_book_schulungen=True,
         )
         self.betrieb.geschaeftsfuehrer = self.geschaeftsfuehrer
         self.betrieb.save()
@@ -203,6 +270,7 @@ class TestCheckoutView:
             nachname="User",
             organisation=self.organisation,
             is_activated=True,
+            can_book_schulungen=True,
         )
 
         self.schulung = Schulung.objects.create(
@@ -230,6 +298,15 @@ class TestCheckoutView:
         assert response.status_code == 200
         assert response.context["schulungstermin"] == self.termin
         assert response.context["preis"] == Decimal("100.00")  # Discounted price
+        
+    def test_checkout_includes_invoice_data(self):
+        self.client.login(username="testuser", password="testpass")
+
+        response = self.client.get(reverse("checkout", args=[self.termin.id]))
+        assert response.status_code == 200
+        assert "invoice_data" in response.context
+        # Individual user should have name prepopulated
+        assert response.context["invoice_data"]["name"] == "Test User"
 
     def test_checkout_view_without_organisation(self):
         self.person.organisation = None
@@ -284,6 +361,45 @@ class TestCheckoutView:
         assert person_allowed in response.context["related_persons"]
         assert person_not_allowed not in response.context["related_persons"]
 
+    def test_checkout_prepopulates_betrieb_invoice_data(self):
+        betrieb = Betrieb.objects.create(
+            name="Test Company GmbH",
+            adresse="Musterstraße 123",
+            plz="1010",
+            ort="Wien"
+        )
+        self.person.betrieb = betrieb
+        self.person.save()
+
+        self.client.login(username="testuser", password="testpass")
+
+        response = self.client.get(reverse("checkout", args=[self.termin.id]))
+        assert response.status_code == 200
+        
+        invoice_data = response.context["invoice_data"]
+        assert invoice_data["name"] == "Test Company GmbH"
+        assert invoice_data["strasse"] == "Musterstraße 123"
+        assert invoice_data["plz"] == "1010"
+        assert invoice_data["ort"] == "Wien"
+
+    def test_checkout_blocked_without_booking_permission(self):
+        self.person.can_book_schulungen = False
+        self.person.save()
+
+        self.client.login(username="testuser", password="testpass")
+
+        response = self.client.get(reverse("checkout", args=[self.termin.id]))
+        assert response.status_code == 302  # Redirect to index
+        
+    def test_checkout_allowed_with_booking_permission(self):
+        self.person.can_book_schulungen = True
+        self.person.save()
+
+        self.client.login(username="testuser", password="testpass")
+
+        response = self.client.get(reverse("checkout", args=[self.termin.id]))
+        assert response.status_code == 200
+
 
 @pytest.mark.django_db
 class TestConfirmOrderView:
@@ -296,6 +412,7 @@ class TestConfirmOrderView:
             nachname="User",
             email="test@example.com",
             is_activated=True,
+            can_book_schulungen=True,
         )
 
         self.schulung = Schulung.objects.create(
@@ -326,6 +443,10 @@ class TestConfirmOrderView:
                 "lastname-1": "Smith",
                 "email-1": "jane@example.com",
                 "meal-1": "Vegetarisch",
+                "rechnungsadresse_name": "Test Customer",
+                "rechnungsadresse_strasse": "Test Street 123",
+                "rechnungsadresse_plz": "1010",
+                "rechnungsadresse_ort": "Vienna",
             },
         )
 
@@ -339,6 +460,12 @@ class TestConfirmOrderView:
         assert bestellung.anzahl == 2
         assert bestellung.einzelpreis == Decimal("100.00")
         assert bestellung.gesamtpreis == Decimal("200.00")
+        
+        # Check invoice address saved
+        assert bestellung.rechnungsadresse_name == "Test Customer"
+        assert bestellung.rechnungsadresse_strasse == "Test Street 123"
+        assert bestellung.rechnungsadresse_plz == "1010"
+        assert bestellung.rechnungsadresse_ort == "Vienna"
 
         # Check Teilnehmer created
         teilnehmer = SchulungsTeilnehmer.objects.filter(bestellung=bestellung)
@@ -374,6 +501,31 @@ class TestConfirmOrderView:
         assert response.status_code == 400
         assert "bereits für diese Schulung angemeldet" in response.json()["message"]
 
+    def test_confirm_order_blocked_without_booking_permission(self):
+        self.person.can_book_schulungen = False
+        self.person.save()
+
+        self.client.login(username="testuser", password="testpass")
+
+        response = self.client.post(
+            reverse("confirm_order"),
+            {
+                "schulungstermin_id": self.termin.id,
+                "quantity": "1",
+                "firstname-0": "Test",
+                "lastname-0": "User",
+                "email-0": "test@example.com",
+                "meal-0": "Standard",
+                "rechnungsadresse_name": "Test Customer",
+                "rechnungsadresse_strasse": "Test Street 123",
+                "rechnungsadresse_plz": "1010",
+                "rechnungsadresse_ort": "Vienna",
+            },
+        )
+
+        assert response.status_code == 403
+        assert "keine Berechtigung" in response.json()["message"]
+
 
 @pytest.mark.django_db
 class TestMitarbeiterView:
@@ -387,6 +539,7 @@ class TestMitarbeiterView:
             nachname="Person",
             betrieb=self.betrieb,
             is_activated=True,
+            can_book_schulungen=True,
         )
         self.betrieb.geschaeftsfuehrer = self.geschaeftsfuehrer
         self.betrieb.save()
@@ -462,6 +615,7 @@ class TestDocumentsView:
             nachname="User",
             funktion=self.funktion,
             is_activated=True,
+            can_book_schulungen=True,
         )
 
     def test_documents_requires_authentication(self):

@@ -29,7 +29,8 @@ def register(request):
                     request,
                     "Ihre Registrierung war erfolgreich! "
                     "Ihr Konto wird von einem Administrator geprüft und aktiviert. "
-                    "Sie erhalten eine E-Mail, sobald Ihr Konto freigeschaltet wurde.",
+                    "Sie können sich erst anmelden, nachdem Ihr Konto freigeschaltet wurde. "
+                    "Sie erhalten eine E-Mail, sobald Ihr Konto aktiviert wurde.",
                 )
                 return redirect("registration_success")
 

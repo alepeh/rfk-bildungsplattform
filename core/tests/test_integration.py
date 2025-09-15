@@ -46,6 +46,7 @@ class TestCompleteRegistrationWorkflow:
             email="max@example.com",
             organisation=self.organisation,
             is_activated=True,
+            can_book_schulungen=True,
         )
 
         # Create course setup
@@ -106,6 +107,10 @@ class TestCompleteRegistrationWorkflow:
                 "lastname-1": "Smith",
                 "email-1": "jane@example.com",
                 "meal-1": "Vegetarisch",
+                "rechnungsadresse_name": "Max Mustermann",
+                "rechnungsadresse_strasse": "Teststraße 123",
+                "rechnungsadresse_plz": "1010",
+                "rechnungsadresse_ort": "Wien",
             },
         )
 
@@ -121,6 +126,12 @@ class TestCompleteRegistrationWorkflow:
         assert bestellung.einzelpreis == Decimal("150.00")
         assert bestellung.gesamtpreis == Decimal("300.00")
         assert bestellung.status == "Bestellt"
+        
+        # Verify invoice address saved
+        assert bestellung.rechnungsadresse_name == "Max Mustermann"
+        assert bestellung.rechnungsadresse_strasse == "Teststraße 123"
+        assert bestellung.rechnungsadresse_plz == "1010"
+        assert bestellung.rechnungsadresse_ort == "Wien"
 
         # Verify participants created
         teilnehmer = SchulungsTeilnehmer.objects.filter(bestellung=bestellung)
@@ -172,6 +183,7 @@ class TestBusinessOwnerRegistrationWorkflow:
             nachname="Müller",
             betrieb=self.betrieb,
             is_activated=True,
+            can_book_schulungen=True,
         )
         self.betrieb.geschaeftsfuehrer = self.owner
         self.betrieb.save()

@@ -178,11 +178,13 @@ class PersonAdmin(admin.ModelAdmin):
         "betrieb",
         "funktion",
         "is_activated",
+        "can_book_schulungen",
         "activation_status",
         "activation_requested_at",
     )
     list_filter = (
         "is_activated",
+        "can_book_schulungen",
         "funktion",
         "betrieb",
         "activation_requested_at",
@@ -211,8 +213,12 @@ class PersonAdmin(admin.ModelAdmin):
             },
         ),
         (
+            "Berechtigungen",
+            {"fields": ("can_book_schulungen",)},
+        ),
+        (
             "Sonstige",
-            {"fields": ("dsv_akzeptiert", "anmerkungen"), "classes": ("collapse",)},
+            {"fields": ("dsv_akzeptiert",), "classes": ("collapse",)},
         ),
     )
 
@@ -265,8 +271,16 @@ class SchulungsTeilnehmerBestellungInline(admin.TabularInline):
 
 
 class BestellungAdmin(admin.ModelAdmin):
-    list_display = ("schulungstermin", "anzahl", "created")
+    list_display = ("schulungstermin", "anzahl", "rechnungsadresse_name", "created")
     inlines = [SchulungsTeilnehmerBestellungInline]
+    fieldsets = (
+        ("Bestelldetails", {
+            "fields": ("person", "schulungstermin", "anzahl", "einzelpreis", "gesamtpreis", "status")
+        }),
+        ("Rechnungsadresse", {
+            "fields": ("rechnungsadresse_name", "rechnungsadresse_strasse", "rechnungsadresse_plz", "rechnungsadresse_ort")
+        }),
+    )
 
 
 class OrganisationAdmin(admin.ModelAdmin):

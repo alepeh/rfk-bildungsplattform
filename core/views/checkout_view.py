@@ -21,6 +21,11 @@ def checkout(request: HttpRequest, schulungstermin_id: int):
     except Person.DoesNotExist:
         messages.error(request, "Kein Personenprofil gefunden.")
         return redirect("index")
+    
+    # Check if person has booking permission
+    if not person.can_book_schulungen:
+        messages.error(request, "Sie haben keine Berechtigung, Schulungen zu buchen.")
+        return redirect("index")
     print(person)
     # Determine the price based on whether the person is related to an organisation
     if person.organisation:
@@ -46,10 +51,29 @@ def checkout(request: HttpRequest, schulungstermin_id: int):
     else:
         related_persons = Person.objects.none()
 
+    # Prepare invoice address data (prepopulate from betrieb if available)
+    invoice_data = {}
+    if person.betrieb:
+        invoice_data = {
+            "name": person.betrieb.name,
+            "strasse": person.betrieb.adresse or "",
+            "plz": person.betrieb.plz or "",
+            "ort": person.betrieb.ort or "",
+        }
+    else:
+        # For individual users, prepopulate with person data
+        invoice_data = {
+            "name": f"{person.vorname} {person.nachname}",
+            "strasse": "",
+            "plz": "",
+            "ort": "",
+        }
+
     context = {
         "schulungstermin": schulungstermin,
         "preis": preis,
         "related_persons": related_persons,  # Add related persons to context
+        "invoice_data": invoice_data,  # Add invoice data for prepopulation
     }
     print(related_persons)
     return render(request, "home/checkout.html", context)
@@ -75,10 +99,26 @@ def confirm_order(request: HttpRequest):
 
     # Fetch the person and determine the price based on organization relationship
     person = get_object_or_404(Person, benutzer=request.user)
+    
+    # Check if person has booking permission
+    if not person.can_book_schulungen:
+        return JsonResponse(
+            {
+                "status": "error",
+                "message": "Sie haben keine Berechtigung, Schulungen zu buchen.",
+            },
+            status=403,
+        )
     if person.organisation:
         preis = schulungstermin.schulung.preis_rabattiert
     else:
         preis = schulungstermin.schulung.preis_standard
+
+    # Get invoice address data from form
+    rechnungsadresse_name = data.get("rechnungsadresse_name", "")
+    rechnungsadresse_strasse = data.get("rechnungsadresse_strasse", "")
+    rechnungsadresse_plz = data.get("rechnungsadresse_plz", "")
+    rechnungsadresse_ort = data.get("rechnungsadresse_ort", "")
 
     # Create the Bestellung object
     einzelpreis = preis or 0  # Default to 0 if preis is None
@@ -90,6 +130,10 @@ def confirm_order(request: HttpRequest):
         einzelpreis=einzelpreis,
         gesamtpreis=anzahl * einzelpreis,
         status="Bestellt",
+        rechnungsadresse_name=rechnungsadresse_name,
+        rechnungsadresse_strasse=rechnungsadresse_strasse,
+        rechnungsadresse_plz=rechnungsadresse_plz,
+        rechnungsadresse_ort=rechnungsadresse_ort,
     )
     bestellung.save()
 

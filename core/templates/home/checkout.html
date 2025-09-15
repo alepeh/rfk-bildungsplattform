@@ -32,14 +32,49 @@
     </div>
 
     <div id="step-3" class="checkout-step d-none">
+        <h3>Rechnungsadresse</h3>
+        <form id="invoice-form" onsubmit="event.preventDefault(); nextStep(3); return false;">
+            <div class="form-group">
+                <label for="rechnungsadresse_name">Name/Firma:</label>
+                <input type="text" id="rechnungsadresse_name" name="rechnungsadresse_name" 
+                       class="form-control" value="{{ invoice_data.name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="rechnungsadresse_strasse">Straße und Hausnummer:</label>
+                <input type="text" id="rechnungsadresse_strasse" name="rechnungsadresse_strasse" 
+                       class="form-control" value="{{ invoice_data.strasse }}" required>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="rechnungsadresse_plz">Postleitzahl:</label>
+                        <input type="text" id="rechnungsadresse_plz" name="rechnungsadresse_plz" 
+                               class="form-control" value="{{ invoice_data.plz }}" required>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label for="rechnungsadresse_ort">Ort:</label>
+                        <input type="text" id="rechnungsadresse_ort" name="rechnungsadresse_ort" 
+                               class="form-control" value="{{ invoice_data.ort }}" required>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="previousStep(3)">Zurück</button>
+            <button type="submit" class="btn btn-primary">Weiter</button>
+        </form>
+    </div>
+
+    <div id="step-4" class="checkout-step d-none">
         <h3>Bestellbestätigung</h3>
         <div id="confirmation-details"></div>
+        <div id="invoice-confirmation"></div>
         <p>Gesamtbetrag: €<span id="total-amount"></span></p>
         <div class="form-group">
             <input type="checkbox" id="accept-terms" name="accept-terms" onclick="toggleConfirmButton()">
             <label for="accept-terms">Ich akzeptiere die <a href="{% url 'terms_and_conditions' %}" target="_blank">AGB</a></label>
         </div>
-        <button type="button" class="btn btn-secondary" onclick="previousStep(3)">Zurück</button>
+        <button type="button" class="btn btn-secondary" onclick="previousStep(4)">Zurück</button>
         <button id="confirm-order-button" type="button" class="btn btn-primary" disabled>Zahlungspflichtig bestellen</button>
     </div>
 </div>
@@ -115,6 +150,8 @@
                 document.getElementById('participants-details').innerHTML = participantsDetails;
                 updatePersonSelects(); // Call the function here after populating the select elements.
             } else if (currentStep === 2) {
+                // Continue to invoice step without confirmation yet
+            } else if (currentStep === 3) {
                 // Collecting confirmation details
                 var detailsForm = document.getElementById('details-form');
                 var confirmationDetails = '<h4>Teilnehmer Details</h4>';
@@ -135,6 +172,13 @@
                     }
                 }
                 document.getElementById('confirmation-details').innerHTML = confirmationDetails;
+                
+                // Add invoice confirmation details
+                var invoiceDetails = '<h4>Rechnungsadresse</h4>';
+                invoiceDetails += `<p><strong>Name/Firma:</strong> ${document.getElementById('rechnungsadresse_name').value}</p>`;
+                invoiceDetails += `<p><strong>Adresse:</strong> ${document.getElementById('rechnungsadresse_strasse').value}</p>`;
+                invoiceDetails += `<p><strong>PLZ/Ort:</strong> ${document.getElementById('rechnungsadresse_plz').value} ${document.getElementById('rechnungsadresse_ort').value}</p>`;
+                document.getElementById('invoice-confirmation').innerHTML = invoiceDetails;
 
                 // Displaying the total amount
                 var totalAmount = parseFloat(document.getElementById('total-price').innerText);
@@ -168,6 +212,18 @@
         } else if (currentStep === 2) {
             let isValid = true;
             const form = document.getElementById('details-form');
+            form.querySelectorAll('input[required], select[required]').forEach((input) => {
+                if (!input.value) {
+                    input.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+            return isValid;
+        } else if (currentStep === 3) {
+            let isValid = true;
+            const form = document.getElementById('invoice-form');
             form.querySelectorAll('input[required], select[required]').forEach((input) => {
                 if (!input.value) {
                     input.classList.add('is-invalid');
@@ -246,6 +302,12 @@
             }
             formData.append(`meal-${index}`, participant.querySelector(`[name=meal-${index}]`).value);
         });
+
+        // Append invoice address details
+        formData.append('rechnungsadresse_name', document.getElementById('rechnungsadresse_name').value);
+        formData.append('rechnungsadresse_strasse', document.getElementById('rechnungsadresse_strasse').value);
+        formData.append('rechnungsadresse_plz', document.getElementById('rechnungsadresse_plz').value);
+        formData.append('rechnungsadresse_ort', document.getElementById('rechnungsadresse_ort').value);
 
         fetch("{% url 'confirm_order' %}", {
             method: 'POST',
