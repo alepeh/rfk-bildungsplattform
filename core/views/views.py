@@ -1,12 +1,11 @@
 import requests
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 from django.db.models import Q
 from django.forms import inlineformset_factory
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.urls import reverse
 from django.utils import timezone
@@ -316,10 +315,6 @@ def get_person_details(request, person_id):
             "email": person.email,
         }
     )
-
-
-from django.contrib.auth import logout
-from django.shortcuts import redirect
 
 
 def logout_view(request):

@@ -76,7 +76,7 @@ class TestIndexView:
 
     def test_index_booking_button_visibility_with_permission(self):
         user = User.objects.create_user(username="testuser", password="testpass")
-        person = Person.objects.create(
+        Person.objects.create(
             benutzer=user,
             vorname="Test",
             nachname="User",
@@ -109,7 +109,7 @@ class TestIndexView:
 
     def test_index_booking_button_blocked_without_permission(self):
         user = User.objects.create_user(username="testuser", password="testpass")
-        person = Person.objects.create(
+        Person.objects.create(
             benutzer=user,
             vorname="Test",
             nachname="User",
@@ -490,7 +490,7 @@ class TestConfirmOrderView:
             {
                 "schulungstermin_id": self.termin.id,
                 "quantity": "1",
-                f"person-0": str(existing_person.id),
+                "person-0": str(existing_person.id),
                 "meal-0": "Standard",
             },
         )
@@ -664,7 +664,7 @@ class TestLogoutView:
         self.client = Client()
 
     def test_logout_redirects_to_index(self):
-        user = User.objects.create_user(username="testuser", password="testpass")
+        User.objects.create_user(username="testuser", password="testpass")
         self.client.login(username="testuser", password="testpass")
 
         response = self.client.get(reverse("logout"))

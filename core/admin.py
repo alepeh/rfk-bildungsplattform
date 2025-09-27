@@ -22,7 +22,6 @@ from core.models import (
 
 
 def export_schulungsteilnehmer_to_csv(modeladmin, request, queryset):
-    meta = modeladmin.model._meta
     # Define the HTTP response with the appropriate CSV header
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = 'attachment; filename="schulungsteilnehmer.csv"'

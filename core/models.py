@@ -4,6 +4,8 @@ import uuid
 from django.contrib.auth.models import User
 from django.db import models
 
+from core.storage import ScalewayObjectStorage
+
 
 def get_unique_upload_path(instance, filename):
     name, ext = os.path.splitext(filename)
@@ -322,9 +324,6 @@ class Bestellung(BaseModel):
 
     class Meta:
         verbose_name_plural = "Bestellungen"
-
-
-from core.storage import ScalewayObjectStorage
 
 
 class Document(BaseModel):

@@ -10,14 +10,13 @@ def activate_existing_users(apps, schema_editor):
     This ensures that existing users aren't locked out when the new approval workflow is deployed.
     """
     Person = apps.get_model("core", "Person")
-    User = apps.get_model("auth", "User")
-    
+
     # Get all existing Person records
     existing_persons = Person.objects.all()
-    
+
     activation_time = timezone.now()
     updated_count = 0
-    
+
     for person in existing_persons:
         # Only update persons that are not already activated
         if not person.is_activated:
@@ -27,12 +26,12 @@ def activate_existing_users(apps, schema_editor):
             # This will be None for the initial activation
             person.save()
             updated_count += 1
-            
+
         # Also ensure the related User account is active
         if person.benutzer and not person.benutzer.is_active:
             person.benutzer.is_active = True
             person.benutzer.save()
-    
+
     print(f"Activated {updated_count} existing Person records")
 
 
@@ -42,14 +41,10 @@ def reverse_activate_existing_users(apps, schema_editor):
     Note: This is a destructive operation and should be used with caution.
     """
     Person = apps.get_model("core", "Person")
-    
+
     # Reset activation status for all persons
-    Person.objects.update(
-        is_activated=False,
-        activated_at=None,
-        activated_by=None
-    )
-    
+    Person.objects.update(is_activated=False, activated_at=None, activated_by=None)
+
     print("Deactivated all existing Person records")
 
 

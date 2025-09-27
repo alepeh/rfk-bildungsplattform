@@ -1,5 +1,3 @@
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 from django.views.generic import ListView
 
 from core.decorators import login_and_activation_required_method
