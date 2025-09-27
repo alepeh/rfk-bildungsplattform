@@ -2,10 +2,7 @@ import json
 
 import requests
 from django.conf import settings
-from django.contrib.auth.models import User
-from django.db.models import Q
 from django.template.loader import render_to_string
-from django.utils import timezone
 
 from ..models import SchulungsTermin
 
@@ -93,16 +90,8 @@ def send_admin_registration_notification(person):
     """
     Send notification email to administrators about new user registration.
     """
-    # Get admin emails - users with staff status
-    admin_emails = list(
-        User.objects.filter(is_staff=True, email__isnull=False)
-        .exclude(email="")
-        .values_list("email", flat=True)
-    )
-
-    if not admin_emails:
-        # Fallback to default admin email if no staff users with emails
-        admin_emails = ["bildungsplattform@rauchfangkehrer.or.at"]
+    # Send notification only to the main admin email address
+    admin_emails = ["bildungsplattform@rauchfangkehrer.or.at"]
 
     subject = f"Neue Registrierung: {person.vorname} {person.nachname} - Aktivierung erforderlich"
 
