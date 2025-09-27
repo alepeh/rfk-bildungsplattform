@@ -77,6 +77,8 @@ class BaseE2ETest(StaticLiveServerTestCase):
             nachname="Mustermann",
             email="max@example.com",
             betrieb=self.test_betrieb,
+            is_activated=True,
+            can_book_schulungen=True,
         )
 
         # Make person the business owner
@@ -95,6 +97,8 @@ class BaseE2ETest(StaticLiveServerTestCase):
             vorname="Hans",
             nachname="Müller",
             betrieb=self.betrieb,
+            is_activated=True,
+            can_book_schulungen=True,
         )
         self.betrieb.geschaeftsfuehrer = self.owner
         self.betrieb.save()
@@ -105,6 +109,8 @@ class BaseE2ETest(StaticLiveServerTestCase):
             nachname="Huber",
             betrieb=self.betrieb,
             email="franz@test-rfk.com",
+            is_activated=True,
+            can_book_schulungen=True,
         )
 
         # Create course
