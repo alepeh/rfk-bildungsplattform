@@ -60,8 +60,12 @@
                                 Dein Betrieb ist angemeldet
                             {% else %}
                                 {% if schulungstermin.freie_plaetze > 0 %}
-                                    {% if person.betrieb and person.betrieb.geschaeftsfuehrer == person %}
-                                        <a href="/checkout/{{ schulungstermin.id }}/" class="btn btn-primary">{% bs_icon 'cart' %} Buchen</a>
+                                    {% if person.can_book_schulungen %}
+                                        {% if not person.betrieb or person.betrieb.geschaeftsfuehrer == person %}
+                                            <a href="/checkout/{{ schulungstermin.id }}/" class="btn btn-primary">{% bs_icon 'cart' %} Buchen</a>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">Buchung nicht erlaubt</span>
                                     {% endif %}
                                 {% else %}
                                     Keine freien Plätze

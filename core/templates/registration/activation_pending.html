@@ -1,0 +1,79 @@
+{% extends "../components/base.html" %}
+{% block title %}Konto noch nicht aktiviert{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="mb-4">
+                    <i class="bi bi-hourglass-split text-warning" style="font-size: 3rem;"></i>
+                </div>
+                
+                <h2 class="card-title text-warning mb-4">Konto noch nicht aktiviert</h2>
+                
+                <p class="card-text mb-4">
+                    Hallo <strong>{{ person.vorname }} {{ person.nachname }}</strong>,<br>
+                    Ihr Konto wartet noch auf die Freischaltung durch einen Administrator.
+                </p>
+                
+                <div class="alert alert-warning" role="alert">
+                    <h6 class="alert-heading">Aktueller Status:</h6>
+                    <p class="mb-2">
+                        <strong>Registrierung angefordert:</strong> 
+                        {% if person.activation_requested_at %}
+                            {{ person.activation_requested_at|date:"d.m.Y H:i" }}
+                        {% else %}
+                            Unbekannt
+                        {% endif %}
+                    </p>
+                    <hr>
+                    <p class="mb-0">
+                        Sobald Ihr Konto aktiviert wurde, können Sie Schulungen buchen und alle Funktionen nutzen.
+                    </p>
+                </div>
+                
+                <div class="card bg-light mb-4">
+                    <div class="card-body">
+                        <h6 class="card-title">Was Sie in der Zwischenzeit tun können:</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="bi bi-eye text-primary me-2"></i>
+                                Verfügbare Schulungen ansehen
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-file-text text-primary me-2"></i>
+                                Allgemeine Dokumente einsehen
+                            </li>
+                            <li>
+                                <i class="bi bi-envelope text-primary me-2"></i>
+                                Bei dringenden Fragen Kontakt aufnehmen
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info" role="alert">
+                    <p class="mb-2">
+                        <strong>Kontakt für Rückfragen:</strong>
+                    </p>
+                    <p class="mb-0">
+                        E-Mail: <a href="mailto:bildungsplattform@rauchfangkehrer.or.at">
+                            bildungsplattform@rauchfangkehrer.or.at
+                        </a>
+                    </p>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'index' %}" class="btn btn-primary">
+                        Verfügbare Schulungen ansehen
+                    </a>
+                    <a href="{% url 'logout' %}" class="btn btn-outline-secondary">
+                        Abmelden
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

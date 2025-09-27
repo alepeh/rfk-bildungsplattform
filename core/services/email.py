@@ -1,8 +1,6 @@
-import json
-
 import requests
 from django.conf import settings
-from django.db.models import Q
+from django.template.loader import render_to_string
 
 from ..models import SchulungsTermin
 
@@ -84,3 +82,38 @@ def send_email(subject, message, to_emails):
         )
         print(response.json())
         response.raise_for_status()
+
+
+def send_admin_registration_notification(person):
+    """
+    Send notification email to administrators about new user registration.
+    """
+    # Send notification only to the main admin email address
+    admin_emails = ["bildungsplattform@rauchfangkehrer.or.at"]
+
+    subject = f"Neue Registrierung: {person.vorname} {person.nachname} - Aktivierung erforderlich"
+
+    html_content = render_to_string(
+        "emails/admin_registration_notification.html",
+        {
+            "person": person,
+        },
+    )
+
+    send_email(subject, html_content, admin_emails)
+
+
+def send_user_activation_notification(person):
+    """
+    Send confirmation email to user after account activation.
+    """
+    subject = "Ihr Konto wurde aktiviert - Bildungsplattform der burgenländischen Rauchfangkehrer"
+
+    html_content = render_to_string(
+        "emails/user_activation_notification.html",
+        {
+            "person": person,
+        },
+    )
+
+    send_email(subject, html_content, [person.email])
