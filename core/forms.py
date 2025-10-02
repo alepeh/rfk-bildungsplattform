@@ -130,17 +130,13 @@ class PersonRegistrationForm(forms.ModelForm):
 
     plz = forms.CharField(
         required=True,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "1234"}
-        ),
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "1234"}),
         label="Postleitzahl",
     )
 
     ort = forms.CharField(
         required=True,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Ort"}
-        ),
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Ort"}),
         label="Ort",
     )
 
