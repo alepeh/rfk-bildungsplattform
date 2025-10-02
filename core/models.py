@@ -175,6 +175,41 @@ class Person(BaseModel):
     nachname = models.CharField(max_length=150)
     email = models.EmailField(null=True, blank=True)
     telefon = models.CharField(max_length=30, null=True, blank=True)
+    # Company information
+    firmenname = models.CharField(
+        max_length=200,
+        null=True,
+        blank=True,
+        verbose_name="Firmenname",
+        help_text="Name des Unternehmens",
+    )
+    firmenanschrift = models.CharField(
+        max_length=200,
+        null=True,
+        blank=True,
+        verbose_name="Firmenanschrift",
+        help_text="Vollständige Adresse des Unternehmens",
+    )
+    # Personal address
+    adresse = models.CharField(
+        max_length=200,
+        null=True,
+        blank=True,
+        verbose_name="Adresse",
+        help_text="Straße und Hausnummer",
+    )
+    plz = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        verbose_name="Postleitzahl",
+    )
+    ort = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        verbose_name="Ort",
+    )
     dsv_akzeptiert = models.BooleanField(
         default=False, verbose_name="Datenschutzvereinbarung akzeptiert"
     )

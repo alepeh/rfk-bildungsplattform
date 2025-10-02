@@ -12,7 +12,10 @@ class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(
         required=True,
         widget=forms.EmailInput(
-            attrs={"class": "form-control", "placeholder": "ihre.email@beispiel.com"}
+            attrs={
+                "class": "form-control",
+                "placeholder": "ihre.email@beispiel.com",
+            }
         ),
         label="E-Mail-Adresse",
     )
@@ -93,6 +96,54 @@ class UserRegistrationForm(UserCreationForm):
 class PersonRegistrationForm(forms.ModelForm):
     """Form for creating a Person record during registration."""
 
+    # Company information
+    firmenname = forms.CharField(
+        required=True,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Firmenname"}
+        ),
+        label="Firmenname",
+    )
+
+    firmenanschrift = forms.CharField(
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Straße, Hausnummer, PLZ, Ort",
+            }
+        ),
+        label="Firmenanschrift",
+    )
+
+    # Personal address
+    adresse = forms.CharField(
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Straße und Hausnummer",
+            }
+        ),
+        label="Adresse",
+    )
+
+    plz = forms.CharField(
+        required=True,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "1234"}
+        ),
+        label="Postleitzahl",
+    )
+
+    ort = forms.CharField(
+        required=True,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Ort"}
+        ),
+        label="Ort",
+    )
+
     telefon = forms.CharField(
         required=False,
         widget=forms.TextInput(
@@ -105,12 +156,23 @@ class PersonRegistrationForm(forms.ModelForm):
         required=True,
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
         label="Ich akzeptiere die Datenschutzvereinbarung",
-        help_text="Sie müssen die Datenschutzvereinbarung akzeptieren, um sich zu registrieren.",
+        help_text=(
+            "Sie müssen die Datenschutzvereinbarung akzeptieren, "
+            "um sich zu registrieren."
+        ),
     )
 
     class Meta:
         model = Person
-        fields = ("telefon", "dsv_akzeptiert")
+        fields = (
+            "firmenname",
+            "firmenanschrift",
+            "adresse",
+            "plz",
+            "ort",
+            "telefon",
+            "dsv_akzeptiert",
+        )
 
     def save(self, user, commit=True):
         """Save the Person instance linked to the provided user."""
