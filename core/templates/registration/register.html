@@ -114,10 +114,76 @@
                         </div>
                     </fieldset>
 
+                    <!-- Company Information -->
+                    <fieldset class="mb-4">
+                        <legend class="fs-5 mb-3">Firmeninformationen</legend>
+
+                        <div class="mb-3">
+                            <label for="{{ person_form.firmenname.id_for_label }}" class="form-label">
+                                {{ person_form.firmenname.label }}
+                            </label>
+                            {{ person_form.firmenname }}
+                            {% if person_form.firmenname.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in person_form.firmenname.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ person_form.firmenanschrift.id_for_label }}" class="form-label">
+                                {{ person_form.firmenanschrift.label }}
+                            </label>
+                            {{ person_form.firmenanschrift }}
+                            {% if person_form.firmenanschrift.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in person_form.firmenanschrift.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </fieldset>
+
                     <!-- Personal Information -->
                     <fieldset class="mb-4">
                         <legend class="fs-5 mb-3">Persönliche Angaben</legend>
-                        
+
+                        <div class="mb-3">
+                            <label for="{{ person_form.adresse.id_for_label }}" class="form-label">
+                                {{ person_form.adresse.label }}
+                            </label>
+                            {{ person_form.adresse }}
+                            {% if person_form.adresse.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in person_form.adresse.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ person_form.plz.id_for_label }}" class="form-label">
+                                    {{ person_form.plz.label }}
+                                </label>
+                                {{ person_form.plz }}
+                                {% if person_form.plz.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in person_form.plz.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                <label for="{{ person_form.ort.id_for_label }}" class="form-label">
+                                    {{ person_form.ort.label }}
+                                </label>
+                                {{ person_form.ort }}
+                                {% if person_form.ort.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in person_form.ort.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             <label for="{{ person_form.telefon.id_for_label }}" class="form-label">
                                 {{ person_form.telefon.label }}
