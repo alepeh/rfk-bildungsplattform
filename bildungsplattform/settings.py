@@ -48,6 +48,8 @@ if IS_PRODUCTION:
     ALLOWED_HOSTS = [
         "bildungsplattform.rauchfangkehrer.or.at",
         "www.bildungsplattform.rauchfangkehrer.or.at",
+        "bildungsplattform.rauchfangkehrer-bgld.at",
+        "www.bildungsplattform.rauchfangkehrer-bgld.at",
     ]
 elif IS_STAGING:
     ALLOWED_HOSTS = [
@@ -83,6 +85,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://3e13a2a1-5eb4-431b-a41d-ebc0c9e89c46-00-1pfa686cbln1x.janeway.replit.dev",
     "https://bildungsplattform-test.rauchfangkehrer.or.at",
     "https://bildungsplattform.rauchfangkehrer.or.at",
+    "https://bildungsplattform.rauchfangkehrer-bgld.at",
     "https://rfk-bildungsplattform-alexanderpehm.replit.app",
 ]
 
