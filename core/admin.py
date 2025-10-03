@@ -216,6 +216,20 @@ class PersonAdmin(admin.ModelAdmin):
             {"fields": ("can_book_schulungen",)},
         ),
         (
+            "Registrierungsinformationen",
+            {
+                "fields": (
+                    "firmenname",
+                    "firmenanschrift",
+                    "adresse",
+                    "plz",
+                    "ort",
+                ),
+                "classes": ("collapse",),
+                "description": "Bei der Registrierung erfasste Adressinformationen",
+            },
+        ),
+        (
             "Sonstige",
             {"fields": ("dsv_akzeptiert",), "classes": ("collapse",)},
         ),

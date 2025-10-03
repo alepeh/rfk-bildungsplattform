@@ -70,6 +70,17 @@
                 {% if person.telefon %}
                 <p><strong>Telefon:</strong> {{ person.telefon }}</p>
                 {% endif %}
+                {% if person.firmenname %}
+                <p><strong>Firmenname:</strong> {{ person.firmenname }}</p>
+                {% endif %}
+                {% if person.firmenanschrift %}
+                <p><strong>Firmenanschrift:</strong> {{ person.firmenanschrift }}</p>
+                {% endif %}
+                {% if person.adresse or person.plz or person.ort %}
+                <p><strong>Privatadresse:</strong>
+                    {% if person.adresse %}{{ person.adresse }}{% endif %}{% if person.plz %}, {{ person.plz }}{% endif %}{% if person.ort %} {{ person.ort }}{% endif %}
+                </p>
+                {% endif %}
                 <p><strong>Registriert am:</strong> {{ person.activation_requested_at|date:"d.m.Y H:i" }}</p>
                 <p><strong>Datenschutz akzeptiert:</strong> {% if person.dsv_akzeptiert %}Ja{% else %}Nein{% endif %}</p>
             </div>
