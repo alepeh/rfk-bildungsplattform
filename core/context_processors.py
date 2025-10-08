@@ -3,6 +3,7 @@ import os
 from django.db.models import Q
 
 from core.models import Person
+from core.utils import get_site_domain
 
 
 def test_system(request):
@@ -17,3 +18,8 @@ def person_context(request):
         except Person.DoesNotExist:
             pass
     return {"person": None}
+
+
+def site_domain(request):
+    """Provide the current site domain to all templates."""
+    return {"site_domain": get_site_domain(request)}

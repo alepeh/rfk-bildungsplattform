@@ -133,6 +133,7 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "core.context_processors.test_system",
                 "core.context_processors.person_context",
+                "core.context_processors.site_domain",
             ],
         },
     },
@@ -239,8 +240,8 @@ if IS_PRODUCTION:
     # Session security
     SESSION_COOKIE_HTTPONLY = True
     CSRF_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = "Strict"
-    CSRF_COOKIE_SAMESITE = "Strict"
+    SESSION_COOKIE_SAMESITE = "Lax"
+    CSRF_COOKIE_SAMESITE = "Lax"
 
     # Additional security
     SECURE_REFERRER_POLICY = "same-origin"

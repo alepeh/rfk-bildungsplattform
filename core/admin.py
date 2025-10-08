@@ -66,7 +66,7 @@ def activate_users(modeladmin, request, queryset):
 
         # Send notification email to user
         try:
-            send_user_activation_notification(person)
+            send_user_activation_notification(person, request)
         except Exception as e:
             messages.warning(
                 request,

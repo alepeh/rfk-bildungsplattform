@@ -249,7 +249,7 @@ def export_schulungsteilnehmer_pdf(request, pk):
 
 def send_reminder(request, pk):
     try:
-        send_reminder_to_all_teilnehmer(pk)
+        send_reminder_to_all_teilnehmer(pk, request)
         messages.success(
             request, "Erinnerung an alle Teilnehmer mit email-adresse verschickt."
         )
