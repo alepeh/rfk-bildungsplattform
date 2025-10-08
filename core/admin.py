@@ -66,7 +66,7 @@ def activate_users(modeladmin, request, queryset):
 
         # Send notification email to user
         try:
-            send_user_activation_notification(person)
+            send_user_activation_notification(person, request)
         except Exception as e:
             messages.warning(
                 request,
@@ -282,6 +282,12 @@ class SchulungsTeilnehmerBestellungInline(admin.TabularInline):
     extra = 0
     fields = ("vorname", "nachname", "email", "verpflegung", "person", "status")
 
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        form = formset.form
+        form.base_fields["person"].widget.attrs["onchange"] = "populateFields(this);"
+        return formset
+
 
 class BestellungAdmin(admin.ModelAdmin):
     list_display = ("schulungstermin", "anzahl", "rechnungsadresse_name", "created")
@@ -312,6 +318,9 @@ class BestellungAdmin(admin.ModelAdmin):
             },
         ),
     )
+
+    class Media:
+        js = ("js/schulungsteilnehmer_admin.js",)
 
 
 class OrganisationAdmin(admin.ModelAdmin):

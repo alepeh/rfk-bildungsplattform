@@ -21,7 +21,7 @@ def register(request):
                 # Send notification email to administrators
                 from ..services.email import send_admin_registration_notification
 
-                send_admin_registration_notification(person)
+                send_admin_registration_notification(person, request)
 
                 messages.success(
                     request,

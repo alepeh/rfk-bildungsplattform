@@ -287,6 +287,19 @@
 
 
     document.getElementById('confirm-order-button').addEventListener('click', function() {
+        const button = this;
+        const originalText = button.textContent;
+
+        // Prevent double-submit by disabling button
+        if (button.disabled) {
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = 'Bestellung wird verarbeitet...';
+        button.style.opacity = '0.6';
+        button.style.cursor = 'not-allowed';
+
         let formData = new FormData();
         formData.append('schulungstermin_id', {{ schulungstermin.id }});
         formData.append('quantity', document.getElementById('quantity').value);
@@ -316,7 +329,12 @@
                 'X-CSRFToken': '{{ csrf_token }}'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.status === 'success') {
                 // Get the base URL from the Django template tag
@@ -326,8 +344,22 @@
                 // Do something with the new URL (e.g., navigate to it)
                 window.location.href = newUrl;
             } else {
-                alert('Fehler bei der Bestellung');
+                alert('Fehler bei der Bestellung: ' + (data.message || 'Unbekannter Fehler'));
+                // Re-enable button on error
+                button.disabled = false;
+                button.textContent = originalText;
+                button.style.opacity = '1';
+                button.style.cursor = 'pointer';
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Fehler bei der Bestellung: ' + (error.message || 'Bitte versuchen Sie es erneut.'));
+            // Re-enable button on error
+            button.disabled = false;
+            button.textContent = originalText;
+            button.style.opacity = '1';
+            button.style.cursor = 'pointer';
         });
     });
 </script>
