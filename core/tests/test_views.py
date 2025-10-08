@@ -523,6 +523,161 @@ class TestConfirmOrderView:
         assert response.status_code == 403
         assert "keine Berechtigung" in response.json()["message"]
 
+    def test_confirm_order_no_orphaned_bestellung_on_duplicate_error(self):
+        """Test that no Bestellung is created when duplicate validation fails"""
+        self.client.login(username="testuser", password="testpass")
+
+        # Create an existing registration
+        existing_person = Person.objects.create(
+            vorname="Already",
+            nachname="Registered",
+            betrieb=self.betrieb,
+        )
+        SchulungsTeilnehmer.objects.create(
+            schulungstermin=self.termin,
+            person=existing_person,
+            vorname=existing_person.vorname,
+            nachname=existing_person.nachname,
+        )
+
+        # Count existing bestellungen
+        initial_bestellung_count = Bestellung.objects.count()
+
+        # Try to register the same person again
+        response = self.client.post(
+            reverse("confirm_order"),
+            {
+                "schulungstermin_id": self.termin.id,
+                "quantity": "1",
+                "person-0": str(existing_person.id),
+                "meal-0": "Standard",
+                "rechnungsadresse_name": "Test",
+                "rechnungsadresse_strasse": "Test Street",
+                "rechnungsadresse_plz": "1010",
+                "rechnungsadresse_ort": "Vienna",
+            },
+        )
+
+        # Should fail with error
+        assert response.status_code == 400
+        assert "bereits für diese Schulung angemeldet" in response.json()["message"]
+
+        # CRITICAL: No new Bestellung should be created
+        assert Bestellung.objects.count() == initial_bestellung_count
+
+    @patch("core.views.checkout_view.send_order_confirmation_email")
+    def test_confirm_order_transaction_rollback_on_email_failure(self, mock_send_email):
+        """Test that transaction is NOT rolled back if only email fails"""
+        # Email failure should not prevent order creation
+        mock_send_email.side_effect = Exception("Email service down")
+
+        self.client.login(username="testuser", password="testpass")
+
+        initial_bestellung_count = Bestellung.objects.count()
+        initial_teilnehmer_count = SchulungsTeilnehmer.objects.count()
+
+        response = self.client.post(
+            reverse("confirm_order"),
+            {
+                "schulungstermin_id": self.termin.id,
+                "quantity": "1",
+                "firstname-0": "Test",
+                "lastname-0": "User",
+                "email-0": "test@example.com",
+                "meal-0": "Standard",
+                "rechnungsadresse_name": "Test Customer",
+                "rechnungsadresse_strasse": "Test Street 123",
+                "rechnungsadresse_plz": "1010",
+                "rechnungsadresse_ort": "Vienna",
+            },
+        )
+
+        # Order should still succeed even if email fails
+        assert response.status_code == 200
+        assert response.json()["status"] == "success"
+
+        # Bestellung and Teilnehmer should be created
+        assert Bestellung.objects.count() == initial_bestellung_count + 1
+        assert SchulungsTeilnehmer.objects.count() == initial_teilnehmer_count + 1
+
+    def test_confirm_order_validates_all_participants_before_save(self):
+        """Test that all participants are validated before Bestellung is created"""
+        self.client.login(username="testuser", password="testpass")
+
+        # Create one valid person and one already registered
+        valid_person = Person.objects.create(
+            vorname="Valid",
+            nachname="Person",
+            betrieb=self.betrieb,
+        )
+        duplicate_person = Person.objects.create(
+            vorname="Duplicate",
+            nachname="Person",
+            betrieb=self.betrieb,
+        )
+        SchulungsTeilnehmer.objects.create(
+            schulungstermin=self.termin,
+            person=duplicate_person,
+            vorname=duplicate_person.vorname,
+            nachname=duplicate_person.nachname,
+        )
+
+        initial_bestellung_count = Bestellung.objects.count()
+        initial_teilnehmer_count = SchulungsTeilnehmer.objects.count()
+
+        # Try to register both (second one will fail)
+        response = self.client.post(
+            reverse("confirm_order"),
+            {
+                "schulungstermin_id": self.termin.id,
+                "quantity": "2",
+                "person-0": str(valid_person.id),
+                "meal-0": "Standard",
+                "person-1": str(duplicate_person.id),
+                "meal-1": "Standard",
+                "rechnungsadresse_name": "Test",
+                "rechnungsadresse_strasse": "Test Street",
+                "rechnungsadresse_plz": "1010",
+                "rechnungsadresse_ort": "Vienna",
+            },
+        )
+
+        # Should fail
+        assert response.status_code == 400
+        assert "bereits für diese Schulung angemeldet" in response.json()["message"]
+
+        # CRITICAL: No Bestellung or Teilnehmer should be created
+        # (Not even for the valid person, since validation happens first)
+        assert Bestellung.objects.count() == initial_bestellung_count
+        assert SchulungsTeilnehmer.objects.count() == initial_teilnehmer_count
+
+    def test_confirm_order_handles_missing_person(self):
+        """Test error handling when person_id doesn't exist"""
+        self.client.login(username="testuser", password="testpass")
+
+        initial_bestellung_count = Bestellung.objects.count()
+
+        response = self.client.post(
+            reverse("confirm_order"),
+            {
+                "schulungstermin_id": self.termin.id,
+                "quantity": "1",
+                "person-0": "99999",  # Non-existent person ID
+                "meal-0": "Standard",
+                "rechnungsadresse_name": "Test",
+                "rechnungsadresse_strasse": "Test Street",
+                "rechnungsadresse_plz": "1010",
+                "rechnungsadresse_ort": "Vienna",
+            },
+        )
+
+        # Should return error
+        assert response.status_code == 400
+        assert "nicht gefunden" in response.json()["message"]
+
+        # No Bestellung should be created
+        assert Bestellung.objects.count() == initial_bestellung_count
+
 
 @pytest.mark.django_db
 class TestMitarbeiterView:
