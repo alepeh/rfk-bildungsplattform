@@ -403,11 +403,13 @@ class TestConfirmOrderView:
     def setup_method(self):
         self.client = Client()
         self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.betrieb = Betrieb.objects.create(name="Test Betrieb")
         self.person = Person.objects.create(
             benutzer=self.user,
             vorname="Test",
             nachname="User",
             email="test@example.com",
+            betrieb=self.betrieb,
             is_activated=True,
             can_book_schulungen=True,
         )
