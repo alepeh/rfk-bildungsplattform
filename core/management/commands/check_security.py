@@ -71,7 +71,7 @@ class Command(BaseCommand):
 
         # HSTS Settings
         if hasattr(settings, "SECURE_HSTS_SECONDS"):
-            self.stdout.write(f"\n=== HSTS Configuration ===")
+            self.stdout.write("\n=== HSTS Configuration ===")
             self.stdout.write(f"HSTS Seconds: {settings.SECURE_HSTS_SECONDS}")
             self.stdout.write(
                 f"Include Subdomains: {getattr(settings, 'SECURE_HSTS_INCLUDE_SUBDOMAINS', False)}"

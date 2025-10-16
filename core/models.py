@@ -4,6 +4,8 @@ import uuid
 from django.contrib.auth.models import User
 from django.db import models
 
+from core.storage import ScalewayObjectStorage
+
 
 def get_unique_upload_path(instance, filename):
     name, ext = os.path.splitext(filename)
@@ -173,6 +175,41 @@ class Person(BaseModel):
     nachname = models.CharField(max_length=150)
     email = models.EmailField(null=True, blank=True)
     telefon = models.CharField(max_length=30, null=True, blank=True)
+    # Company information
+    firmenname = models.CharField(
+        max_length=200,
+        null=True,
+        blank=True,
+        verbose_name="Firmenname",
+        help_text="Name des Unternehmens",
+    )
+    firmenanschrift = models.CharField(
+        max_length=200,
+        null=True,
+        blank=True,
+        verbose_name="Firmenanschrift",
+        help_text="Vollständige Adresse des Unternehmens",
+    )
+    # Personal address
+    adresse = models.CharField(
+        max_length=200,
+        null=True,
+        blank=True,
+        verbose_name="Adresse",
+        help_text="Straße und Hausnummer",
+    )
+    plz = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        verbose_name="Postleitzahl",
+    )
+    ort = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        verbose_name="Ort",
+    )
     dsv_akzeptiert = models.BooleanField(
         default=False, verbose_name="Datenschutzvereinbarung akzeptiert"
     )
@@ -191,6 +228,36 @@ class Person(BaseModel):
         null=True,
         blank=True,
         help_text="Nur relevant für Bgld. Rauchfangkehrer",
+    )
+    # Activation fields for registration approval workflow
+    is_activated = models.BooleanField(
+        default=False,
+        verbose_name="Konto aktiviert",
+        help_text="Gibt an, ob das Konto vom Administrator genehmigt wurde",
+    )
+    activation_requested_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Aktivierung angefordert am",
+    )
+    activated_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Aktiviert am",
+    )
+    activated_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="activated_persons",
+        verbose_name="Aktiviert von",
+    )
+    # Booking permission field
+    can_book_schulungen = models.BooleanField(
+        default=True,
+        verbose_name="Darf Schulungen buchen",
+        help_text="Gibt an, ob diese Person Schulungen buchen darf",
     )
 
     def __str__(self):
@@ -269,14 +336,29 @@ class Bestellung(BaseModel):
         max_length=50, choices=STATUS_CHOICES, default="Angemeldet"
     )
 
+    # Rechnungsadresse fields
+    rechnungsadresse_name = models.CharField(
+        max_length=200,
+        verbose_name="Name/Firma",
+        help_text="Name oder Firmenname für die Rechnung",
+        null=True,
+        blank=True,
+    )
+    rechnungsadresse_strasse = models.CharField(
+        max_length=200, verbose_name="Straße und Hausnummer", null=True, blank=True
+    )
+    rechnungsadresse_plz = models.CharField(
+        max_length=20, verbose_name="Postleitzahl", null=True, blank=True
+    )
+    rechnungsadresse_ort = models.CharField(
+        max_length=100, verbose_name="Ort", null=True, blank=True
+    )
+
     def __str__(self):
         return f"{self.person} - {self.schulungstermin}"
 
     class Meta:
         verbose_name_plural = "Bestellungen"
-
-
-from core.storage import ScalewayObjectStorage
 
 
 class Document(BaseModel):

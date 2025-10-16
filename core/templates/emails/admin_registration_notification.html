@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        .email-content {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .email-header {
+            background-color: #0056b3;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .email-body {
+            background-color: white;
+            padding: 30px;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .user-details {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #0056b3;
+            margin: 20px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #0056b3;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            color: #6c757d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-content">
+        <div class="email-header">
+            <h2>Neue Registrierung - Aktivierung erforderlich</h2>
+        </div>
+        
+        <div class="email-body">
+            <p>Sehr geehrte Damen und Herren,</p>
+            
+            <p>es liegt eine neue Registrierung auf der Bildungsplattform vor, die Ihre Freischaltung benötigt:</p>
+            
+            <div class="user-details">
+                <h4>Benutzerdetails:</h4>
+                <p><strong>Name:</strong> {{ person.vorname }} {{ person.nachname }}</p>
+                <p><strong>E-Mail:</strong> {{ person.email }}</p>
+                <p><strong>Benutzername:</strong> {{ person.benutzer.username }}</p>
+                {% if person.telefon %}
+                <p><strong>Telefon:</strong> {{ person.telefon }}</p>
+                {% endif %}
+                {% if person.firmenname %}
+                <p><strong>Firmenname:</strong> {{ person.firmenname }}</p>
+                {% endif %}
+                {% if person.firmenanschrift %}
+                <p><strong>Firmenanschrift:</strong> {{ person.firmenanschrift }}</p>
+                {% endif %}
+                {% if person.adresse or person.plz or person.ort %}
+                <p><strong>Privatadresse:</strong>
+                    {% if person.adresse %}{{ person.adresse }}{% endif %}{% if person.plz %}, {{ person.plz }}{% endif %}{% if person.ort %} {{ person.ort }}{% endif %}
+                </p>
+                {% endif %}
+                <p><strong>Registriert am:</strong> {{ person.activation_requested_at|date:"d.m.Y H:i" }}</p>
+                <p><strong>Datenschutz akzeptiert:</strong> {% if person.dsv_akzeptiert %}Ja{% else %}Nein{% endif %}</p>
+            </div>
+            
+            <p>Bitte prüfen Sie die Registrierung und aktivieren Sie das Konto falls zutreffend. Nach der Aktivierung kann der Benutzer Schulungen buchen.</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{ site_domain }}/admin/core/person/{{ person.id }}/change/" class="btn">
+                    Benutzer aktivieren
+                </a>
+                <a href="{{ site_domain }}/admin/core/person/" class="btn btn-secondary">
+                    Alle Benutzer verwalten
+                </a>
+            </div>
+            
+            <p><strong>Wichtige Hinweise:</strong></p>
+            <ul>
+                <li>Prüfen Sie die Berechtigung des Benutzers zur Schulungsteilnahme</li>
+                <li>Weisen Sie den Benutzer gegebenenfalls einem Betrieb oder einer Organisation zu</li>
+                <li>Der Benutzer erhält automatisch eine Benachrichtigung nach der Aktivierung</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p>Diese E-Mail wurde automatisch generiert von der Bildungsplattform der burgenländischen Rauchfangkehrer.</p>
+            <p>Bei Fragen wenden Sie sich an: bildungsplattform@rauchfangkehrer.or.at</p>
+        </div>
+    </div>
+</body>
+</html>

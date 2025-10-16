@@ -1,16 +1,16 @@
 import requests
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 from django.db.models import Q
 from django.forms import inlineformset_factory
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.urls import reverse
 from django.utils import timezone
 
+from core.decorators import login_and_activation_required
 from core.models import Betrieb, Document, Person, SchulungsTeilnehmer, SchulungsTermin
 from core.services.email import send_reminder_to_all_teilnehmer
 
@@ -56,7 +56,7 @@ def is_overbooked(request, schulungsterminId):
         return True
 
 
-@login_required
+@login_and_activation_required
 def register(request: HttpRequest, id: int):
     # form has been submitted
     if request.method == "POST":
@@ -121,7 +121,7 @@ def removePersonFromSchulungstermin(schulungsTerminId, personId):
         ).delete()
 
 
-@login_required
+@login_and_activation_required
 def mitarbeiter(request):
     PersonFormSet = inlineformset_factory(
         Betrieb,
@@ -249,7 +249,7 @@ def export_schulungsteilnehmer_pdf(request, pk):
 
 def send_reminder(request, pk):
     try:
-        send_reminder_to_all_teilnehmer(pk)
+        send_reminder_to_all_teilnehmer(pk, request)
         messages.success(
             request, "Erinnerung an alle Teilnehmer mit email-adresse verschickt."
         )
@@ -261,7 +261,7 @@ def send_reminder(request, pk):
     )
 
 
-@login_required
+@login_and_activation_required
 def my_schulungen(request):
     user = request.user
     try:
@@ -281,10 +281,7 @@ def my_schulungen(request):
     )
 
 
-from django.contrib.auth.decorators import login_required
-
-
-@login_required
+@login_and_activation_required
 def documents(request):
     user = request.user
     try:
@@ -318,10 +315,6 @@ def get_person_details(request, person_id):
             "email": person.email,
         }
     )
-
-
-from django.contrib.auth import logout
-from django.shortcuts import redirect
 
 
 def logout_view(request):

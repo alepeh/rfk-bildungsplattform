@@ -35,7 +35,9 @@ class TestIndexView:
 
     def test_index_view_authenticated(self):
         user = User.objects.create_user(username="testuser", password="testpass")
-        person = Person.objects.create(benutzer=user, vorname="Test", nachname="User")
+        person = Person.objects.create(
+            benutzer=user, vorname="Test", nachname="User", is_activated=True
+        )
 
         self.client.login(username="testuser", password="testpass")
         response = self.client.get(reverse("index"))
@@ -72,6 +74,72 @@ class TestIndexView:
         assert future_termin in termine
         assert past_termin not in termine
 
+    def test_index_booking_button_visibility_with_permission(self):
+        user = User.objects.create_user(username="testuser", password="testpass")
+        Person.objects.create(
+            benutzer=user,
+            vorname="Test",
+            nachname="User",
+            is_activated=True,
+            can_book_schulungen=True,
+        )
+
+        schulung = Schulung.objects.create(
+            name="Future Training",
+            beschreibung="Test",
+            preis_standard=Decimal("100.00"),
+        )
+        ort = SchulungsOrt.objects.create(name="Test Location")
+        termin = SchulungsTermin.objects.create(
+            datum_von=timezone.now() + timedelta(days=7),
+            datum_bis=timezone.now() + timedelta(days=7, hours=4),
+            schulung=schulung,
+            ort=ort,
+            buchbar=True,
+            max_teilnehmer=10,
+        )
+
+        self.client.login(username="testuser", password="testpass")
+        response = self.client.get(reverse("index"))
+
+        # Button should be visible for users with booking permission
+        content = response.content.decode()
+        assert "Buchen" in content
+        assert f"/checkout/{termin.id}/" in content
+
+    def test_index_booking_button_blocked_without_permission(self):
+        user = User.objects.create_user(username="testuser", password="testpass")
+        Person.objects.create(
+            benutzer=user,
+            vorname="Test",
+            nachname="User",
+            is_activated=True,
+            can_book_schulungen=False,
+        )
+
+        schulung = Schulung.objects.create(
+            name="Future Training",
+            beschreibung="Test",
+            preis_standard=Decimal("100.00"),
+        )
+        ort = SchulungsOrt.objects.create(name="Test Location")
+        termin = SchulungsTermin.objects.create(
+            datum_von=timezone.now() + timedelta(days=7),
+            datum_bis=timezone.now() + timedelta(days=7, hours=4),
+            schulung=schulung,
+            ort=ort,
+            buchbar=True,
+            max_teilnehmer=10,
+        )
+
+        self.client.login(username="testuser", password="testpass")
+        response = self.client.get(reverse("index"))
+
+        # Button should show "Buchung nicht erlaubt" message
+        content = response.content.decode()
+        assert "Buchung nicht erlaubt" in content
+        assert f"/checkout/{termin.id}/" not in content
+
 
 @pytest.mark.django_db
 class TestRegisterView:
@@ -80,7 +148,12 @@ class TestRegisterView:
         self.user = User.objects.create_user(username="gf", password="testpass")
         self.betrieb = Betrieb.objects.create(name="Test Betrieb")
         self.geschaeftsfuehrer = Person.objects.create(
-            benutzer=self.user, vorname="Boss", nachname="Person", betrieb=self.betrieb
+            benutzer=self.user,
+            vorname="Boss",
+            nachname="Person",
+            betrieb=self.betrieb,
+            is_activated=True,
+            can_book_schulungen=True,
         )
         self.betrieb.geschaeftsfuehrer = self.geschaeftsfuehrer
         self.betrieb.save()
@@ -196,6 +269,8 @@ class TestCheckoutView:
             vorname="Test",
             nachname="User",
             organisation=self.organisation,
+            is_activated=True,
+            can_book_schulungen=True,
         )
 
         self.schulung = Schulung.objects.create(
@@ -223,6 +298,15 @@ class TestCheckoutView:
         assert response.status_code == 200
         assert response.context["schulungstermin"] == self.termin
         assert response.context["preis"] == Decimal("100.00")  # Discounted price
+
+    def test_checkout_includes_invoice_data(self):
+        self.client.login(username="testuser", password="testpass")
+
+        response = self.client.get(reverse("checkout", args=[self.termin.id]))
+        assert response.status_code == 200
+        assert "invoice_data" in response.context
+        # Individual user should have name prepopulated
+        assert response.context["invoice_data"]["name"] == "Test User"
 
     def test_checkout_view_without_organisation(self):
         self.person.organisation = None
@@ -277,17 +361,57 @@ class TestCheckoutView:
         assert person_allowed in response.context["related_persons"]
         assert person_not_allowed not in response.context["related_persons"]
 
+    def test_checkout_prepopulates_betrieb_invoice_data(self):
+        betrieb = Betrieb.objects.create(
+            name="Test Company GmbH", adresse="Musterstraße 123", plz="1010", ort="Wien"
+        )
+        self.person.betrieb = betrieb
+        self.person.save()
+
+        self.client.login(username="testuser", password="testpass")
+
+        response = self.client.get(reverse("checkout", args=[self.termin.id]))
+        assert response.status_code == 200
+
+        invoice_data = response.context["invoice_data"]
+        assert invoice_data["name"] == "Test Company GmbH"
+        assert invoice_data["strasse"] == "Musterstraße 123"
+        assert invoice_data["plz"] == "1010"
+        assert invoice_data["ort"] == "Wien"
+
+    def test_checkout_blocked_without_booking_permission(self):
+        self.person.can_book_schulungen = False
+        self.person.save()
+
+        self.client.login(username="testuser", password="testpass")
+
+        response = self.client.get(reverse("checkout", args=[self.termin.id]))
+        assert response.status_code == 302  # Redirect to index
+
+    def test_checkout_allowed_with_booking_permission(self):
+        self.person.can_book_schulungen = True
+        self.person.save()
+
+        self.client.login(username="testuser", password="testpass")
+
+        response = self.client.get(reverse("checkout", args=[self.termin.id]))
+        assert response.status_code == 200
+
 
 @pytest.mark.django_db
 class TestConfirmOrderView:
     def setup_method(self):
         self.client = Client()
         self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.betrieb = Betrieb.objects.create(name="Test Betrieb")
         self.person = Person.objects.create(
             benutzer=self.user,
             vorname="Test",
             nachname="User",
             email="test@example.com",
+            betrieb=self.betrieb,
+            is_activated=True,
+            can_book_schulungen=True,
         )
 
         self.schulung = Schulung.objects.create(
@@ -318,6 +442,10 @@ class TestConfirmOrderView:
                 "lastname-1": "Smith",
                 "email-1": "jane@example.com",
                 "meal-1": "Vegetarisch",
+                "rechnungsadresse_name": "Test Customer",
+                "rechnungsadresse_strasse": "Test Street 123",
+                "rechnungsadresse_plz": "1010",
+                "rechnungsadresse_ort": "Vienna",
             },
         )
 
@@ -331,6 +459,12 @@ class TestConfirmOrderView:
         assert bestellung.anzahl == 2
         assert bestellung.einzelpreis == Decimal("100.00")
         assert bestellung.gesamtpreis == Decimal("200.00")
+
+        # Check invoice address saved
+        assert bestellung.rechnungsadresse_name == "Test Customer"
+        assert bestellung.rechnungsadresse_strasse == "Test Street 123"
+        assert bestellung.rechnungsadresse_plz == "1010"
+        assert bestellung.rechnungsadresse_ort == "Vienna"
 
         # Check Teilnehmer created
         teilnehmer = SchulungsTeilnehmer.objects.filter(bestellung=bestellung)
@@ -358,13 +492,193 @@ class TestConfirmOrderView:
             {
                 "schulungstermin_id": self.termin.id,
                 "quantity": "1",
-                f"person-0": str(existing_person.id),
+                "person-0": str(existing_person.id),
                 "meal-0": "Standard",
             },
         )
 
         assert response.status_code == 400
         assert "bereits für diese Schulung angemeldet" in response.json()["message"]
+
+    def test_confirm_order_blocked_without_booking_permission(self):
+        self.person.can_book_schulungen = False
+        self.person.save()
+
+        self.client.login(username="testuser", password="testpass")
+
+        response = self.client.post(
+            reverse("confirm_order"),
+            {
+                "schulungstermin_id": self.termin.id,
+                "quantity": "1",
+                "firstname-0": "Test",
+                "lastname-0": "User",
+                "email-0": "test@example.com",
+                "meal-0": "Standard",
+                "rechnungsadresse_name": "Test Customer",
+                "rechnungsadresse_strasse": "Test Street 123",
+                "rechnungsadresse_plz": "1010",
+                "rechnungsadresse_ort": "Vienna",
+            },
+        )
+
+        assert response.status_code == 403
+        assert "keine Berechtigung" in response.json()["message"]
+
+    def test_confirm_order_no_orphaned_bestellung_on_duplicate_error(self):
+        """Test that no Bestellung is created when duplicate validation fails"""
+        self.client.login(username="testuser", password="testpass")
+
+        # Create an existing registration
+        existing_person = Person.objects.create(
+            vorname="Already",
+            nachname="Registered",
+            betrieb=self.betrieb,
+        )
+        SchulungsTeilnehmer.objects.create(
+            schulungstermin=self.termin,
+            person=existing_person,
+            vorname=existing_person.vorname,
+            nachname=existing_person.nachname,
+        )
+
+        # Count existing bestellungen
+        initial_bestellung_count = Bestellung.objects.count()
+
+        # Try to register the same person again
+        response = self.client.post(
+            reverse("confirm_order"),
+            {
+                "schulungstermin_id": self.termin.id,
+                "quantity": "1",
+                "person-0": str(existing_person.id),
+                "meal-0": "Standard",
+                "rechnungsadresse_name": "Test",
+                "rechnungsadresse_strasse": "Test Street",
+                "rechnungsadresse_plz": "1010",
+                "rechnungsadresse_ort": "Vienna",
+            },
+        )
+
+        # Should fail with error
+        assert response.status_code == 400
+        assert "bereits für diese Schulung angemeldet" in response.json()["message"]
+
+        # CRITICAL: No new Bestellung should be created
+        assert Bestellung.objects.count() == initial_bestellung_count
+
+    @patch("core.views.checkout_view.send_order_confirmation_email")
+    def test_confirm_order_transaction_rollback_on_email_failure(self, mock_send_email):
+        """Test that transaction is NOT rolled back if only email fails"""
+        # Email failure should not prevent order creation
+        mock_send_email.side_effect = Exception("Email service down")
+
+        self.client.login(username="testuser", password="testpass")
+
+        initial_bestellung_count = Bestellung.objects.count()
+        initial_teilnehmer_count = SchulungsTeilnehmer.objects.count()
+
+        response = self.client.post(
+            reverse("confirm_order"),
+            {
+                "schulungstermin_id": self.termin.id,
+                "quantity": "1",
+                "firstname-0": "Test",
+                "lastname-0": "User",
+                "email-0": "test@example.com",
+                "meal-0": "Standard",
+                "rechnungsadresse_name": "Test Customer",
+                "rechnungsadresse_strasse": "Test Street 123",
+                "rechnungsadresse_plz": "1010",
+                "rechnungsadresse_ort": "Vienna",
+            },
+        )
+
+        # Order should still succeed even if email fails
+        assert response.status_code == 200
+        assert response.json()["status"] == "success"
+
+        # Bestellung and Teilnehmer should be created
+        assert Bestellung.objects.count() == initial_bestellung_count + 1
+        assert SchulungsTeilnehmer.objects.count() == initial_teilnehmer_count + 1
+
+    def test_confirm_order_validates_all_participants_before_save(self):
+        """Test that all participants are validated before Bestellung is created"""
+        self.client.login(username="testuser", password="testpass")
+
+        # Create one valid person and one already registered
+        valid_person = Person.objects.create(
+            vorname="Valid",
+            nachname="Person",
+            betrieb=self.betrieb,
+        )
+        duplicate_person = Person.objects.create(
+            vorname="Duplicate",
+            nachname="Person",
+            betrieb=self.betrieb,
+        )
+        SchulungsTeilnehmer.objects.create(
+            schulungstermin=self.termin,
+            person=duplicate_person,
+            vorname=duplicate_person.vorname,
+            nachname=duplicate_person.nachname,
+        )
+
+        initial_bestellung_count = Bestellung.objects.count()
+        initial_teilnehmer_count = SchulungsTeilnehmer.objects.count()
+
+        # Try to register both (second one will fail)
+        response = self.client.post(
+            reverse("confirm_order"),
+            {
+                "schulungstermin_id": self.termin.id,
+                "quantity": "2",
+                "person-0": str(valid_person.id),
+                "meal-0": "Standard",
+                "person-1": str(duplicate_person.id),
+                "meal-1": "Standard",
+                "rechnungsadresse_name": "Test",
+                "rechnungsadresse_strasse": "Test Street",
+                "rechnungsadresse_plz": "1010",
+                "rechnungsadresse_ort": "Vienna",
+            },
+        )
+
+        # Should fail
+        assert response.status_code == 400
+        assert "bereits für diese Schulung angemeldet" in response.json()["message"]
+
+        # CRITICAL: No Bestellung or Teilnehmer should be created
+        # (Not even for the valid person, since validation happens first)
+        assert Bestellung.objects.count() == initial_bestellung_count
+        assert SchulungsTeilnehmer.objects.count() == initial_teilnehmer_count
+
+    def test_confirm_order_handles_missing_person(self):
+        """Test error handling when person_id doesn't exist"""
+        self.client.login(username="testuser", password="testpass")
+
+        initial_bestellung_count = Bestellung.objects.count()
+
+        response = self.client.post(
+            reverse("confirm_order"),
+            {
+                "schulungstermin_id": self.termin.id,
+                "quantity": "1",
+                "person-0": "99999",  # Non-existent person ID
+                "meal-0": "Standard",
+                "rechnungsadresse_name": "Test",
+                "rechnungsadresse_strasse": "Test Street",
+                "rechnungsadresse_plz": "1010",
+                "rechnungsadresse_ort": "Vienna",
+            },
+        )
+
+        # Should return error
+        assert response.status_code == 400
+        assert "nicht gefunden" in response.json()["message"]
+
+        # No Bestellung should be created
+        assert Bestellung.objects.count() == initial_bestellung_count
 
 
 @pytest.mark.django_db
@@ -374,7 +688,12 @@ class TestMitarbeiterView:
         self.user = User.objects.create_user(username="gf", password="testpass")
         self.betrieb = Betrieb.objects.create(name="Test Betrieb")
         self.geschaeftsfuehrer = Person.objects.create(
-            benutzer=self.user, vorname="Boss", nachname="Person", betrieb=self.betrieb
+            benutzer=self.user,
+            vorname="Boss",
+            nachname="Person",
+            betrieb=self.betrieb,
+            is_activated=True,
+            can_book_schulungen=True,
         )
         self.betrieb.geschaeftsfuehrer = self.geschaeftsfuehrer
         self.betrieb.save()
@@ -400,7 +719,7 @@ class TestMySchulungenView:
         self.client = Client()
         self.user = User.objects.create_user(username="testuser", password="testpass")
         self.person = Person.objects.create(
-            benutzer=self.user, vorname="Test", nachname="User"
+            benutzer=self.user, vorname="Test", nachname="User", is_activated=True
         )
 
     def test_my_schulungen_requires_authentication(self):
@@ -445,7 +764,12 @@ class TestDocumentsView:
         self.user = User.objects.create_user(username="testuser", password="testpass")
         self.funktion = Funktion.objects.create(name="Meister")
         self.person = Person.objects.create(
-            benutzer=self.user, vorname="Test", nachname="User", funktion=self.funktion
+            benutzer=self.user,
+            vorname="Test",
+            nachname="User",
+            funktion=self.funktion,
+            is_activated=True,
+            can_book_schulungen=True,
         )
 
     def test_documents_requires_authentication(self):
@@ -497,7 +821,7 @@ class TestLogoutView:
         self.client = Client()
 
     def test_logout_redirects_to_index(self):
-        user = User.objects.create_user(username="testuser", password="testpass")
+        User.objects.create_user(username="testuser", password="testpass")
         self.client.login(username="testuser", password="testpass")
 
         response = self.client.get(reverse("logout"))

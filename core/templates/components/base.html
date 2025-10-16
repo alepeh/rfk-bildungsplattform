@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html data-bs-theme="light" lang="de">
 <head>
-    <title>{% block title %}{% endblock %}</title>
+    <title>{% block title %}Bildungsplattform - RFK Burgenland{% endblock %}</title>
     {% load django_bootstrap5 %}
     {% load bootstrap_icons %}
     {% load static %}
@@ -116,7 +116,10 @@
                 </li>
                 {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                    <a class="nav-link" href="{% url 'login' %}">Anmelden</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'account_register' %}">Registrieren</a>
                 </li>
                 {% endif %}
             </ul>

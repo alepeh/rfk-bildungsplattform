@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+
 import os
 import sys
 from pathlib import Path
@@ -47,6 +48,8 @@ if IS_PRODUCTION:
     ALLOWED_HOSTS = [
         "bildungsplattform.rauchfangkehrer.or.at",
         "www.bildungsplattform.rauchfangkehrer.or.at",
+        "bildungsplattform.rauchfangkehrer-bgld.at",
+        "www.bildungsplattform.rauchfangkehrer-bgld.at",
     ]
 elif IS_STAGING:
     ALLOWED_HOSTS = [
@@ -82,6 +85,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://3e13a2a1-5eb4-431b-a41d-ebc0c9e89c46-00-1pfa686cbln1x.janeway.replit.dev",
     "https://bildungsplattform-test.rauchfangkehrer.or.at",
     "https://bildungsplattform.rauchfangkehrer.or.at",
+    "https://bildungsplattform.rauchfangkehrer-bgld.at",
     "https://rfk-bildungsplattform-alexanderpehm.replit.app",
 ]
 
@@ -129,6 +133,7 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "core.context_processors.test_system",
                 "core.context_processors.person_context",
+                "core.context_processors.site_domain",
             ],
         },
     },
@@ -144,6 +149,11 @@ DATABASES = {
         "PASSWORD": os.getenv("PGPASSWORD"),
         "HOST": os.getenv("PGHOST"),
         "PORT": os.getenv("PGPORT"),
+        "OPTIONS": {
+            "sslmode": os.getenv(
+                "PGSSLMODE", "disable" if ENVIRONMENT == "test" else "require"
+            ),  # Disable SSL for test environment
+        },
     }
 }
 
@@ -230,8 +240,8 @@ if IS_PRODUCTION:
     # Session security
     SESSION_COOKIE_HTTPONLY = True
     CSRF_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = "Strict"
-    CSRF_COOKIE_SAMESITE = "Strict"
+    SESSION_COOKIE_SAMESITE = "Lax"
+    CSRF_COOKIE_SAMESITE = "Lax"
 
     # Additional security
     SECURE_REFERRER_POLICY = "same-origin"

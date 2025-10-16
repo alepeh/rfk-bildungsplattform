@@ -5,6 +5,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 from ..models import SchulungsTermin
+from ..utils import get_site_domain
 
 
 def get_google_maps_url(schulungsort):
@@ -33,8 +34,9 @@ def get_google_maps_url(schulungsort):
     return f"https://www.google.com/maps/search/?api=1&query={encoded_address}"
 
 
-def send_reminder_to_all_teilnehmer(schulungsterminId):
+def send_reminder_to_all_teilnehmer(schulungsterminId, request=None):
     schulungstermin = SchulungsTermin.objects.get(pk=schulungsterminId)
+    site_domain = get_site_domain(request)
 
     emails = list(
         schulungstermin.schulungsteilnehmer_set.exclude(email__isnull=True).values_list(
@@ -56,15 +58,17 @@ def send_reminder_to_all_teilnehmer(schulungsterminId):
             "schulungstermin": schulungstermin,
             "schulung_beginn": schulung_beginn,
             "google_maps_url": google_maps_url,
+            "site_domain": site_domain,
         },
     )
 
     send_email(subject, html_content, emails)
 
 
-def send_order_confirmation_email(to_email, bestellung):
+def send_order_confirmation_email(to_email, bestellung, request=None):
     subject = "Bestellbestätigung"
     schulung_beginn = bestellung.schulungstermin.datum_von.strftime("%d.%m.%Y um %H:%M")
+    site_domain = get_site_domain(request)
 
     # Generate Google Maps URL if location exists
     google_maps_url = get_google_maps_url(bestellung.schulungstermin.ort)
@@ -76,6 +80,7 @@ def send_order_confirmation_email(to_email, bestellung):
             "bestellung": bestellung,
             "schulung_beginn": schulung_beginn,
             "google_maps_url": google_maps_url,
+            "site_domain": site_domain,
         },
     )
 
@@ -110,3 +115,42 @@ def send_email(subject, message, to_emails):
         )
         print(response.json())
         response.raise_for_status()
+
+
+def send_admin_registration_notification(person, request=None):
+    """
+    Send notification email to administrators about new user registration.
+    """
+    # Send notification only to the main admin email address
+    admin_emails = ["bildungsplattform@rauchfangkehrer.or.at"]
+    site_domain = get_site_domain(request)
+
+    subject = f"Neue Registrierung: {person.vorname} {person.nachname} - Aktivierung erforderlich"
+
+    html_content = render_to_string(
+        "emails/admin_registration_notification.html",
+        {
+            "person": person,
+            "site_domain": site_domain,
+        },
+    )
+
+    send_email(subject, html_content, admin_emails)
+
+
+def send_user_activation_notification(person, request=None):
+    """
+    Send confirmation email to user after account activation.
+    """
+    site_domain = get_site_domain(request)
+    subject = "Ihr Konto wurde aktiviert - Bildungsplattform der burgenländischen Rauchfangkehrer"
+
+    html_content = render_to_string(
+        "emails/user_activation_notification.html",
+        {
+            "person": person,
+            "site_domain": site_domain,
+        },
+    )
+
+    send_email(subject, html_content, [person.email])
