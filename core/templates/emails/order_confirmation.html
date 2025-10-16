@@ -1,0 +1,104 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Bestellbestätigung - {{ bestellung.schulungstermin.schulung.name }}{% endblock %}
+
+{% block header %}Bestellbestätigung{% endblock %}
+
+{% block content %}
+<h2>Ihre Bestellung war erfolgreich</h2>
+
+<p>Sehr geehrte Damen und Herren,</p>
+
+<p>vielen Dank für Ihre Bestellung. Hiermit bestätigen wir Ihre Anmeldung für die folgende Schulung:</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <strong>Bestellnummer:</strong> {{ bestellung.id }}
+    </div>
+    <div class="info-row">
+        <strong>Schulung:</strong> {{ bestellung.schulungstermin.schulung.name }}
+    </div>
+    <div class="info-row">
+        <strong>Datum:</strong> {{ schulung_beginn }}
+    </div>
+    {% if bestellung.schulungstermin.dauer %}
+    <div class="info-row">
+        <strong>Dauer:</strong> {{ bestellung.schulungstermin.dauer }}
+    </div>
+    {% endif %}
+    <div class="info-row">
+        <strong>Anzahl Teilnehmer:</strong> {{ bestellung.anzahl }}
+    </div>
+    <div class="info-row">
+        <strong>Gesamtpreis:</strong> €{{ bestellung.gesamtpreis }}
+    </div>
+</div>
+
+{% if bestellung.schulungstermin.ort %}
+<div class="location-section">
+    <h3>Veranstaltungsort</h3>
+    <div class="location-details">
+        <div class="detail-row">
+            <span class="detail-label">Ort:</span>
+            <strong>{{ bestellung.schulungstermin.ort.name }}</strong>
+        </div>
+        {% if bestellung.schulungstermin.ort.adresse %}
+        <div class="detail-row">
+            <span class="detail-label">Adresse:</span>
+            {{ bestellung.schulungstermin.ort.adresse }}
+            {% if bestellung.schulungstermin.ort.plz or bestellung.schulungstermin.ort.ort %}
+            <br>
+            <span class="detail-label"></span>
+            {% if bestellung.schulungstermin.ort.plz %}{{ bestellung.schulungstermin.ort.plz }}{% endif %}
+            {% if bestellung.schulungstermin.ort.ort %}{{ bestellung.schulungstermin.ort.ort }}{% endif %}
+            {% endif %}
+        </div>
+        {% endif %}
+        {% if bestellung.schulungstermin.ort.kontakt %}
+        <div class="detail-row">
+            <span class="detail-label">Kontaktperson:</span>
+            {{ bestellung.schulungstermin.ort.kontakt }}
+        </div>
+        {% endif %}
+        {% if bestellung.schulungstermin.ort.telefon %}
+        <div class="detail-row">
+            <span class="detail-label">Telefon:</span>
+            <a href="tel:{{ bestellung.schulungstermin.ort.telefon }}">{{ bestellung.schulungstermin.ort.telefon }}</a>
+        </div>
+        {% endif %}
+        {% if bestellung.schulungstermin.ort.email %}
+        <div class="detail-row">
+            <span class="detail-label">E-Mail:</span>
+            <a href="mailto:{{ bestellung.schulungstermin.ort.email }}">{{ bestellung.schulungstermin.ort.email }}</a>
+        </div>
+        {% endif %}
+        {% if bestellung.schulungstermin.ort.hinweise %}
+        <div class="detail-row" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ffcc80;">
+            <span class="detail-label">Hinweise:</span>
+            <div style="margin-top: 5px;">{{ bestellung.schulungstermin.ort.hinweise }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if google_maps_url %}
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="{{ google_maps_url }}" class="btn" target="_blank">📍 Route in Google Maps anzeigen</a>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<hr class="divider">
+
+<p><strong>Wichtige Hinweise:</strong></p>
+<ul style="line-height: 1.8;">
+    <li>Die Rechnung wird separat zugestellt und ist vor Schulungsbeginn zu begleichen.</li>
+    <li>Weitere Details zur Schulung erhalten Sie rechtzeitig per E-Mail.</li>
+</ul>
+
+<p>Bei Fragen oder Änderungswünschen kontaktieren Sie uns bitte unter:<br>
+<a href="mailto:bildungsplattform@rauchfangkehrer.or.at">bildungsplattform@rauchfangkehrer.or.at</a></p>
+
+<p>Mit freundlichen Grüßen,<br>
+<strong>Ihr Team der Bildungsplattform</strong></p>
+{% endblock %}

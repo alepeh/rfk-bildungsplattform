@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Bildungsplattform{% endblock %}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            color: #333333;
+        }
+        .email-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .email-header {
+            background-color: #c41e3a;
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .email-body {
+            padding: 40px 30px;
+            line-height: 1.6;
+        }
+        .email-body h2 {
+            color: #c41e3a;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #c41e3a;
+            padding-bottom: 10px;
+        }
+        .email-body p {
+            margin: 0 0 15px 0;
+        }
+        .info-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #c41e3a;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .info-box strong {
+            color: #c41e3a;
+            display: inline-block;
+            width: 140px;
+        }
+        .info-row {
+            margin-bottom: 10px;
+        }
+        .location-section {
+            background-color: #fff8e1;
+            border: 1px solid #ffcc80;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .location-section h3 {
+            color: #e65100;
+            font-size: 18px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .location-section h3:before {
+            content: "📍 ";
+            margin-right: 8px;
+            font-size: 20px;
+        }
+        .location-details {
+            line-height: 1.8;
+        }
+        .location-details .detail-row {
+            margin-bottom: 8px;
+        }
+        .location-details .detail-label {
+            font-weight: 600;
+            color: #555;
+            display: inline-block;
+            width: 110px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #c41e3a;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        .btn:hover {
+            background-color: #a01629;
+        }
+        .email-footer {
+            background-color: #333333;
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .email-footer a {
+            color: #ffcc80;
+            text-decoration: none;
+        }
+        .divider {
+            border: 0;
+            border-top: 1px solid #e0e0e0;
+            margin: 25px 0;
+        }
+        a {
+            color: #c41e3a;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        @media only screen and (max-width: 600px) {
+            .email-body {
+                padding: 30px 20px;
+            }
+            .info-box strong {
+                display: block;
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            .location-details .detail-label {
+                display: block;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-header">
+            <h1>{% block header %}Bildungsplattform der burgenländischen Rauchfangkehrer{% endblock %}</h1>
+        </div>
+
+        <div class="email-body">
+            {% block content %}{% endblock %}
+        </div>
+
+        <div class="email-footer">
+            <p><strong>WTG Burgenland</strong></p>
+            <p>Bildungsplattform der burgenländischen Rauchfangkehrer</p>
+            <p>
+                <a href="https://bildungsplattform.rauchfangkehrer.or.at">bildungsplattform.rauchfangkehrer.or.at</a><br>
+                E-Mail: <a href="mailto:bildungsplattform@rauchfangkehrer.or.at">bildungsplattform@rauchfangkehrer.or.at</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,91 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Schulungserinnerung - {{ schulungstermin.schulung }}{% endblock %}
+
+{% block header %}Erinnerung: Schulungstermin{% endblock %}
+
+{% block content %}
+<h2>Schulungstermin am {{ schulung_beginn }}</h2>
+
+<p>Sehr geehrte Damen und Herren,</p>
+
+<p>hiermit erinnern wir Sie an Ihren bevorstehenden Schulungstermin.</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <strong>Schulung:</strong> {{ schulungstermin.schulung }}
+    </div>
+    <div class="info-row">
+        <strong>Termin:</strong> {{ schulung_beginn }}
+    </div>
+    {% if schulungstermin.dauer %}
+    <div class="info-row">
+        <strong>Dauer:</strong> {{ schulungstermin.dauer }}
+    </div>
+    {% endif %}
+</div>
+
+{% if schulungstermin.ort %}
+<div class="location-section">
+    <h3>Veranstaltungsort</h3>
+    <div class="location-details">
+        <div class="detail-row">
+            <span class="detail-label">Ort:</span>
+            <strong>{{ schulungstermin.ort.name }}</strong>
+        </div>
+        {% if schulungstermin.ort.adresse %}
+        <div class="detail-row">
+            <span class="detail-label">Adresse:</span>
+            {{ schulungstermin.ort.adresse }}
+            {% if schulungstermin.ort.plz or schulungstermin.ort.ort %}
+            <br>
+            <span class="detail-label"></span>
+            {% if schulungstermin.ort.plz %}{{ schulungstermin.ort.plz }}{% endif %}
+            {% if schulungstermin.ort.ort %}{{ schulungstermin.ort.ort }}{% endif %}
+            {% endif %}
+        </div>
+        {% endif %}
+        {% if schulungstermin.ort.kontakt %}
+        <div class="detail-row">
+            <span class="detail-label">Kontaktperson:</span>
+            {{ schulungstermin.ort.kontakt }}
+        </div>
+        {% endif %}
+        {% if schulungstermin.ort.telefon %}
+        <div class="detail-row">
+            <span class="detail-label">Telefon:</span>
+            <a href="tel:{{ schulungstermin.ort.telefon }}">{{ schulungstermin.ort.telefon }}</a>
+        </div>
+        {% endif %}
+        {% if schulungstermin.ort.email %}
+        <div class="detail-row">
+            <span class="detail-label">E-Mail:</span>
+            <a href="mailto:{{ schulungstermin.ort.email }}">{{ schulungstermin.ort.email }}</a>
+        </div>
+        {% endif %}
+        {% if schulungstermin.ort.hinweise %}
+        <div class="detail-row" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ffcc80;">
+            <span class="detail-label">Hinweise:</span>
+            <div style="margin-top: 5px;">{{ schulungstermin.ort.hinweise }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if google_maps_url %}
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="{{ google_maps_url }}" class="btn" target="_blank">📍 Route in Google Maps anzeigen</a>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<hr class="divider">
+
+<p>Weitere Informationen finden Sie auf der Bildungsplattform:<br>
+<a href="https://bildungsplattform.rauchfangkehrer.or.at">https://bildungsplattform.rauchfangkehrer.or.at</a></p>
+
+<p>Wir freuen uns auf Ihre Teilnahme und darauf, eine informative und bereichernde Schulung mit Ihnen zu erleben.</p>
+
+<p>Mit freundlichen Grüßen,<br>
+<strong>WTG Burgenland</strong></p>
+{% endblock %}
