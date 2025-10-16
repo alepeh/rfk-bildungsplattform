@@ -2,8 +2,8 @@
 {% load bootstrap_icons %}
 {% block content %}
 <div class="text-center mb-5">
-    <h2 class="mb-3 fw-bold">Herzlich Willkommen auf der Bildungsplattform</h2>
-    <p class="lead text-muted">Hier könnt ihr euch direkt für die bereits geplanten Schulungen anmelden.</p>
+    <h2 class="mb-3 fw-bold">Herzlich willkommen auf der Bildungsplattform</h2>
+    <p class="lead text-muted">Hier können Sie sich direkt für die bereits geplanten Schulungen anmelden.</p>
 </div>
 <div class="row g-3 mb-4">
     {% if schulungstermine %}
@@ -57,7 +57,7 @@
                     
                         {% if user.is_authenticated %}
                             {% if person.betrieb in schulungstermin.registrierte_betriebe %}
-                                Dein Betrieb ist angemeldet
+                                Ihr Betrieb ist angemeldet
                             {% else %}
                                 {% if schulungstermin.freie_plaetze > 0 %}
                                     {% if person.betrieb and person.betrieb.geschaeftsfuehrer == person %}
