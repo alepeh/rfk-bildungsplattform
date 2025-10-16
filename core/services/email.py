@@ -125,7 +125,10 @@ def send_admin_registration_notification(person, request=None):
     admin_emails = ["bildungsplattform@rauchfangkehrer.or.at"]
     site_domain = get_site_domain(request)
 
-    subject = f"Neue Registrierung: {person.vorname} {person.nachname} - Aktivierung erforderlich"
+    subject = (
+        f"Neue Registrierung: {person.vorname} {person.nachname} - "
+        f"Aktivierung erforderlich"
+    )
 
     html_content = render_to_string(
         "emails/admin_registration_notification.html",
@@ -143,7 +146,10 @@ def send_user_activation_notification(person, request=None):
     Send confirmation email to user after account activation.
     """
     site_domain = get_site_domain(request)
-    subject = "Ihr Konto wurde aktiviert - Bildungsplattform der burgenländischen Rauchfangkehrer"
+    subject = (
+        "Ihr Konto wurde aktiviert - "
+        "Bildungsplattform der burgenländischen Rauchfangkehrer"
+    )
 
     html_content = render_to_string(
         "emails/user_activation_notification.html",
