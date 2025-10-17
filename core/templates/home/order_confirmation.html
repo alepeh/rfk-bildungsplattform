@@ -4,7 +4,7 @@
     <h1>Bestellbestätigung</h1>
 
     {% if bestellung %}
-        <p>Vielen Dank für Deine Bestellung. Deine Bestellung war erfolgreich. Die Rechnung wird separat zugestellt und ist vor dem Schulungstermin zu begleichen.</p>
+        <p>Vielen Dank für Ihre Bestellung. Ihre Bestellung war erfolgreich. Die Rechnung wird separat zugestellt und ist vor dem Schulungstermin zu begleichen.</p>
         <p>Bestellnummer: {{ bestellung.id }}</p>
         <p>Gesamtpreis: €{{ bestellung.gesamtpreis|default:"0.00" }}</p>
     {% else %}

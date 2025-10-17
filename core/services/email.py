@@ -1,9 +1,37 @@
+from urllib.parse import quote
+
 import requests
 from django.conf import settings
 from django.template.loader import render_to_string
 
 from ..models import SchulungsTermin
 from ..utils import get_site_domain
+
+
+def get_google_maps_url(schulungsort):
+    """Generate a Google Maps URL for the given SchulungsOrt"""
+    if not schulungsort:
+        return None
+
+    # Build address string
+    address_parts = []
+    if schulungsort.name:
+        address_parts.append(schulungsort.name)
+    if schulungsort.adresse:
+        address_parts.append(schulungsort.adresse)
+    if schulungsort.plz:
+        address_parts.append(schulungsort.plz)
+    if schulungsort.ort:
+        address_parts.append(schulungsort.ort)
+
+    if not address_parts:
+        return None
+
+    # Join and encode address
+    address = ", ".join(address_parts)
+    encoded_address = quote(address)
+
+    return f"https://www.google.com/maps/search/?api=1&query={encoded_address}"
 
 
 def send_reminder_to_all_teilnehmer(schulungsterminId, request=None):
@@ -16,43 +44,45 @@ def send_reminder_to_all_teilnehmer(schulungsterminId, request=None):
         )
     )
     schulung_beginn = schulungstermin.datum_von.strftime("%d.%m.%Y um %H:%M")
-    subject = f"Schulungserinnerung: {schulungstermin.schulung} am {schulung_beginn}"
+    subject = (
+        f"Schulungserinnerung: {schulungstermin.schulung} " f"am {schulung_beginn}"
+    )
 
-    html_content = f"""
-  <div class=\"email-content\">
-    <h2 class=\"email-heading\">Erinnerung: Schulungstermin am {schulung_beginn}</h2>
-    <p>Sehr geehrte Damen und Herren,</p>
-    <p>hiermit erinnern wir Sie an Ihren bevorstehenden Schulungstermin.</p>
-    <p><strong>Schulung:</strong> {schulungstermin.schulung}<br>
-    <strong>Termin:</strong> {schulung_beginn}<br>
-    <strong>Ort:</strong> {schulungstermin.ort}<br>
-    <p>Weitere Informationen finden Sie auf der Bildungsplattform: {site_domain}</p>
-    <p>Wir freuen uns auf Ihre Teilnahme und darauf, eine informative und bereichernde Schulung mit Ihnen zu erleben.</p>
-    <p>Mit freundlichen Grüßen,<br>WTG Burgenland<br>
-  </div>"""
+    # Generate Google Maps URL if location exists
+    google_maps_url = get_google_maps_url(schulungstermin.ort)
+
+    # Render template with context
+    html_content = render_to_string(
+        "emails/schulungsterminerinnerung.html",
+        {
+            "schulungstermin": schulungstermin,
+            "schulung_beginn": schulung_beginn,
+            "google_maps_url": google_maps_url,
+            "site_domain": site_domain,
+        },
+    )
 
     send_email(subject, html_content, emails)
 
 
-def send_order_confirmation_email(to_email, bestellung):
+def send_order_confirmation_email(to_email, bestellung, request=None):
     subject = "Bestellbestätigung"
-    html_message = f"""
-    <html>
-    <body>
-      <p>Sehr geehrte Damen und Herren,</p>
-      <p>Ihre Bestellung war erfolgreich.</p>
-      <p><strong>Bestellnummer:</strong> {bestellung.id}</p>
-      <p><strong>Gesamtpreis:</strong> €{bestellung.gesamtpreis}</p>
-      <p><strong>Schulungs-Termin:</strong> {bestellung.schulungstermin.schulung.name}</p>
-      <p><strong>Datum:</strong> {bestellung.schulungstermin.datum_von.strftime("%d.%m.%Y um %H:%M")}</p>
-      <p><strong>Ort:</strong> {bestellung.schulungstermin.ort.name}</p>
-      <p>Die Rechnung wird separat zugestellt und ist vor Schulungsbeginn zu begleichen.
-      </p>
-      <p>Vielen Dank für Ihre Bestellung.</p>
-      <p>Mit freundlichen Grüßen,<br>Ihr Team</p>
-    </body>
-    </html>
-    """
+    schulung_beginn = bestellung.schulungstermin.datum_von.strftime("%d.%m.%Y um %H:%M")
+    site_domain = get_site_domain(request)
+
+    # Generate Google Maps URL if location exists
+    google_maps_url = get_google_maps_url(bestellung.schulungstermin.ort)
+
+    # Render template with context
+    html_message = render_to_string(
+        "emails/order_confirmation.html",
+        {
+            "bestellung": bestellung,
+            "schulung_beginn": schulung_beginn,
+            "google_maps_url": google_maps_url,
+            "site_domain": site_domain,
+        },
+    )
 
     send_email(
         subject,
@@ -69,7 +99,7 @@ def send_email(subject, message, to_emails):
         data = {
             "from": {
                 "email": "bildungsplattform@rauchfangkehrer.or.at",
-                "name": "Bildungsplattform der burgenländischen Rauchfangkehrer",
+                "name": ("Bildungsplattform der burgenländischen " "Rauchfangkehrer"),
             },
             "to": [{"email": email_address}],
             "subject": subject,
@@ -78,7 +108,8 @@ def send_email(subject, message, to_emails):
         }
         print(data)
         response = requests.post(
-            "https://api.scaleway.com/transactional-email/v1alpha1/regions/fr-par/emails",
+            "https://api.scaleway.com/transactional-email"
+            "/v1alpha1/regions/fr-par/emails",
             json=data,
             headers=headers,
         )
@@ -94,7 +125,10 @@ def send_admin_registration_notification(person, request=None):
     admin_emails = ["bildungsplattform@rauchfangkehrer.or.at"]
     site_domain = get_site_domain(request)
 
-    subject = f"Neue Registrierung: {person.vorname} {person.nachname} - Aktivierung erforderlich"
+    subject = (
+        f"Neue Registrierung: {person.vorname} {person.nachname} - "
+        f"Aktivierung erforderlich"
+    )
 
     html_content = render_to_string(
         "emails/admin_registration_notification.html",
@@ -112,7 +146,10 @@ def send_user_activation_notification(person, request=None):
     Send confirmation email to user after account activation.
     """
     site_domain = get_site_domain(request)
-    subject = "Ihr Konto wurde aktiviert - Bildungsplattform der burgenländischen Rauchfangkehrer"
+    subject = (
+        "Ihr Konto wurde aktiviert - "
+        "Bildungsplattform der burgenländischen Rauchfangkehrer"
+    )
 
     html_content = render_to_string(
         "emails/user_activation_notification.html",

@@ -218,7 +218,7 @@ def confirm_order(request: HttpRequest):
 
             # Send confirmation email
             try:
-                send_order_confirmation_email(request.user.email, bestellung)
+                send_order_confirmation_email(request.user.email, bestellung, request)
             except Exception as e:
                 logger.error(
                     f"Failed to send order confirmation email for bestellung {bestellung.id}: {str(e)}"

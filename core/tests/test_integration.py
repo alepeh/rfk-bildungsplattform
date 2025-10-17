@@ -140,7 +140,11 @@ class TestCompleteRegistrationWorkflow:
         assert teilnehmer.filter(vorname="Jane", nachname="Smith").exists()
 
         # Verify email sent
-        mock_email.assert_called_once_with("user@example.com", bestellung)
+        mock_email.assert_called_once()
+        # Verify it was called with the correct email and bestellung (request is optional)
+        call_args = mock_email.call_args
+        assert call_args[0][0] == "user@example.com"
+        assert call_args[0][1] == bestellung
 
     def test_view_order_confirmation(self):
         """Step 4: View order confirmation"""
