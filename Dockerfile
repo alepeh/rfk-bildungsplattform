@@ -38,6 +38,7 @@ COPY nginx/ ./app/nginx/
 COPY bildungsplattform/ ./app/bildungsplattform/
 COPY core/ ./app/core/
 COPY erweiterungen/ ./app/erweiterungen
+COPY attached_assets/ ./app/attached_assets/
 
 COPY manage.py ./app/
 
