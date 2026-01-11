@@ -499,3 +499,220 @@ class TestUserSchulungsHistory:
             schulungstermin__schulung=completed_schulung
         ).first()
         assert schulung_with_materials.schulungstermin.schulung.unterlagen.exists()
+
+
+@pytest.mark.django_db
+class TestOrganisationDiscountPricing:
+    """Test that organisation discount pricing works correctly based on preisrabatt flag"""
+
+    def setup_method(self):
+        self.client = Client()
+
+        # Create organisation WITH discount enabled
+        self.org_with_discount = Organisation.objects.create(
+            name="Partner With Discount", preisrabatt=True
+        )
+
+        # Create organisation WITHOUT discount enabled
+        self.org_without_discount = Organisation.objects.create(
+            name="Partner Without Discount", preisrabatt=False
+        )
+
+        # Create course with both prices
+        self.schulung = Schulung.objects.create(
+            name="Test Course",
+            beschreibung="Test course for discount testing",
+            preis_standard=Decimal("200.00"),
+            preis_rabattiert=Decimal("150.00"),
+        )
+        self.termin = SchulungsTermin.objects.create(
+            datum_von=timezone.now() + timedelta(days=14),
+            datum_bis=timezone.now() + timedelta(days=14, hours=8),
+            schulung=self.schulung,
+            max_teilnehmer=20,
+            buchbar=True,
+        )
+
+    def test_checkout_shows_discounted_price_for_org_with_discount(self):
+        """Person with organisation that has preisrabatt=True should see discounted price"""
+        user = User.objects.create_user(
+            username="user_with_discount", password="testpass", email="discount@example.com"
+        )
+        person = Person.objects.create(
+            benutzer=user,
+            vorname="Discount",
+            nachname="User",
+            organisation=self.org_with_discount,
+            is_activated=True,
+            can_book_schulungen=True,
+        )
+
+        self.client.login(username="user_with_discount", password="testpass")
+        response = self.client.get(reverse("checkout", args=[self.termin.id]))
+
+        assert response.status_code == 200
+        assert response.context["preis"] == Decimal("150.00")  # Discounted price
+
+    def test_checkout_shows_standard_price_for_org_without_discount(self):
+        """Person with organisation that has preisrabatt=False should see standard price"""
+        user = User.objects.create_user(
+            username="user_no_discount", password="testpass", email="nodiscount@example.com"
+        )
+        person = Person.objects.create(
+            benutzer=user,
+            vorname="NoDiscount",
+            nachname="User",
+            organisation=self.org_without_discount,
+            is_activated=True,
+            can_book_schulungen=True,
+        )
+
+        self.client.login(username="user_no_discount", password="testpass")
+        response = self.client.get(reverse("checkout", args=[self.termin.id]))
+
+        assert response.status_code == 200
+        assert response.context["preis"] == Decimal("200.00")  # Standard price
+
+    def test_checkout_shows_standard_price_for_person_without_org(self):
+        """Person without any organisation should see standard price"""
+        user = User.objects.create_user(
+            username="user_no_org", password="testpass", email="noorg@example.com"
+        )
+        person = Person.objects.create(
+            benutzer=user,
+            vorname="NoOrg",
+            nachname="User",
+            organisation=None,
+            is_activated=True,
+            can_book_schulungen=True,
+        )
+
+        self.client.login(username="user_no_org", password="testpass")
+        response = self.client.get(reverse("checkout", args=[self.termin.id]))
+
+        assert response.status_code == 200
+        assert response.context["preis"] == Decimal("200.00")  # Standard price
+
+    @patch("core.views.checkout_view.send_order_confirmation_email")
+    def test_order_uses_discounted_price_for_org_with_discount(self, mock_email):
+        """Order should use discounted price when organisation has preisrabatt=True"""
+        user = User.objects.create_user(
+            username="order_discount", password="testpass", email="orderdiscount@example.com"
+        )
+        person = Person.objects.create(
+            benutzer=user,
+            vorname="OrderDiscount",
+            nachname="User",
+            organisation=self.org_with_discount,
+            is_activated=True,
+            can_book_schulungen=True,
+        )
+
+        self.client.login(username="order_discount", password="testpass")
+        response = self.client.post(
+            reverse("confirm_order"),
+            {
+                "schulungstermin_id": self.termin.id,
+                "quantity": "1",
+                "firstname-0": "Test",
+                "lastname-0": "Person",
+                "email-0": "test@example.com",
+                "meal-0": "Standard",
+                "rechnungsadresse_name": "Test",
+                "rechnungsadresse_strasse": "Teststr 1",
+                "rechnungsadresse_plz": "1010",
+                "rechnungsadresse_ort": "Wien",
+            },
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+
+        bestellung = Bestellung.objects.get(id=data["bestellung_id"])
+        assert bestellung.einzelpreis == Decimal("150.00")  # Discounted price
+        assert bestellung.gesamtpreis == Decimal("150.00")
+
+    @patch("core.views.checkout_view.send_order_confirmation_email")
+    def test_order_uses_standard_price_for_org_without_discount(self, mock_email):
+        """Order should use standard price when organisation has preisrabatt=False"""
+        user = User.objects.create_user(
+            username="order_no_discount", password="testpass", email="ordernodiscount@example.com"
+        )
+        person = Person.objects.create(
+            benutzer=user,
+            vorname="OrderNoDiscount",
+            nachname="User",
+            organisation=self.org_without_discount,
+            is_activated=True,
+            can_book_schulungen=True,
+        )
+
+        self.client.login(username="order_no_discount", password="testpass")
+        response = self.client.post(
+            reverse("confirm_order"),
+            {
+                "schulungstermin_id": self.termin.id,
+                "quantity": "2",
+                "firstname-0": "Test",
+                "lastname-0": "Person1",
+                "email-0": "test1@example.com",
+                "meal-0": "Standard",
+                "firstname-1": "Test",
+                "lastname-1": "Person2",
+                "email-1": "test2@example.com",
+                "meal-1": "Vegetarisch",
+                "rechnungsadresse_name": "Test",
+                "rechnungsadresse_strasse": "Teststr 1",
+                "rechnungsadresse_plz": "1010",
+                "rechnungsadresse_ort": "Wien",
+            },
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+
+        bestellung = Bestellung.objects.get(id=data["bestellung_id"])
+        assert bestellung.einzelpreis == Decimal("200.00")  # Standard price
+        assert bestellung.gesamtpreis == Decimal("400.00")  # 2 x 200
+
+    @patch("core.views.checkout_view.send_order_confirmation_email")
+    def test_order_uses_standard_price_for_person_without_org(self, mock_email):
+        """Order should use standard price when person has no organisation"""
+        user = User.objects.create_user(
+            username="order_no_org", password="testpass", email="ordernoorg@example.com"
+        )
+        person = Person.objects.create(
+            benutzer=user,
+            vorname="OrderNoOrg",
+            nachname="User",
+            organisation=None,
+            is_activated=True,
+            can_book_schulungen=True,
+        )
+
+        self.client.login(username="order_no_org", password="testpass")
+        response = self.client.post(
+            reverse("confirm_order"),
+            {
+                "schulungstermin_id": self.termin.id,
+                "quantity": "1",
+                "firstname-0": "Test",
+                "lastname-0": "Person",
+                "email-0": "test@example.com",
+                "meal-0": "Standard",
+                "rechnungsadresse_name": "Test",
+                "rechnungsadresse_strasse": "Teststr 1",
+                "rechnungsadresse_plz": "1010",
+                "rechnungsadresse_ort": "Wien",
+            },
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+
+        bestellung = Bestellung.objects.get(id=data["bestellung_id"])
+        assert bestellung.einzelpreis == Decimal("200.00")  # Standard price
+        assert bestellung.gesamtpreis == Decimal("200.00")
