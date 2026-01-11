@@ -16,18 +16,14 @@ from django.conf import settings
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
 from django.contrib.messages.storage.fallback import FallbackStorage
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, TestCase
 
 from core.admin import SchulungsTeilnehmerAdmin
 from core.models import SchulungsTeilnehmer
 from core.services.certificate import generate_teilnahmebestaetigung
 from core.services.email import send_teilnahmebestaetigung_email
 
-from .factories import (
-    PersonFactory,
-    SchulungsTerminFactory,
-    SchulungsTeilnehmerFactory,
-)
+from .factories import PersonFactory, SchulungsTeilnehmerFactory, SchulungsTerminFactory
 
 
 class TestCertificateGeneration(TestCase):

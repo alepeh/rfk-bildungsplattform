@@ -318,8 +318,7 @@ def download_teilnahmebestaetigung(request, pk):
         if schulungsteilnehmer.person != person:
             messages.error(
                 request,
-                "Sie haben keine Berechtigung, "
-                "dieses Zertifikat herunterzuladen.",
+                "Sie haben keine Berechtigung, " "dieses Zertifikat herunterzuladen.",
             )
             return redirect("my_schulungen")
     except Person.DoesNotExist:

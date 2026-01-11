@@ -37,7 +37,7 @@ def generate_teilnahmebestaetigung(schulungsteilnehmer):
     schulung_name = schulung.name
     dauer = schulungstermin.dauer or ""
 
-    # Load and draw the background template image (clean version without placeholder text)
+    # Load and draw the background template image (clean version)
     template_path = os.path.join(
         settings.BASE_DIR, "attached_assets", "Teilnahmebestätigung_template_v1.png"
     )
