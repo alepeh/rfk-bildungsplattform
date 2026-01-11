@@ -1,3 +1,4 @@
+import base64
 from urllib.parse import quote
 
 import requests
@@ -115,6 +116,89 @@ def send_email(subject, message, to_emails):
         )
         print(response.json())
         response.raise_for_status()
+
+
+def send_teilnahmebestaetigung_email(schulungsteilnehmer, request=None):
+    """
+    Send Teilnahmebestätigung (completion certificate) email with PDF attachment.
+
+    Args:
+        schulungsteilnehmer: SchulungsTeilnehmer instance
+        request: Optional request object for domain context
+    """
+    from .certificate import generate_teilnahmebestaetigung
+
+    # Get email address
+    if schulungsteilnehmer.person:
+        email_address = schulungsteilnehmer.person.email
+        vorname = schulungsteilnehmer.person.vorname
+        nachname = schulungsteilnehmer.person.nachname
+        name = f"{vorname} {nachname}"
+    else:
+        email_address = schulungsteilnehmer.email
+        name = f"{schulungsteilnehmer.vorname} {schulungsteilnehmer.nachname}"
+
+    if not email_address:
+        raise ValueError("Keine E-Mail-Adresse für Teilnehmer verfügbar")
+
+    # Generate PDF certificate
+    pdf_buffer = generate_teilnahmebestaetigung(schulungsteilnehmer)
+    pdf_content = pdf_buffer.read()
+    pdf_base64 = base64.b64encode(pdf_content).decode("utf-8")
+
+    # Prepare email data
+    schulung = schulungsteilnehmer.schulungstermin.schulung
+    datum = schulungsteilnehmer.schulungstermin.datum_von.strftime("%d.%m.%Y")
+    site_domain = get_site_domain(request)
+
+    subject = f"Teilnahmebestätigung: {schulung.name}"
+
+    # Render email template
+    html_content = render_to_string(
+        "emails/teilnahmebestaetigung.html",
+        {
+            "schulungsteilnehmer": schulungsteilnehmer,
+            "schulung": schulung,
+            "datum": datum,
+            "name": name,
+            "site_domain": site_domain,
+        },
+    )
+
+    # Send email with attachment
+    headers = {
+        "X-Auth-Token": settings.SCALEWAY_EMAIL_API_TOKEN,
+    }
+
+    data = {
+        "from": {
+            "email": "bildungsplattform@rauchfangkehrer.or.at",
+            "name": "Bildungsplattform der burgenländischen Rauchfangkehrer",
+        },
+        "to": [{"email": email_address}],
+        "subject": subject,
+        "html": html_content,
+        "project_id": "03bc621b-579e-4758-8b97-87f6406b2a38",
+        "attachments": [
+            {
+                "name": (
+                    f"Teilnahmebestaetigung_{schulung.name.replace(' ', '_')}"
+                    f"_{datum}.pdf"
+                ),
+                "type": "application/pdf",
+                "content": pdf_base64,
+            }
+        ],
+    }
+
+    print(f"Sending Teilnahmebestätigung to {email_address}")
+    response = requests.post(
+        "https://api.scaleway.com/transactional-email/v1alpha1/regions/fr-par/emails",
+        json=data,
+        headers=headers,
+    )
+    print(response.json())
+    response.raise_for_status()
 
 
 def send_admin_registration_notification(person, request=None):

@@ -70,7 +70,8 @@ def activate_users(modeladmin, request, queryset):
         except Exception as e:
             messages.warning(
                 request,
-                f"Konto von {person.vorname} {person.nachname} wurde aktiviert, aber E-Mail-Benachrichtigung fehlgeschlagen: {e}",
+                f"Konto von {person.vorname} {person.nachname} wurde "
+                f"aktiviert, aber E-Mail-Benachrichtigung fehlgeschlagen: {e}",
             )
 
         activated_count += 1
@@ -78,7 +79,8 @@ def activate_users(modeladmin, request, queryset):
     if activated_count > 0:
         messages.success(
             request,
-            f"{activated_count} Benutzer wurde(n) erfolgreich aktiviert und benachrichtigt.",
+            f"{activated_count} Benutzer wurde(n) erfolgreich aktiviert "
+            "und benachrichtigt.",
         )
 
 
@@ -107,6 +109,133 @@ def deactivate_users(modeladmin, request, queryset):
 
 activate_users.short_description = "Ausgewählte Benutzer aktivieren und benachrichtigen"
 deactivate_users.short_description = "Ausgewählte Benutzer deaktivieren"
+
+
+def send_teilnahmebestaetigung(modeladmin, request, queryset):
+    """Admin action to send Teilnahmebestätigung emails for selected participants."""
+    from core.services.email import send_teilnahmebestaetigung_email
+
+    sent_count = 0
+    skipped_count = 0
+    error_count = 0
+
+    for teilnehmer in queryset:
+        # Only send for participants with "Teilgenommen" status
+        if teilnehmer.status != "Teilgenommen":
+            skipped_count += 1
+            continue
+
+        # Check if email address exists
+        email_address = None
+        if teilnehmer.person:
+            email_address = teilnehmer.person.email
+        elif teilnehmer.email:
+            email_address = teilnehmer.email
+
+        if not email_address:
+            skipped_count += 1
+            name_v = teilnehmer.vorname or teilnehmer.person.vorname
+            name_n = teilnehmer.nachname or teilnehmer.person.nachname
+            messages.warning(
+                request,
+                f"Keine E-Mail-Adresse für {name_v} {name_n}",
+            )
+            continue
+
+        # Send certificate email
+        try:
+            send_teilnahmebestaetigung_email(teilnehmer, request)
+            sent_count += 1
+        except Exception as e:
+            error_count += 1
+            messages.error(
+                request,
+                f"Fehler beim Senden an {email_address}: {e}",
+            )
+
+    # Success message
+    if sent_count > 0:
+        messages.success(
+            request,
+            f"{sent_count} Teilnahmebestätigung(en) erfolgreich versendet.",
+        )
+    if skipped_count > 0:
+        messages.info(
+            request,
+            f"{skipped_count} Teilnehmer übersprungen "
+            "(kein Status 'Teilgenommen' oder keine E-Mail).",
+        )
+    if error_count > 0:
+        messages.warning(
+            request,
+            f"{error_count} Fehler beim Versenden.",
+        )
+
+
+send_teilnahmebestaetigung.short_description = "Teilnahmebestätigung versenden"
+
+
+def send_teilnahmebestaetigung_for_termin(modeladmin, request, queryset):
+    """
+    Admin action to send Teilnahmebestätigung for all completed participants
+    of selected SchulungsTermin.
+    """
+    from core.services.email import send_teilnahmebestaetigung_email
+
+    sent_count = 0
+    skipped_count = 0
+    error_count = 0
+
+    for schulungstermin in queryset:
+        # Get all participants with status "Teilgenommen"
+        teilnehmer_list = schulungstermin.schulungsteilnehmer_set.filter(
+            status="Teilgenommen"
+        )
+
+        for teilnehmer in teilnehmer_list:
+            # Check if email address exists
+            email_address = None
+            if teilnehmer.person:
+                email_address = teilnehmer.person.email
+            elif teilnehmer.email:
+                email_address = teilnehmer.email
+
+            if not email_address:
+                skipped_count += 1
+                continue
+
+            # Send certificate email
+            try:
+                send_teilnahmebestaetigung_email(teilnehmer, request)
+                sent_count += 1
+            except Exception as e:
+                error_count += 1
+                messages.error(
+                    request,
+                    f"Fehler beim Senden an {email_address}: {e}",
+                )
+
+    # Success message
+    if sent_count > 0:
+        messages.success(
+            request,
+            f"{sent_count} Teilnahmebestätigung(en) erfolgreich versendet.",
+        )
+    if skipped_count > 0:
+        messages.info(
+            request,
+            f"{skipped_count} Teilnehmer übersprungen (keine E-Mail).",
+        )
+    if error_count > 0:
+        messages.warning(
+            request,
+            f"{error_count} Fehler beim Versenden.",
+        )
+
+
+send_teilnahmebestaetigung_for_termin.short_description = (
+    "Teilnahmebestätigung an alle Teilgenommenen versenden"
+)
 
 
 class PersonInline(admin.TabularInline):
@@ -208,7 +337,9 @@ class PersonAdmin(admin.ModelAdmin):
                     "activated_at",
                     "activated_by",
                 ),
-                "description": "Verwaltung der Kontoaktivierung für neue Registrierungen",
+                "description": (
+                    "Verwaltung der Kontoaktivierung für neue Registrierungen"
+                ),
             },
         ),
         (
@@ -265,7 +396,7 @@ class SchulungsTerminAdmin(admin.ModelAdmin):
     )
     inlines = (SchulungsTeilnehmerInline,)
     ordering = ("-datum_von",)
-    actions = [export_schulungsteilnehmer_to_csv]
+    actions = [export_schulungsteilnehmer_to_csv, send_teilnahmebestaetigung_for_termin]
 
     class Media:
         js = ("js/schulungsteilnehmer_admin.js",)
@@ -346,3 +477,36 @@ class DocumentAdmin(admin.ModelAdmin):
 
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(SchulungsUnterlage)
+
+
+class SchulungsTeilnehmerAdmin(admin.ModelAdmin):
+    list_display = (
+        "get_name",
+        "schulungstermin",
+        "status",
+        "verpflegung",
+        "email",
+    )
+    list_filter = ("status", "schulungstermin__schulung", "verpflegung")
+    search_fields = (
+        "vorname",
+        "nachname",
+        "email",
+        "person__vorname",
+        "person__nachname",
+        "person__email",
+    )
+    actions = [send_teilnahmebestaetigung]
+    ordering = ("-schulungstermin__datum_von",)
+
+    def get_name(self, obj):
+        """Display participant name from person or direct fields."""
+        if obj.person:
+            return f"{obj.person.vorname} {obj.person.nachname}"
+        return f"{obj.vorname} {obj.nachname}"
+
+    get_name.short_description = "Name"
+    get_name.admin_order_field = "person__nachname"
+
+
+admin.site.register(SchulungsTeilnehmer, SchulungsTeilnehmerAdmin)

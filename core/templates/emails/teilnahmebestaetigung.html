@@ -1,0 +1,58 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+    <h2>Herzlichen Glückwunsch zur erfolgreichen Schulungsteilnahme!</h2>
+
+    <p>Liebe/r {{ name }},</p>
+
+    <p>
+        wir freuen uns, Ihnen mitteilen zu können, dass Sie erfolgreich an der Schulung
+        <strong>{{ schulung.name }}</strong> am <strong>{{ datum }}</strong> teilgenommen haben.
+    </p>
+
+    <div class="info-box">
+        <div class="info-row">
+            <strong>Schulung:</strong> {{ schulung.name }}
+        </div>
+        <div class="info-row">
+            <strong>Datum:</strong> {{ datum }}
+        </div>
+        {% if schulungsteilnehmer.schulungstermin.dauer %}
+        <div class="info-row">
+            <strong>Umfang:</strong> {{ schulungsteilnehmer.schulungstermin.dauer }}
+        </div>
+        {% endif %}
+        {% if schulungsteilnehmer.schulungstermin.ort %}
+        <div class="info-row">
+            <strong>Ort:</strong> {{ schulungsteilnehmer.schulungstermin.ort }}
+        </div>
+        {% endif %}
+    </div>
+
+    <p>
+        Im Anhang dieser E-Mail finden Sie Ihre <strong>Teilnahmebestätigung</strong> als PDF-Dokument.
+    </p>
+
+    <p>
+        Sie können Ihre Teilnahmebestätigung auch jederzeit in Ihrem Profil unter
+        <strong>"Meine Schulungen"</strong> herunterladen:
+    </p>
+
+    <p style="text-align: center; margin: 30px 0;">
+        <a href="https://{{ site_domain }}/meine-schulungen/" class="btn">
+            Zu Meinen Schulungen
+        </a>
+    </p>
+
+    <hr class="divider">
+
+    <p>
+        Vielen Dank für Ihre Teilnahme und Ihr Engagement in der beruflichen Weiterbildung!
+    </p>
+
+    <p>
+        Mit freundlichen Grüßen<br>
+        <strong>Die burgenländischen Rauchfangkehrer</strong><br>
+        für Umwelt & Leben
+    </p>
+{% endblock %}

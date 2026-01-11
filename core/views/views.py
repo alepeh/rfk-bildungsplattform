@@ -172,8 +172,9 @@ def export_schulungsteilnehmer_pdf(request, pk):
     styles = getSampleStyleSheet()
     title_style = styles["Heading2"]
     title_style.alignment = 1  # Center alignment
+    schulung_datum = schulungstermin.datum_von.strftime("%d.%m.%Y")
     title = Paragraph(
-        f"{schulungstermin.schulung.name} - {schulungstermin.datum_von.strftime('%d.%m.%Y')}",
+        f"{schulungstermin.schulung.name} - {schulung_datum}",
         title_style,
     )
     elements.append(title)
@@ -294,6 +295,57 @@ def documents(request):
         documents = Document.objects.filter(allowed_funktionen__isnull=True)
 
     return render(request, "home/documents.html", {"documents": documents})
+
+
+@login_and_activation_required
+def download_teilnahmebestaetigung(request, pk):
+    """
+    Download Teilnahmebestätigung (completion certificate) for a specific
+    SchulungsTeilnehmer.
+
+    Security: Only the participant (person) can download their own certificate.
+    """
+    from core.services.certificate import generate_teilnahmebestaetigung
+
+    # Get the SchulungsTeilnehmer
+    schulungsteilnehmer = get_object_or_404(SchulungsTeilnehmer, pk=pk)
+
+    # Security check: Verify that the logged-in user owns this certificate
+    user = request.user
+    try:
+        person = Person.objects.get(benutzer=user)
+        # Check if this certificate belongs to the logged-in user
+        if schulungsteilnehmer.person != person:
+            messages.error(
+                request,
+                "Sie haben keine Berechtigung, "
+                "dieses Zertifikat herunterzuladen.",
+            )
+            return redirect("my_schulungen")
+    except Person.DoesNotExist:
+        messages.error(request, "Kein Personenprofil gefunden.")
+        return redirect("index")
+
+    # Check if status is "Teilgenommen"
+    if schulungsteilnehmer.status != "Teilgenommen":
+        messages.warning(
+            request, "Teilnahmebestätigung nur für abgeschlossene Schulungen verfügbar."
+        )
+        return redirect("my_schulungen")
+
+    # Generate PDF
+    pdf_buffer = generate_teilnahmebestaetigung(schulungsteilnehmer)
+
+    # Prepare filename
+    schulung_name = schulungsteilnehmer.schulungstermin.schulung.name.replace(" ", "_")
+    datum = schulungsteilnehmer.schulungstermin.datum_von.strftime("%Y-%m-%d")
+    filename = f"Teilnahmebestaetigung_{schulung_name}_{datum}.pdf"
+
+    # Create HTTP response with PDF
+    response = HttpResponse(pdf_buffer, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+
+    return response
 
 
 def terms_and_conditions(request: HttpRequest):

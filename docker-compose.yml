@@ -40,13 +40,14 @@ services:
       PGPASSWORD: localpassword
       PGHOST: db
       PGPORT: 5432
+      PGSSLMODE: disable
     depends_on:
       db:
         condition: service_healthy
     command: >
       sh -c "
-        python manage.py migrate &&
-        python manage.py runserver 0.0.0.0:8000
+        /opt/venv/bin/python manage.py migrate &&
+        /opt/venv/bin/python manage.py runserver 0.0.0.0:8000
       "
 
 volumes:

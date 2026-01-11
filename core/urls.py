@@ -48,4 +48,9 @@ urlpatterns = [
     ),
     path("documents/", views.documents, name="documents"),
     path("meine-schulungen/", views.my_schulungen, name="my_schulungen"),
+    path(
+        "teilnahmebestaetigung/<int:pk>/download/",
+        views.download_teilnahmebestaetigung,
+        name="download_certificate",
+    ),
 ]
