@@ -536,7 +536,9 @@ class TestOrganisationDiscountPricing:
     def test_checkout_shows_discounted_price_for_org_with_discount(self):
         """Person with organisation that has preisrabatt=True should see discounted price"""
         user = User.objects.create_user(
-            username="user_with_discount", password="testpass", email="discount@example.com"
+            username="user_with_discount",
+            password="testpass",
+            email="discount@example.com",
         )
         person = Person.objects.create(
             benutzer=user,
@@ -556,7 +558,9 @@ class TestOrganisationDiscountPricing:
     def test_checkout_shows_standard_price_for_org_without_discount(self):
         """Person with organisation that has preisrabatt=False should see standard price"""
         user = User.objects.create_user(
-            username="user_no_discount", password="testpass", email="nodiscount@example.com"
+            username="user_no_discount",
+            password="testpass",
+            email="nodiscount@example.com",
         )
         person = Person.objects.create(
             benutzer=user,
@@ -597,7 +601,9 @@ class TestOrganisationDiscountPricing:
     def test_order_uses_discounted_price_for_org_with_discount(self, mock_email):
         """Order should use discounted price when organisation has preisrabatt=True"""
         user = User.objects.create_user(
-            username="order_discount", password="testpass", email="orderdiscount@example.com"
+            username="order_discount",
+            password="testpass",
+            email="orderdiscount@example.com",
         )
         person = Person.objects.create(
             benutzer=user,
@@ -637,7 +643,9 @@ class TestOrganisationDiscountPricing:
     def test_order_uses_standard_price_for_org_without_discount(self, mock_email):
         """Order should use standard price when organisation has preisrabatt=False"""
         user = User.objects.create_user(
-            username="order_no_discount", password="testpass", email="ordernodiscount@example.com"
+            username="order_no_discount",
+            password="testpass",
+            email="ordernodiscount@example.com",
         )
         person = Person.objects.create(
             benutzer=user,
