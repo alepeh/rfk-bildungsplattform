@@ -31,8 +31,8 @@ def checkout(request: HttpRequest, schulungstermin_id: int):
         messages.error(request, "Sie haben keine Berechtigung, Schulungen zu buchen.")
         return redirect("index")
     print(person)
-    # Determine the price based on whether the person is related to an organisation
-    if person.organisation:
+    # Determine the price based on whether the person belongs to an organisation with discount
+    if person.organisation and person.organisation.preisrabatt:
         preis = schulungstermin.schulung.preis_rabattiert
     else:
         preis = schulungstermin.schulung.preis_standard
@@ -174,8 +174,8 @@ def confirm_order(request: HttpRequest):
                     }
                 )
 
-        # Determine price
-        if person.organisation:
+        # Determine price based on whether person belongs to an organisation with discount
+        if person.organisation and person.organisation.preisrabatt:
             preis = schulungstermin.schulung.preis_rabattiert
         else:
             preis = schulungstermin.schulung.preis_standard
