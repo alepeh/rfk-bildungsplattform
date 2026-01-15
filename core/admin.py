@@ -279,18 +279,25 @@ class SchulungsTeilnehmerInline(admin.TabularInline):
         "status",
     )
     readonly_fields = ("betrieb",)
-    ordering = ("person__betrieb",)
 
     def betrieb(self, obj):
-        return obj.person.betrieb
+        """Display the Betrieb from the linked Person, if available."""
+        if obj and obj.person:
+            return obj.person.betrieb
+        return "-"
+
+    betrieb.short_description = "Betrieb"
+
+    def get_queryset(self, request):
+        """Optimize queryset with select_related to prevent N+1 queries."""
+        qs = super().get_queryset(request)
+        return qs.select_related("person", "person__betrieb")
 
     def get_formset(self, request, obj=None, **kwargs):
         formset = super().get_formset(request, obj, **kwargs)
         form = formset.form
         form.base_fields["person"].widget.attrs["onchange"] = "populateFields(this);"
         return formset
-
-    betrieb.short_description = "Betrieb"
 
 
 class FunktionAdmin(admin.ModelAdmin):
