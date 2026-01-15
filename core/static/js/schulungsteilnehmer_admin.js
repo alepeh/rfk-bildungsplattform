@@ -3,15 +3,29 @@ function populateFields(select) {
     var personId = select.value;
     if (personId) {
         fetch('/admin/get_person_details/' + personId + '/')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
-                row.querySelector('input[name$="-vorname"]').value = data.vorname;
-                row.querySelector('input[name$="-nachname"]').value = data.nachname;
-                row.querySelector('input[name$="-email"]').value = data.email;
+                var vornameField = row.querySelector('input[name$="-vorname"]');
+                var nachnameField = row.querySelector('input[name$="-nachname"]');
+                var emailField = row.querySelector('input[name$="-email"]');
+                if (vornameField) vornameField.value = data.vorname || '';
+                if (nachnameField) nachnameField.value = data.nachname || '';
+                if (emailField) emailField.value = data.email || '';
+            })
+            .catch(error => {
+                console.error('Error fetching person details:', error);
             });
     } else {
-        row.querySelector('input[name$="-vorname"]').value = '';
-        row.querySelector('input[name$="-nachname"]').value = '';
-        row.querySelector('input[name$="-email"]').value = '';
+        var vornameField = row.querySelector('input[name$="-vorname"]');
+        var nachnameField = row.querySelector('input[name$="-nachname"]');
+        var emailField = row.querySelector('input[name$="-email"]');
+        if (vornameField) vornameField.value = '';
+        if (nachnameField) nachnameField.value = '';
+        if (emailField) emailField.value = '';
     }
 }
