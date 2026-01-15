@@ -20,12 +20,6 @@ function populateFields(select) {
             .catch(error => {
                 console.error('Error fetching person details:', error);
             });
-    } else {
-        var vornameField = row.querySelector('input[name$="-vorname"]');
-        var nachnameField = row.querySelector('input[name$="-nachname"]');
-        var emailField = row.querySelector('input[name$="-email"]');
-        if (vornameField) vornameField.value = '';
-        if (nachnameField) nachnameField.value = '';
-        if (emailField) emailField.value = '';
     }
+    // Do NOT clear fields when person is deselected - preserve existing data
 }
