@@ -420,8 +420,9 @@ class TestAdminCSVExportBugs:
         - Participants with Person but no Betrieb
         - External participants (no Person)
         """
-        from core.admin import export_schulungsteilnehmer_to_csv
         from django.test import RequestFactory
+
+        from core.admin import export_schulungsteilnehmer_to_csv
 
         betrieb = Betrieb.objects.create(name="Test Betrieb")
 
