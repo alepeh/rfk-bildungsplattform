@@ -223,7 +223,9 @@ class TestIndexTemplateForUsersWithoutBetrieb:
         assert "Buchen" in content, "User without Betrieb should see booking button"
         assert "Ihr Betrieb ist angemeldet" not in content
 
-    def test_user_without_betrieb_still_sees_button_after_other_user_without_betrieb_registers(self):
+    def test_user_without_betrieb_still_sees_button_after_other_user_without_betrieb_registers(
+        self,
+    ):
         """
         BUG: When another user without Betrieb registers for a course,
         all other users without Betrieb incorrectly see "Ihr Betrieb ist angemeldet"
@@ -270,11 +272,13 @@ class TestIndexTemplateForUsersWithoutBetrieb:
             "BUG: User without Betrieb incorrectly sees 'Ihr Betrieb ist angemeldet' "
             "just because another user without Betrieb has registered"
         )
-        assert "Buchen" in content, (
-            "User without Betrieb should still see booking button"
-        )
+        assert (
+            "Buchen" in content
+        ), "User without Betrieb should still see booking button"
 
-    def test_user_without_betrieb_sees_button_after_external_participant_registers(self):
+    def test_user_without_betrieb_sees_button_after_external_participant_registers(
+        self,
+    ):
         """
         BUG: When an external participant is registered (person=None),
         the template may crash or show incorrect message.
@@ -470,7 +474,9 @@ class TestAdminCSVExportBugs:
             content = response.content.decode("utf-8")
 
             # Verify all participants are included
-            assert "With Betrieb" in content or "With,Betrieb" in content.replace(" ", "")
+            assert "With Betrieb" in content or "With,Betrieb" in content.replace(
+                " ", ""
+            )
             assert "Without" in content
             assert "External" in content
 
@@ -636,7 +642,7 @@ class TestLegacyRegisterViewBugs:
         response = self.client.get(reverse("register", args=[self.termin.id]))
 
         # The response should be a redirect to index
-        assert response.status_code == 302, (
-            "Legacy register view should redirect users without Betrieb"
-        )
+        assert (
+            response.status_code == 302
+        ), "Legacy register view should redirect users without Betrieb"
         assert response.url == reverse("index")
