@@ -119,8 +119,21 @@ class SchulungsTermin(BaseModel):
 
     @property
     def registrierte_betriebe(self):
+        """
+        Returns a set of Betriebe that have participants registered for this course.
+
+        Excludes:
+        - External participants (person=None)
+        - Participants whose Person has no Betrieb (betrieb=None)
+        """
         betriebe = set()
         for schulungsteilnehmer in self.schulungsteilnehmer_set.all():
+            # Skip external participants (no linked Person)
+            if schulungsteilnehmer.person is None:
+                continue
+            # Skip participants without a Betrieb
+            if schulungsteilnehmer.person.betrieb is None:
+                continue
             betriebe.add(schulungsteilnehmer.person.betrieb)
         return betriebe
 
