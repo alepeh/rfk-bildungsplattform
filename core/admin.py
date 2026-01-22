@@ -22,25 +22,37 @@ from core.models import (
 
 
 def export_schulungsteilnehmer_to_csv(modeladmin, request, queryset):
-    # Define the HTTP response with the appropriate CSV header
+    """
+    Export all participants of selected SchulungsTermine to CSV.
+
+    Handles:
+    - Participants with linked Person and Betrieb
+    - Participants with linked Person but no Betrieb
+    - External participants (no linked Person)
+    """
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = 'attachment; filename="schulungsteilnehmer.csv"'
     writer = csv.writer(response)
-    # Write your CSV headers (adapt these fields as needed)
+    # Write CSV headers
     writer.writerow(["Person", "Betrieb", "Email", "Telefon", "DSV akzeptiert"])
     # Gather related SchulungsTeilnehmer instances and write them to the CSV
     for schulungstermin in queryset:
         for stp in schulungstermin.schulungsteilnehmer_set.all():
-            dsv_akzeptiert = "Ja" if stp.person.dsv_akzeptiert else "Nein"
-            writer.writerow(
-                [
-                    stp.person,
-                    stp.person.betrieb,
-                    stp.person.email,
-                    stp.person.telefon,
-                    dsv_akzeptiert,
-                ]
-            )
+            if stp.person:
+                # Participant has a linked Person record
+                person_name = f"{stp.person.vorname} {stp.person.nachname}"
+                betrieb = stp.person.betrieb.name if stp.person.betrieb else ""
+                email = stp.person.email or ""
+                telefon = stp.person.telefon or ""
+                dsv_akzeptiert = "Ja" if stp.person.dsv_akzeptiert else "Nein"
+            else:
+                # External participant (no Person record)
+                person_name = f"{stp.vorname} {stp.nachname}"
+                betrieb = ""
+                email = stp.email or ""
+                telefon = ""
+                dsv_akzeptiert = ""
+            writer.writerow([person_name, betrieb, email, telefon, dsv_akzeptiert])
     return response
 
 

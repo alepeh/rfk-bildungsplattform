@@ -79,7 +79,19 @@ def register(request: HttpRequest, id: int):
     except Person.DoesNotExist:
         messages.error(request, "Kein Personenprofil gefunden.")
         return redirect("index")
-    betrieb = Betrieb.objects.get(geschaeftsfuehrer=person)
+
+    # Check if user is a Geschäftsführer of a Betrieb
+    try:
+        betrieb = Betrieb.objects.get(geschaeftsfuehrer=person)
+    except Betrieb.DoesNotExist:
+        # User is not a Geschäftsführer - redirect to checkout flow instead
+        messages.info(
+            request,
+            "Diese Seite ist nur für Betriebsinhaber. "
+            "Bitte nutzen Sie die Buchungsfunktion auf der Startseite.",
+        )
+        return redirect("index")
+
     mitarbeiter = Person.objects.filter(betrieb=betrieb)
     schulungstermin = SchulungsTermin.objects.get(id=id)
     teilnehmer = SchulungsTeilnehmer.objects.filter(
