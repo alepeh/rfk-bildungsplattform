@@ -138,9 +138,9 @@ class TestTeilnahmebestaetigungEmail(TestCase):
 
         send_teilnahmebestaetigung_email(self.teilnehmer)
 
-        mock_post.assert_called_once()
-        call_args = mock_post.call_args
-        self.assertIn("api.scaleway.com", call_args[0][0])
+        self.assertEqual(mock_post.call_count, 2)
+        for call in mock_post.call_args_list:
+            self.assertIn("api.scaleway.com", call[0][0])
 
     @patch("core.services.email.requests.post")
     def test_send_email_includes_attachment(self, mock_post):
@@ -160,7 +160,7 @@ class TestTeilnahmebestaetigungEmail(TestCase):
 
     @patch("core.services.email.requests.post")
     def test_send_email_correct_recipient(self, mock_post):
-        """Test that email is sent to correct recipient."""
+        """Test that email is sent to participant and platform."""
         mock_response = MagicMock()
         mock_response.json.return_value = {"emails": [{"id": "test-id"}]}
         mock_response.raise_for_status = MagicMock()
@@ -168,9 +168,11 @@ class TestTeilnahmebestaetigungEmail(TestCase):
 
         send_teilnahmebestaetigung_email(self.teilnehmer)
 
-        call_args = mock_post.call_args
-        data = call_args[1]["json"]
-        self.assertEqual(data["to"][0]["email"], "max@example.com")
+        recipients = [
+            call[1]["json"]["to"][0]["email"] for call in mock_post.call_args_list
+        ]
+        self.assertIn("max@example.com", recipients)
+        self.assertIn("bildungsplattform@rauchfangkehrer.or.at", recipients)
 
     @patch("core.services.email.requests.post")
     def test_send_email_correct_subject(self, mock_post):
@@ -205,9 +207,11 @@ class TestTeilnahmebestaetigungEmail(TestCase):
 
         send_teilnahmebestaetigung_email(external_teilnehmer)
 
-        call_args = mock_post.call_args
-        data = call_args[1]["json"]
-        self.assertEqual(data["to"][0]["email"], "external@example.com")
+        recipients = [
+            call[1]["json"]["to"][0]["email"] for call in mock_post.call_args_list
+        ]
+        self.assertIn("external@example.com", recipients)
+        self.assertIn("bildungsplattform@rauchfangkehrer.or.at", recipients)
 
     def test_send_email_no_email_address_raises(self):
         """Test that sending email without email address raises ValueError."""
@@ -241,6 +245,47 @@ class TestTeilnahmebestaetigungEmail(TestCase):
         filename = data["attachments"][0]["name"]
         self.assertTrue(filename.startswith("Teilnahmebestaetigung_"))
         self.assertTrue(filename.endswith(".pdf"))
+
+    @patch("core.services.email.requests.post")
+    def test_send_email_separate_api_call_per_recipient(self, mock_post):
+        """Test that each recipient gets a separate API call."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {"emails": [{"id": "test-id"}]}
+        mock_response.raise_for_status = MagicMock()
+        mock_post.return_value = mock_response
+
+        send_teilnahmebestaetigung_email(self.teilnehmer)
+
+        self.assertEqual(mock_post.call_count, 2)
+        # Each call has exactly one recipient
+        for call in mock_post.call_args_list:
+            data = call[1]["json"]
+            self.assertEqual(len(data["to"]), 1)
+
+    @patch("core.services.email.requests.post")
+    def test_send_email_platform_copy_identical_content(self, mock_post):
+        """Test that platform copy has identical subject, HTML, and attachment."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {"emails": [{"id": "test-id"}]}
+        mock_response.raise_for_status = MagicMock()
+        mock_post.return_value = mock_response
+
+        send_teilnahmebestaetigung_email(self.teilnehmer)
+
+        participant_data = mock_post.call_args_list[0][1]["json"]
+        platform_data = mock_post.call_args_list[1][1]["json"]
+
+        # Subject, HTML body, and attachments are identical
+        self.assertEqual(participant_data["subject"], platform_data["subject"])
+        self.assertEqual(participant_data["html"], platform_data["html"])
+        self.assertEqual(participant_data["attachments"], platform_data["attachments"])
+
+        # Only the recipient differs
+        self.assertEqual(participant_data["to"][0]["email"], "max@example.com")
+        self.assertEqual(
+            platform_data["to"][0]["email"],
+            "bildungsplattform@rauchfangkehrer.or.at",
+        )
 
 
 class TestTeilnahmebestaetigungSignal(TestCase):

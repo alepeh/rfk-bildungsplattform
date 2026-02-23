@@ -83,6 +83,7 @@ SCALEWAY_ACCESS_KEY = None
 SCALEWAY_SECRET_KEY = None
 SCALEWAY_BUCKET_NAME = None
 SCALEWAY_REGION = "fr-par"
+SCALEWAY_EMAIL_API_TOKEN = "test-token"
 
 # Use default file storage for tests
 DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"

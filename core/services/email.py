@@ -165,40 +165,44 @@ def send_teilnahmebestaetigung_email(schulungsteilnehmer, request=None):
         },
     )
 
-    # Send email with attachment
+    # Send email with attachment to participant and platform
     headers = {
         "X-Auth-Token": settings.SCALEWAY_EMAIL_API_TOKEN,
     }
 
-    data = {
-        "from": {
-            "email": "bildungsplattform@rauchfangkehrer.or.at",
-            "name": "Bildungsplattform der burgenländischen Rauchfangkehrer",
-        },
-        "to": [{"email": email_address}],
-        "subject": subject,
-        "html": html_content,
-        "project_id": "03bc621b-579e-4758-8b97-87f6406b2a38",
-        "attachments": [
-            {
-                "name": (
-                    f"Teilnahmebestaetigung_{schulung.name.replace(' ', '_')}"
-                    f"_{datum}.pdf"
-                ),
-                "type": "application/pdf",
-                "content": pdf_base64,
-            }
-        ],
-    }
+    recipients = [email_address, "bildungsplattform@rauchfangkehrer.or.at"]
 
-    print(f"Sending Teilnahmebestätigung to {email_address}")
-    response = requests.post(
-        "https://api.scaleway.com/transactional-email/v1alpha1/regions/fr-par/emails",
-        json=data,
-        headers=headers,
-    )
-    print(response.json())
-    response.raise_for_status()
+    for recipient in recipients:
+        data = {
+            "from": {
+                "email": "bildungsplattform@rauchfangkehrer.or.at",
+                "name": "Bildungsplattform der burgenländischen Rauchfangkehrer",
+            },
+            "to": [{"email": recipient}],
+            "subject": subject,
+            "html": html_content,
+            "project_id": "03bc621b-579e-4758-8b97-87f6406b2a38",
+            "attachments": [
+                {
+                    "name": (
+                        f"Teilnahmebestaetigung_{schulung.name.replace(' ', '_')}"
+                        f"_{datum}.pdf"
+                    ),
+                    "type": "application/pdf",
+                    "content": pdf_base64,
+                }
+            ],
+        }
+
+        print(f"Sending Teilnahmebestätigung to {recipient}")
+        response = requests.post(
+            "https://api.scaleway.com/transactional-email"
+            "/v1alpha1/regions/fr-par/emails",
+            json=data,
+            headers=headers,
+        )
+        print(response.json())
+        response.raise_for_status()
 
 
 def send_admin_registration_notification(person, request=None):
