@@ -1,0 +1,45 @@
+project: bildung
+rules:
+  - id: R-001
+    title: TEXT UUID primary keys, no integer autoincrement.
+    category: technical
+    source: 2026-06-cloudflare-rebuild
+    rule: |
+      Every table uses a TEXT primary key populated with crypto.randomUUID().
+      Never INTEGER AUTOINCREMENT — it leaks row counts and complicates merges.
+    why: D1/edge convention; stable IDs that can be generated client- or server-side.
+  - id: R-002
+    title: No foreign-key constraints in D1; enforce integrity in app code.
+    category: technical
+    source: 2026-06-cloudflare-rebuild
+    rule: |
+      Schema declares relationships as indexed columns with a comment, not
+      FOREIGN KEY clauses. Referential checks live in db.ts and route handlers.
+    why: D1 does not enforce FKs reliably; circular refs (betrieb<->person) need acyclic creation.
+  - id: R-003
+    title: Money is stored and transported in integer cents.
+    category: domain
+    source: 2026-06-cloudflare-rebuild
+    rule: All prices (preis_standard, einzelpreis, …) are INTEGER cents; format to EUR only at the view edge.
+    why: Avoids floating-point drift in pricing and totals.
+  - id: R-004
+    title: Pricing is decided by the buyer's Organisation, snapshotted at purchase.
+    category: domain
+    source: 2026-06-cloudflare-rebuild
+    rule: |
+      unitPriceCents() applies preis_rabattiert only when the buyer's Person
+      belongs to an Organisation with preisrabatt=1. The chosen unit/total are
+      written into the Bestellung and never recomputed.
+    why: Faithful to legacy behaviour; protects historic orders from price changes. See I-001, I-005.
+  - id: R-005
+    title: Two-stage admin activation gates login.
+    category: domain
+    source: 2026-06-cloudflare-rebuild
+    rule: Registration creates User.is_active=0 + Person.is_activated=0; both must be set by an admin before a token is issued.
+    why: Matches the legacy approval workflow. See I-004.
+  - id: R-006
+    title: Auth uses Web Crypto only — PBKDF2 + HS256, no Node polyfills.
+    category: technical
+    source: 2026-06-cloudflare-rebuild
+    rule: Passwords hashed with PBKDF2 (100k/SHA-256); JWTs signed/verified with HMAC-SHA256 via crypto.subtle. No nodejs_compat.
+    why: Keeps the Worker bundle light and portable on the edge runtime.

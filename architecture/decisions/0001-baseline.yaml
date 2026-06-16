@@ -1,0 +1,36 @@
+id: ADR-0001
+title: Rebuild the RFK Bildungsplattform on the Cloudflare stack
+date: 2026-06-16
+status:
+  value: accepted
+change: 2026-06-cloudflare-rebuild
+change_type: infra
+context: |
+  The platform existed as a Django 4.2 monolith (PostgreSQL, Bootstrap server
+  templates, Scaleway storage/email, Docker + Nginx). It was retired in favour
+  of a ground-up rebuild on the incunabula Cloudflare stack: cheaper to run,
+  zero-ops, deploys in seconds. The legacy app is preserved read-only under
+  legacy/ as the functional reference.
+decision:
+  md: ./prose/0001-decision.md
+consequences:
+  easier:
+    - One platform (Workers/D1/R2/Email), one CLI (wrangler), no servers to patch.
+    - A typed Hono API with an OpenAPI spec replaces ad-hoc Django views.
+    - Modern React SPA decoupled from the data layer; design fully refreshed.
+  harder:
+    - Postgres → D1 (SQLite) means no FK enforcement and additive-only migrations.
+    - PDF generation (legacy ReportLab) is not ported in phase 1 — CSV export + print views instead.
+    - Email moves from Scaleway API to the native Cloudflare Email Service (Workers Paid).
+  neutral:
+    - German domain vocabulary and all business rules are preserved verbatim.
+domain_impact: |
+  No change to the domain — every legacy entity, role, pricing rule, and workflow
+  is reproduced. The model is captured fresh in architecture/domain-model.yaml.
+rules_produced:
+  - R-001
+  - R-002
+  - R-003
+  - R-004
+  - R-005
+  - R-006

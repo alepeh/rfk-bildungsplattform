@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bildung-web",
+  "compatibility_date": "2026-06-16",
+
+  // Purely static SPA — the Worker is just an asset server. Unmatched paths
+  // fall back to index.html so react-router can take over.
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+
+  "routes": [
+    { "pattern": "bildung.pehm.co.at", "custom_domain": true }
+  ]
+}

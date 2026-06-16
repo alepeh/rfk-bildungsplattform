@@ -1,0 +1,11 @@
+feature_groups: []
+non_coder_mode: false
+deploy_tier: 2
+
+domain_model: architecture/domain-model.yaml
+rules_file: architecture/rules.yaml
+guidelines: architecture/guidelines.md
+acceptance_dir: architecture/acceptance
+decisions_dir: architecture/decisions
+changes_dir: changes
+specs_dir: specs

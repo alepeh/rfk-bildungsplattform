@@ -1,0 +1,123 @@
+project: bildung
+last_reviewed: 2026-06-16
+bounded_contexts:
+  - name: Course Catalog & Booking
+    primary: true
+    description: |
+      The heart of the platform — training courses (Schulungen), their
+      scheduled sessions (Termine), and the booking/order flow that enrols
+      participants. German domain vocabulary is preserved throughout.
+    aggregates:
+      - name: Schulung
+        description: A training-course definition with pricing and eligibility.
+        concepts:
+          - name: Schulung
+            type: aggregate_root
+            description: Course definition. Owns its sessions and materials.
+          - name: SchulungsTermin
+            type: entity
+            description: A scheduled session of a course (date, venue, seat limits).
+          - name: SchulungsArt
+            type: value_object
+            description: Course category (e.g. Sicherheitsschulung).
+          - name: SchulungsUnterlage
+            type: entity
+            description: A downloadable course material; the blob lives in R2.
+          - name: Preis
+            type: value_object
+            description: Standard and discounted price in cents. Discount applies only to members of an Organisation with preisrabatt.
+      - name: Bestellung
+        description: An order that enrols one or more participants in a session.
+        concepts:
+          - name: Bestellung
+            type: aggregate_root
+            description: Order with quantity, snapshotted unit/total price, invoice address.
+          - name: SchulungsTeilnehmer
+            type: entity
+            description: One enrolled seat — either a linked Person or an external name snapshot.
+          - name: BestellStatus
+            type: value_object_enum
+            description: Order lifecycle.
+            enum_values: [Bestellt, Storniert]
+          - name: TeilnahmeStatus
+            type: value_object_enum
+            description: Attendance state of a participant.
+            enum_values: [Angemeldet, Teilgenommen, Entschuldigt, Unentschuldigt]
+          - name: Verpflegung
+            type: value_object_enum
+            description: Meal preference for catering.
+            enum_values: [Standard, Vegetarisch]
+    relationships:
+      - { from: Schulung, to: SchulungsTermin, kind: contains, cardinality: "1..*" }
+      - { from: SchulungsTermin, to: Bestellung, kind: references, cardinality: "0..*" }
+      - { from: Bestellung, to: SchulungsTeilnehmer, kind: contains, cardinality: "1..*" }
+
+  - name: Identity & Organisations
+    primary: false
+    description: |
+      Accounts, the Person master record, and the business/partner structures
+      that drive pricing and access. A Person may exist without a login.
+    aggregates:
+      - name: Person
+        description: Master record for a participant; optionally tied to a login User.
+        concepts:
+          - name: User
+            type: entity
+            description: Login account. Inactive until admin activation.
+          - name: Person
+            type: aggregate_root
+            description: Profile/participant record. Belongs to a Betrieb and/or Organisation.
+          - name: Betrieb
+            type: entity
+            description: A chimney-sweep business with one Geschäftsführer and many employees.
+          - name: Organisation
+            type: value_object
+            description: Partner organisation; preisrabatt drives discounted pricing.
+          - name: Funktion
+            type: value_object
+            description: Professional role (Meister/Geselle/Lehrling); gates eligibility and documents.
+    relationships:
+      - { from: Betrieb, to: Person, kind: owns, cardinality: "1..*" }
+      - { from: Person, to: User, kind: references, cardinality: "0..1" }
+      - { from: Person, to: SchulungsTeilnehmer, kind: references, cardinality: "0..*" }
+
+  - name: Documents
+    primary: false
+    description: Role-gated document library and per-course materials; blobs in R2, metadata in D1.
+    aggregates:
+      - name: Document
+        description: A general document restricted by Funktion (empty = public).
+        concepts:
+          - name: Document
+            type: aggregate_root
+            description: File metadata + R2 key, with allowed Funktionen.
+
+invariants:
+  - id: I-001
+    text: Discounted pricing applies only when the buyer's Person belongs to an Organisation with preisrabatt = true; otherwise the standard price applies.
+  - id: I-002
+    text: A Person cannot be enrolled twice in the same SchulungsTermin.
+  - id: I-003
+    text: An order's seat count may not exceed the session's free seats at confirmation time.
+  - id: I-004
+    text: A login User cannot authenticate until both User.is_active and Person.is_activated are true (admin two-stage activation).
+  - id: I-005
+    text: Order price (einzelpreis, gesamtpreis) is snapshotted at purchase and never recomputed from the course afterwards.
+  - id: I-006
+    text: A document with no allowed_funktionen is visible to everyone; otherwise only to Persons whose funktion is in the set.
+
+glossary:
+  - term: Schulung
+    definition: A training course offered to the trade.
+  - term: SchulungsTermin
+    definition: A concrete scheduled session of a Schulung (date, venue, seats).
+  - term: Betrieb
+    definition: A chimney-sweep business; its Geschäftsführer books for employees.
+  - term: Geschäftsführer
+    definition: The managing director of a Betrieb — the only role that may book on the Betrieb's behalf.
+  - term: Funktion
+    definition: Professional role/qualification; gates course eligibility and document access.
+  - term: DSV
+    definition: Datenschutzvereinbarung — the GDPR consent captured at registration.
+  - term: Verpflegung
+    definition: Meal preference (Standard/Vegetarisch) recorded per participant for catering.

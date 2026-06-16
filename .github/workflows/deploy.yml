@@ -1,0 +1,65 @@
+name: deploy
+
+on:
+  push:
+    branches: ["**"]
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Non-main branches: upload preview versions (shared bindings, no traffic).
+  preview:
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: "npm"
+      - run: npm ci
+      - name: Build web SPA
+        run: cd apps/web && npm run build
+      - name: Upload API preview
+        working-directory: apps/api
+        run: npx wrangler versions upload --message "${{ github.event.head_commit.message }}" --tag "${{ github.ref_name }}"
+      - name: Upload web preview
+        working-directory: apps/web
+        run: npx wrangler versions upload --message "${{ github.event.head_commit.message }}" --tag "${{ github.ref_name }}"
+
+  # main: apply migrations, then deploy both apps to production.
+  deploy-prod:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: "npm"
+      - run: npm ci
+      - name: Apply D1 migrations (prod)
+        working-directory: apps/api
+        run: npx wrangler d1 migrations apply DB --remote
+      - name: Deploy API
+        working-directory: apps/api
+        run: npx wrangler deploy --var GIT_COMMIT:${{ github.sha }}
+      - name: Build + deploy web SPA
+        working-directory: apps/web
+        run: |
+          npm run build
+          npx wrangler deploy
+      - run: echo "🚀 Deployed ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"

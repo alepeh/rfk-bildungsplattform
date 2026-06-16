@@ -2,6 +2,7 @@
   "name": "bildung-api",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "types": "wrangler types",
     "dev": "wrangler dev",
