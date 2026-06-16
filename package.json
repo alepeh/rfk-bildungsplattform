@@ -1,0 +1,5 @@
+{
+  "name": "bildung",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"]
+}

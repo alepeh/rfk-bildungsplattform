@@ -1,0 +1,45 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bildung-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-16",
+
+  // Dev server port — hash-derived base for project "bildung" (see Makefile).
+  "dev": { "port": 45240 },
+
+  // Custom domain — auto-creates A+AAAA records on first deploy.
+  "routes": [
+    { "pattern": "bildung-api.pehm.co.at", "custom_domain": true }
+  ],
+
+  // D1 — primary database. Run once: wrangler d1 create bildung-api-db
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bildung-api-db",
+      "database_id": "REPLACE_WITH_D1_UUID",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // R2 — one bucket per concern. Documents are the general document library
+  // and course materials; uploads is reserved for future user uploads.
+  "r2_buckets": [
+    { "binding": "DOCUMENTS", "bucket_name": "bildung-documents" }
+  ],
+
+  // Native Cloudflare Email Service. `remote: true` sends real mail in
+  // `wrangler dev` (use a test recipient); omit/false to sandbox.
+  "send_email": [
+    { "name": "EMAIL" }
+  ],
+
+  // Public config. Secrets (JWT_SECRET) go through `wrangler secret put`.
+  "vars": {
+    "GIT_COMMIT": "dev",
+    "APP_URL": "https://bildung.pehm.co.at",
+    "EMAIL_FROM": "bildungsplattform@rauchfangkehrer.or.at",
+    "EMAIL_FROM_NAME": "Bildungsplattform der burgenländischen Rauchfangkehrer",
+    "ADMIN_EMAIL": "bildungsplattform@rauchfangkehrer.or.at"
+  }
+}
