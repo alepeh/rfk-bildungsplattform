@@ -1,0 +1,11 @@
+type: feature
+title: Forgot-password / self-service password reset
+trigger: Gap vs the legacy Django flow — only authenticated change-password existed.
+created: 2026-06-17
+feature_group: null
+acceptance_criteria: []
+domain_impact: additive
+domain_changes:
+  - Added password_reset token table (hashed, single-use, time-limited).
+rules_distilled: []
+completed: 2026-06-17

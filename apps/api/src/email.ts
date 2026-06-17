@@ -152,6 +152,26 @@ export function activationEmail(appUrl: string): { subject: string; html: string
   };
 }
 
+export function passwordResetEmail(d: { appUrl: string; token: string }): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const link = `${d.appUrl}/passwort-zuruecksetzen?token=${encodeURIComponent(d.token)}`;
+  const body = `
+    <p>Sie haben das Zurücksetzen Ihres Passworts angefordert.</p>
+    <p>Klicken Sie auf den folgenden Button, um ein neues Passwort zu vergeben. Der Link ist
+       <strong>60 Minuten</strong> gültig.</p>
+    <p style="margin:24px 0;"><a href="${link}" style="background:#d11317;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;">Neues Passwort festlegen</a></p>
+    <p style="font-size:13px;color:#71717a;">Falls Sie diese Anfrage nicht gestellt haben, können Sie diese
+       E-Mail ignorieren — Ihr Passwort bleibt unverändert.</p>`;
+  return {
+    subject: "Passwort zurücksetzen",
+    html: shell("Passwort zurücksetzen", body),
+    text: `Passwort zurücksetzen (60 Minuten gültig): ${link}\n\nFalls Sie das nicht angefordert haben, ignorieren Sie diese E-Mail.`,
+  };
+}
+
 export function certificateReadyEmail(d: { schulungName: string; appUrl: string }): {
   subject: string;
   html: string;

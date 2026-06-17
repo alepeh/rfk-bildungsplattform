@@ -1,0 +1,40 @@
+context: |
+  The rebuild shipped only an authenticated change-password. Users who forget
+  their password had no recovery path. This adds an email-token reset flow.
+rationale: |
+  Tokens live in D1 (additive migration 0002), not KV — the data is low-volume,
+  benefits from a clear audit trail, and needs no sub-10ms reads. Only the
+  SHA-256 hash of the token is stored; the plaintext is emailed and never
+  persisted. Tokens are single-use (used_at) and expire after 60 minutes.
+decisions:
+  - decision: Store token hashes in D1, not plaintext and not KV.
+    rationale: Auditable, low-volume, no read-after-write race; mirrors session-token hygiene.
+    alternatives:
+      - KV with TTL (loses audit trail; eventual consistency on the used flag).
+      - Plaintext token in the row (leaks on DB read).
+  - decision: forgot-password always returns 200.
+    rationale: Prevents account-enumeration via differing responses/timing.
+  - decision: Requesting a new link invalidates prior unused tokens for that user.
+    rationale: Limits the window of valid tokens to one.
+risks:
+  - risk: No rate limiting on forgot-password — could be used to spam an address.
+    mitigation: Out of scope here; documented as a follow-up (edge rate limiting / Turnstile).
+  - risk: Reset works even for not-yet-activated accounts.
+    mitigation: Acceptable — login still requires activation, so no privilege is granted.
+rollback: |
+  Drop the password_reset table (migration), remove the two auth routes, the
+  reset email, and the two frontend pages. No other data affected.
+domain_impact:
+  checklist:
+    - { item: new_entity_or_aggregate, checked: false }
+    - { item: new_or_changed_enum_values, checked: false }
+    - { item: new_relationship, checked: false }
+    - { item: changed_invariant, checked: false }
+    - { item: new_bounded_context_interaction, checked: false }
+    - { item: schema_change, checked: true, note: "New password_reset table." }
+    - { item: new_migration, checked: true, note: "0002_password_reset.sql — additive." }
+    - { item: sync_behavior_change, checked: false }
+    - { item: status_workflow_change, checked: false }
+  impact: additive
+  domain_changes_needed:
+    - Note password_reset as an Identity-context support table (not a domain aggregate).

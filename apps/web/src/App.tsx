@@ -7,6 +7,8 @@ import { useAuth } from "./auth";
 import { Home } from "./routes/Home";
 import { Course } from "./routes/Course";
 import { Login } from "./routes/Login";
+import { ForgotPassword } from "./routes/ForgotPassword";
+import { ResetPassword } from "./routes/ResetPassword";
 import { Register } from "./routes/Register";
 import { RegistrationSuccess } from "./routes/RegistrationSuccess";
 import { MyCourses } from "./routes/MyCourses";
@@ -40,6 +42,8 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/schulung/:id" element={<Course />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/passwort-vergessen" element={<ForgotPassword />} />
+        <Route path="/passwort-zuruecksetzen" element={<ResetPassword />} />
         <Route path="/registrieren" element={<Register />} />
         <Route path="/registrierung-erfolgreich" element={<RegistrationSuccess />} />
         <Route path="/impressum" element={<Impressum />} />

@@ -101,3 +101,14 @@ export async function verifyJwt(token: string, secret: string): Promise<JwtPaylo
 export function uuid(): string {
   return crypto.randomUUID();
 }
+
+// URL-safe random token for password-reset links (the plaintext is emailed,
+// never stored — see sha256Hex).
+export function randomToken(bytes = 32): string {
+  return toB64url(crypto.getRandomValues(new Uint8Array(bytes)));
+}
+
+export async function sha256Hex(input: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}

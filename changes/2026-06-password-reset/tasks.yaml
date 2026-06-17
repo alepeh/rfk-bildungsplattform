@@ -1,0 +1,33 @@
+phases:
+  - name: Persistence
+    tasks:
+      - id: "1.1"
+        text: Add migration 0002_password_reset.sql (hashed, single-use, expiring tokens).
+        file: apps/api/migrations/0002_password_reset.sql
+        done: true
+  - name: API
+    tasks:
+      - id: "2.1"
+        text: randomToken() + sha256Hex() helpers (Web Crypto).
+        file: apps/api/src/crypto.ts
+        done: true
+      - id: "2.2"
+        text: Password-reset email template.
+        file: apps/api/src/email.ts
+        done: true
+      - id: "2.3"
+        text: POST /auth/forgot-password (enumeration-safe) and POST /auth/reset-password (single-use, expiry-checked).
+        file: apps/api/src/routes/auth.ts
+        done: true
+  - name: Frontend
+    tasks:
+      - id: "3.1"
+        text: ForgotPassword + ResetPassword pages; routes + login link.
+        file: apps/web/src/routes/ForgotPassword.tsx
+        done: true
+  - name: Tests
+    tasks:
+      - id: "4.1"
+        text: Enumeration safety, invalid-token rejection, full reset-then-login, single-use enforcement.
+        file: apps/api/tests/api.test.ts
+        done: true

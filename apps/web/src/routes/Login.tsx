@@ -42,6 +42,11 @@ export function Login() {
           <Field label="Passwort">
             <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </Field>
+          <div style={{ textAlign: "right", marginBottom: 16, marginTop: -6 }}>
+            <Link to="/passwort-vergessen" style={{ fontSize: "0.86rem" }}>
+              Passwort vergessen?
+            </Link>
+          </div>
           <button className="btn btn-primary btn-block" disabled={busy} type="submit">
             {busy ? "Anmelden…" : "Anmelden"}
           </button>
