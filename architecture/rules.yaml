@@ -43,3 +43,13 @@ rules:
     source: 2026-06-cloudflare-rebuild
     rule: Passwords hashed with PBKDF2 (100k/SHA-256); JWTs signed/verified with HMAC-SHA256 via crypto.subtle. No nodejs_compat.
     why: Keeps the Worker bundle light and portable on the edge runtime.
+  - id: R-007
+    title: Light PDFs are generated in-Worker with pdf-lib, not a Container.
+    category: technical
+    source: 2026-06-pdf-export
+    rule: |
+      Tabular/certificate PDFs are produced inline with pure-JS pdf-lib. Reserve
+      the Container-gateway pattern for genuinely heavy rendering. Avoid Hono
+      routes with a param-plus-extension (`:id.pdf`) — use a clean `:id` segment
+      and set the filename via Content-Disposition.
+    why: Right-sized — no extra deploy target/ops for documents the Worker can render in milliseconds.

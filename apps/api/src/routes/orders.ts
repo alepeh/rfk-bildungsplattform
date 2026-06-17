@@ -5,6 +5,7 @@ import { uuid } from "../crypto";
 import { freiePlaetze, unitPriceCents, nowIso } from "../db";
 import { requireUser, type AuthVariables } from "../auth";
 import { sendMail, orderConfirmation, type VenueInfo } from "../email";
+import { certificatePdf } from "../pdf";
 
 export const orders = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
@@ -185,4 +186,60 @@ orders.get("/meine-schulungen", requireUser, async (c) => {
     items.push({ ...r, unterlagen: mats });
   }
   return c.json({ items });
+});
+
+// Owner-only attendance certificate (Teilnahmebestätigung) PDF. The participant
+// must belong to the signed-in person and have status = Teilgenommen.
+orders.get("/teilnahmebestaetigung/:id", requireUser, async (c) => {
+  const personId = c.var.current.person?.id;
+  if (!personId) return c.json({ error: "Kein Profil" }, 403);
+  const r = await c.env.DB.prepare(
+    `SELECT st.status, st.person_id,
+            COALESCE(p.vorname, st.vorname) AS vorname,
+            COALESCE(p.nachname, st.nachname) AS nachname,
+            s.name AS schulung_name, t.datum_von, t.dauer, o.name AS ort_name
+       FROM schulungsteilnehmer st
+       JOIN schulungstermin t ON t.id = st.schulungstermin_id
+       JOIN schulung s ON s.id = t.schulung_id
+       LEFT JOIN person p ON p.id = st.person_id
+       LEFT JOIN schulungsort o ON o.id = t.ort_id
+      WHERE st.id = ?`,
+  )
+    .bind(c.req.param("id"))
+    .first<{
+      status: string;
+      person_id: string | null;
+      vorname: string | null;
+      nachname: string | null;
+      schulung_name: string;
+      datum_von: string;
+      dauer: string | null;
+      ort_name: string | null;
+    }>();
+  if (!r) return c.json({ error: "Nicht gefunden" }, 404);
+  if (r.person_id !== personId && !c.var.current.user.is_staff) {
+    return c.json({ error: "Kein Zugriff" }, 403);
+  }
+  if (r.status !== "Teilgenommen") {
+    return c.json({ error: "Teilnahmebestätigung noch nicht verfügbar" }, 409);
+  }
+
+  const pdf = await certificatePdf({
+    participantName: `${r.vorname ?? ""} ${r.nachname ?? ""}`.trim(),
+    schulungName: r.schulung_name,
+    datum: new Date(r.datum_von).toLocaleDateString("de-AT", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      timeZone: "Europe/Vienna",
+    }),
+    ort: r.ort_name,
+    dauer: r.dauer,
+  });
+  return new Response(pdf as unknown as BodyInit, {
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="teilnahmebestaetigung.pdf"`,
+    },
+  });
 });

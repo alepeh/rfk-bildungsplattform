@@ -152,6 +152,25 @@ export function activationEmail(appUrl: string): { subject: string; html: string
   };
 }
 
+export function certificateReadyEmail(d: { schulungName: string; appUrl: string }): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const body = `
+    <p>Herzlichen Glückwunsch! Ihre Teilnahme an der folgenden Schulung wurde bestätigt:</p>
+    <div style="background:#fafafa;border-radius:10px;padding:16px;margin:16px 0;">
+      <strong>${d.schulungName}</strong>
+    </div>
+    <p>Ihre Teilnahmebestätigung steht ab sofort zum Download bereit.</p>
+    <p style="margin-top:20px;"><a href="${d.appUrl}/meine-schulungen" style="background:#d11317;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;">Teilnahmebestätigung herunterladen</a></p>`;
+  return {
+    subject: `Teilnahmebestätigung: ${d.schulungName}`,
+    html: shell("Ihre Teilnahmebestätigung ist bereit", body),
+    text: `Ihre Teilnahme an "${d.schulungName}" wurde bestätigt. Teilnahmebestätigung herunterladen: ${d.appUrl}/meine-schulungen`,
+  };
+}
+
 export function adminRegistrationNotice(d: { name: string; email: string; username: string; dsv: boolean }, appUrl: string): {
   subject: string;
   html: string;

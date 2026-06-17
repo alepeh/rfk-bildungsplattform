@@ -1,0 +1,39 @@
+context: |
+  The legacy Django app produced two PDFs via ReportLab: a landscape attendance
+  sheet (admin) and a participation certificate (Teilnahmebestätigung) emailed on
+  completion. ADR-0001 deferred these in phase 1. This change restores them.
+rationale: |
+  The cloudflare-baseline skill lists PDF generation as a Container-gateway use
+  case. For simple tabular/certificate documents that is over-engineering: the
+  pure-JS pdf-lib runs inside the Worker with negligible CPU and no native deps,
+  so no Container, Durable Object, or extra deploy target is needed. A Container
+  would only be justified for heavy rendering (large images, HTML-to-PDF, fonts).
+decisions:
+  - decision: Generate PDFs in-Worker with pdf-lib rather than a Container gateway.
+    rationale: Tabular/certificate output is light; avoids operational overhead. Right-sized per philosophy.
+    alternatives:
+      - Container + Durable Object pool (the baseline heavy-PDF pattern).
+      - Client-side print-to-PDF in the browser (loses server-side authority/branding).
+  - decision: Deliver the certificate as an authenticated download, not an email attachment.
+    rationale: The native env.EMAIL.send() wrapper is text/html only; a completion email links to the download instead of attaching MIME.
+risks:
+  - risk: pdf-lib bundle size grows the Worker.
+    mitigation: pdf-lib + standard fonts only (~no embedded font files); bundle stays well within limits.
+  - risk: A param-with-extension route (:id.pdf) does not bind in Hono.
+    mitigation: Certificate route uses a clean :id segment; the filename is set via Content-Disposition.
+rollback: |
+  Remove src/pdf.ts, the two routes, the certificate email, and the frontend
+  buttons. No schema or data change to revert.
+domain_impact:
+  checklist:
+    - { item: new_entity_or_aggregate, checked: false }
+    - { item: new_or_changed_enum_values, checked: false }
+    - { item: new_relationship, checked: false }
+    - { item: changed_invariant, checked: false }
+    - { item: new_bounded_context_interaction, checked: false }
+    - { item: schema_change, checked: false }
+    - { item: new_migration, checked: false }
+    - { item: sync_behavior_change, checked: false }
+    - { item: status_workflow_change, checked: true, note: "Marking Teilgenommen now sends a certificate-ready email." }
+  impact: none
+  domain_changes_needed: []

@@ -1,0 +1,11 @@
+type: feature
+title: PDF attendance sheets and completion certificates
+trigger: Deferred in the Cloudflare rebuild (ADR-0001) — legacy ReportLab PDFs needed a port.
+created: 2026-06-17
+feature_group: null
+acceptance_criteria: []
+domain_impact: none
+domain_changes: []
+rules_distilled:
+  - R-007
+completed: 2026-06-17

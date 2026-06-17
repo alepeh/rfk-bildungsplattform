@@ -56,6 +56,16 @@ export function AdminTeilnehmer() {
     }
   }
 
+  async function exportPdf() {
+    if (!id) return;
+    setError(null);
+    try {
+      await downloadFile(`/admin/schulungstermine/${id}/teilnehmer.pdf`, `teilnehmerliste-${id}.pdf`);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : "Export fehlgeschlagen");
+    }
+  }
+
   async function sendReminder() {
     if (!id) return;
     setBusy("reminder");
@@ -85,6 +95,9 @@ export function AdminTeilnehmer() {
         <div className="row" style={{ gap: 8 }}>
           <button className="btn btn-ghost btn-sm" onClick={exportCsv}>
             CSV Export
+          </button>
+          <button className="btn btn-ghost btn-sm" onClick={exportPdf}>
+            Teilnehmerliste PDF
           </button>
           <button
             className="btn btn-dark btn-sm"

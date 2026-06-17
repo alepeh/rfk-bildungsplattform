@@ -40,7 +40,20 @@ export function MyCourses() {
                     {it.ort_name ? ` · ${it.ort_name}` : ""}
                   </p>
                 </div>
-                <Badge tone="green">Teilgenommen</Badge>
+                <div className="row" style={{ gap: 8 }}>
+                  <Badge tone="green">Teilgenommen</Badge>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() =>
+                      downloadFile(
+                        `/bestellungen/teilnahmebestaetigung/${it.teilnehmer_id}`,
+                        `Teilnahmebestaetigung-${it.schulung_name}.pdf`,
+                      )
+                    }
+                  >
+                    📜 Teilnahmebestätigung
+                  </button>
+                </div>
               </div>
               {it.unterlagen.length > 0 && (
                 <>

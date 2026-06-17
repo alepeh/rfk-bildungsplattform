@@ -1,0 +1,37 @@
+phases:
+  - name: PDF generation
+    tasks:
+      - id: "1.1"
+        text: Add pdf-lib; implement attendanceSheetPdf + certificatePdf in src/pdf.ts.
+        file: apps/api/src/pdf.ts
+        done: true
+  - name: API routes
+    tasks:
+      - id: "2.1"
+        text: Admin attendance-sheet PDF endpoint (GET /admin/schulungstermine/:id/teilnehmer.pdf).
+        file: apps/api/src/routes/admin.ts
+        done: true
+      - id: "2.2"
+        text: Owner-only certificate endpoint (GET /bestellungen/teilnahmebestaetigung/:id), status guard.
+        file: apps/api/src/routes/orders.ts
+        done: true
+      - id: "2.3"
+        text: Send certificate-ready email when a participant is marked Teilgenommen.
+        file: apps/api/src/routes/admin.ts
+        done: true
+  - name: Frontend
+    tasks:
+      - id: "3.1"
+        text: "MyCourses: Teilnahmebestätigung download button per completed course."
+        file: apps/web/src/routes/MyCourses.tsx
+        done: true
+      - id: "3.2"
+        text: "Admin Teilnehmer: Teilnehmerliste PDF button."
+        file: apps/web/src/routes/admin/Teilnehmer.tsx
+        done: true
+  - name: Tests
+    tasks:
+      - id: "4.1"
+        text: Unit tests for both PDFs (valid %PDF) + staff guard on the sheet endpoint.
+        file: apps/api/tests/api.test.ts
+        done: true

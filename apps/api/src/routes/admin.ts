@@ -3,7 +3,17 @@ import { z } from "zod";
 import { uuid } from "../crypto";
 import { nowIso } from "../db";
 import { requireStaff, type AuthVariables } from "../auth";
-import { sendMail, reminderEmail, activationEmail, type VenueInfo } from "../email";
+import { sendMail, reminderEmail, activationEmail, certificateReadyEmail, type VenueInfo } from "../email";
+import { attendanceSheetPdf, type AttendanceRow } from "../pdf";
+
+function germanDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("de-AT", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    timeZone: "Europe/Vienna",
+  });
+}
 
 export const admin = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 admin.use("*", requireStaff);
@@ -249,9 +259,30 @@ admin.patch("/teilnehmer/:id", async (c) => {
     binds.push(body.verpflegung);
   }
   if (!sets.length) return c.json({ error: "Keine Felder" }, 400);
+  const teilnehmerId = c.req.param("id");
   await c.env.DB.prepare(`UPDATE schulungsteilnehmer SET ${sets.join(", ")}, updated_at = ? WHERE id = ?`)
-    .bind(...binds, nowIso(), c.req.param("id"))
+    .bind(...binds, nowIso(), teilnehmerId)
     .run();
+
+  // On completion, notify the participant that their certificate is ready.
+  if (body.status === "Teilgenommen") {
+    const row = await c.env.DB.prepare(
+      `SELECT COALESCE(p.email, st.email) AS email, s.name AS schulung_name
+         FROM schulungsteilnehmer st
+         JOIN schulungstermin t ON t.id = st.schulungstermin_id
+         JOIN schulung s ON s.id = t.schulung_id
+         LEFT JOIN person p ON p.id = st.person_id
+        WHERE st.id = ?`,
+    )
+      .bind(teilnehmerId)
+      .first<{ email: string | null; schulung_name: string }>();
+    if (row?.email) {
+      await sendMail(c.env, {
+        to: row.email,
+        ...certificateReadyEmail({ schulungName: row.schulung_name, appUrl: c.env.APP_URL }),
+      });
+    }
+  }
   return c.json({ ok: true });
 });
 
@@ -289,6 +320,55 @@ admin.get("/schulungstermine/:id/export.csv", async (c) => {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
       "Content-Disposition": `attachment; filename="teilnehmer-${c.req.param("id").slice(0, 8)}.csv"`,
+    },
+  });
+});
+
+// Attendance sheet PDF (landscape A4) — the port of the legacy ReportLab sheet.
+admin.get("/schulungstermine/:id/teilnehmer.pdf", async (c) => {
+  const id = c.req.param("id");
+  const head = await c.env.DB.prepare(
+    `SELECT s.name AS schulung_name, t.datum_von, o.name AS ort_name
+       FROM schulungstermin t JOIN schulung s ON s.id = t.schulung_id
+       LEFT JOIN schulungsort o ON o.id = t.ort_id WHERE t.id = ?`,
+  )
+    .bind(id)
+    .first<{ schulung_name: string; datum_von: string; ort_name: string | null }>();
+  if (!head) return c.json({ error: "Nicht gefunden" }, 404);
+
+  const { results } = await c.env.DB.prepare(
+    `SELECT COALESCE(p.vorname, st.vorname) AS vorname,
+            COALESCE(p.nachname, st.nachname) AS nachname,
+            b.name AS betrieb_name,
+            COALESCE(p.email, st.email) AS email,
+            COALESCE(p.telefon, '') AS telefon,
+            p.dsv_akzeptiert AS dsv
+       FROM schulungsteilnehmer st
+       LEFT JOIN person p ON p.id = st.person_id
+       LEFT JOIN betrieb b ON b.id = p.betrieb_id
+      WHERE st.schulungstermin_id = ? ORDER BY nachname, vorname`,
+  )
+    .bind(id)
+    .all<{ vorname: string | null; nachname: string | null; betrieb_name: string | null; email: string | null; telefon: string | null; dsv: number | null }>();
+
+  const rows: AttendanceRow[] = results.map((r) => ({
+    name: `${r.vorname ?? ""} ${r.nachname ?? ""}`.trim(),
+    betrieb: r.betrieb_name ?? "",
+    email: r.email ?? "",
+    telefon: r.telefon ?? "",
+    dsv: !!r.dsv,
+  }));
+
+  const pdf = await attendanceSheetPdf({
+    schulungName: head.schulung_name,
+    datum: germanDate(head.datum_von),
+    ort: head.ort_name,
+    rows,
+  });
+  return new Response(pdf as unknown as BodyInit, {
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="teilnehmerliste-${id.slice(0, 8)}.pdf"`,
     },
   });
 });
